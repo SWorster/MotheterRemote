@@ -91,33 +91,45 @@ def set_interval_report_period():
     else:
         boot = "p"
 
-    interval = parse("Reporting interval (integer), default unit seconds\nFor minutes: ####m\nFor hours: ####h")
-    time = int(re.search(r'\d+', interval).group())
-    if "m" in interval:
-        time=time*60
-    if "h" in interval:
-        time=time*3600
+    interval = parse("Reporting interval (as integer only): ")
+    value = "".join(re.findall(r'\d+', interval))
+    try:
+        int(value)
+    except:
+        print(f"{value} is not a valid integer.")
+        return
 
-    num=time
-    count = 0
-    while num>=10:
-        num=num%10
-        count+=1
-    hashes="#"*(10-count)
-    send(f"{boot}{hashes}{time}x","SET INTERVAL REPORT PERIOD")
+    unit = parse("Unit for time value - s=seconds, m=minutes, h=hours: ")
+    if "m" in unit:
+        time=time*60
+    elif "h" in unit:
+        time=time*3600
+    elif "s" not in unit:
+        print("Assuming default (seconds)")
+    with_zeroes = zero_fill(10,value)
+    send(f"{boot}{with_zeroes}{time}x","SET INTERVAL REPORT PERIOD")
 
 def set_interval_report_threshold():
-    boot = parse("Set for immediate use only = i, set for booting and immediate use = b\nMode: ")
-    if "b" in boot:
-        boot = "T"
-    elif "i" in boot:
-        boot = "t"
-    threshold = float(parse("Reporting threshold in mag/arcsec^2: "))
-    hashes=zero_fill_decimal(8,2,threshold)
-    send(f"{boot}{hashes}x","SET INTERVAL REPORT THRESHOLD")
+    print("This command sets the interval report threshold in the RAM by default.\nThis change will not persist through a reboot.\nYou can choose to set this interval in the EEPROM so that the system will boot with this new interval.\n However, the EEPROM only has 1 million erase/write cycles, so please test your settings with just RAM before committing to EEPROM.")
+    boot = parse("To write to EEPROM and RAM, type EEPROM. To write to RAM only (recommended), type anything else and press enter.\nMode:")
+    if boot==("EEPROM"):
+        boot = "P"
+    else:
+        boot = "p"
+
+    threshold = parse("Reporting threshold in mag/arcsec^2: ")
+    value = "".join(re.findall(r'[\d]*[.][\d]+', threshold))
+    try:
+        float(value)
+    except:
+        print(f"{value} is not a valid float.")
+        return
+
+    with_zeroes=zero_fill_decimal(8,2,threshold)
+    send(f"{boot}{with_zeroes}x","SET INTERVAL REPORT THRESHOLD")
 
 def parse_interval_settings(r): # this is the response for Ix, set period, and set threshold
-    print("Interval setting response:")
+    print("INTERVAL SETTINGS RESPONSE")
     print("Interval period EEPROM:",ssql(r,2,12))
     print("Interval period RAM:",ssql(r,14,24))
     print("Threshold EEPROM:",ssql(r,26,37))
@@ -126,27 +138,47 @@ def parse_interval_settings(r): # this is the response for Ix, set period, and s
 ##### MANUAL CALIBRATION #####
 
 def man_cal_set_light_offset():
-    value = parse("Type offset value in mag/arcsec^2: ")
+    value = parse("Type offset value in mag/arcsec^2 (float): ")
+    try:
+        float(value)
+    except:
+        print(f"{value} is not a valid float.")
+        return
     hashes=zero_fill_decimal(8,2,value)
-    send(f"zcal5{hashes}x","manual calibration - set light offset")
+    send(f"zcal5{hashes}x","MANUAL CALIBRATION - SET LIGHT OFFSET")
 
 def man_cal_set_light_temperature():
-    value = parse("Type temperature value in °C: ")
-    hashes=zero_fill_decimal(8,2,value)
-    send(f"zcal6{hashes}x","manual calibration - set light temperature")
+    value = parse("Type temperature value in °C (float): ")
+    try:
+        float(value)
+    except:
+        print(f"{value} is not a valid float.")
+        return
+    hashes=zero_fill_decimal(3,1,value)
+    send(f"zcal6{hashes}x","MANUAL CALIBRATION - SET LIGHT TEMPERATURE")
 
 def man_cal_set_dark_period():
-    value = parse("Type period value in seconds: ")
+    value = parse("Type period value in seconds (float): ")
+    try:
+        float(value)
+    except:
+        print(f"{value} is not a valid float.")
+        return
     hashes=zero_fill_decimal(7,3,value)
-    send(f"zcal7{hashes}x","manual calibration - set dark period")
+    send(f"zcal7{hashes}x","MANUAL CALIBRATION - SET DARK PERIOD")
 
 def man_cal_set_dark_temperature():
-    value = parse("Type temperature value in °C: ")
-    hashes=zero_fill_decimal(8,2,value)
-    send(f"zcal8{hashes}x","manual calibration - set dark period")
+    value = parse("Type temperature value in °C (float): ")
+    try:
+        float(value)
+    except:
+        print(f"{value} is not a valid float.")
+        return
+    hashes=zero_fill_decimal(3,1,value)
+    send(f"zcal8{hashes}x","MANUAL CALIBRATION - SET DARK TEMPERATURE")
 
 def parse_manual_cal(r)->bool:
-    print("Results of manual calibration:")
+    print("MANUAL CALIBRATION RESULTS")
     match r[2]:
         case "5":
             print("Light Magnitude (mag/arcsec^2):", ssql(r,4,15))
@@ -164,10 +196,10 @@ def parse_manual_cal(r)->bool:
 ##### SIMULATION COMMANDS #####
 
 def request_simulation_values():
-    send("sx","request internal simulation values")
+    send("sx","REQUEST INTERNAL SIMULATION VALUES")
 
 def parse_simulation_values(r):
-    print("Internal simulation values response:")
+    print("INTERNAL SIMULATION VALUES RESPONSE")
     print("Number of counts:",ssql(r,2,12))
     print("Frequency (Hz):",ssql(r,14,24))
     print("Temperature ADC (°C):",ssql(r,26,37))
@@ -179,10 +211,10 @@ def request_simulation_calculation():
     count_zeroes = zero_fill(10,counts)
     freq_zeroes = zero_fill(10,frequency)
     temp_zeroes=zero_fill(10,temp)
-    send(f"S,{count_zeroes},{freq_zeroes},{temp_zeroes}x","simulate internal calculation")
+    send(f"S,{count_zeroes},{freq_zeroes},{temp_zeroes}x","SIMULATE INTERNAL CALCULATION")
 
 def parse_simulation_calculation(r):
-    print("Simulation calculation response:")
+    print("SIMULATION CALCULATION RESPONSE")
     print("Number of counts:",ssql(r,2,13))
     print("Frequency (Hz):",ssql(r,14,25))
     print("Temperature ADC (°C):",ssql(r,26,37))
@@ -215,70 +247,91 @@ def sort_response(r):
         case _:
             pass
 
-##### BOOTLOADER COMMANDS #####
-
-# THESE AREN'T DOCUMENTED IN THE MANUAL, SO I'VE MADE THE EXECUTIVE DECISION NOT TO WORK ON THEM
-
-# def reset_microcontroller():
-#     send("0x19")#should be hex value 19, not string
-
-# def intel_hex_firmware_upgrade_initiation():
-#     send(":")
-
-
 ##### DATA LOGGER COMMANDS #####
 def sort_L(r):
     match r[1]:
         case "0":
             parse_ID(r)
+        case "1":
+            parse_logging_pointer(r)
+        case "2":
+            erase_flash_chip(r)
+        case "3":
+            parse_log_one_record(r)
+        case "4":
+            parse_return_one_record(r)
+        case "5":
+            parse_battery_voltage(r)
+        case "M":
+            parse_logging_trigger_mode(r)
+        case "I":
+            parse_logging_interval_settings(r)
+        case "c":
+            parse_clock_data(r)
+        case "a":
+            parse_alarm_data(r)
+        case _:
+            print(f"INVALID RESPONSE {r}")
 
 def request_ID():
-    send("L0x","request report ID")
+    send("L0x","REPORT ID REQUEST")
 
 def parse_ID(r):
-    print("Report ID response:")
-    print("Manufacturer ID:",ssql(r,3,5))
-    print("Device ID:",ssql(r,6,8))
+    print("REPORT ID RESPONSE")
+    print("Manufacturer ID:",ssq(r,3,5))
+    print("Device ID:",ssq(r,6,8))
 
 def request_logging_pointer():
-    send("L1x","request logging pointer")
+    send("L1x","LOGGING POINTER REQUEST")
 
 def parse_logging_pointer(r):
-    print("Logging pointer response:")
+    print("LOGGING POINTER RESPONSE")
+    print("Pointer position:",ssq(r,3,8))
 
 def erase_flash_chip(): #no corresponding response
     sure = parse("This action is irreversible. Are you sure you want to erase the entire flash memory? To proceed, type ERASE. To cancel, type anything else.")
     if sure==("ERASE"):
-        send("L2x","erase flash chip")
+        send("L2x","ERASE FLASH CHIP")
     else:
         print("Request cancelled, flash NOT erased.")
 
 def request_log_one_record():
-    send("L3x","request log one record")
+    send("L3x","LOG ONE RECORD REQUEST")
 
 def parse_log_one_record(r):
-    print("Log one record response:")
-    print("Pointer position:",ssql(r,3,8))
+    print("LOG ONE RECORD RESPONSE")
+    print("Pointer position:",ssq(r,3,8))
 
 def request_return_one_record():
     pointer = parse("Type pointer position of record to return: ")
+    try:
+        value = int(pointer)
+    except:
+        print(f"{pointer} is not a valid integer.")
+        return
+    if len(pointer)<10:
+        print(f"{pointer} must be between 0 and 9999999999 (ten digits).")
+        return
+    if value<0:
+        print(f"{pointer} must be between 0 and 9999999999 (ten digits).")
+        return
     pt = zero_fill(10,pointer)
-    send(f"L4{pt}x","request return one record")
+    send(f"L4{pt}x","RETURN ONE RECORD REQUEST")
 
 def parse_return_one_record(r):
-    print("Return one record response:")
-    print("Date, day of week, time of recording:",ssql(r,3,22))
-    print("Reading (mag/arcsec^2):",ssql(r,23,28))
-    print("Temperature (°C):",ssql(r,29,36))
-    print("Battery voltage ADC valueL:",ssql(r,37,39))
+    print("RETURN ONE RECORD RESPONSE")
+    print("Date, day of week, time of recording:",ssq(r,3,22))
+    print("Reading (mag/arcsec^2):",ssq(r,23,28))
+    print("Temperature (°C):",ssq(r,29,36))
+    print("Battery voltage ADC valueL:",ssq(r,37,39))
 
 def request_battery_voltage():
-    send("L5x","request battery voltage")
+    send("L5x","BATTERY VOLTAGE REQUEST")
 
 def parse_battery_voltage(r):
-    print("Battery voltage response:")
-    print("Internal voltage ADC:",ssql(r,3,5))
-    adc = int(ssql(r,3,5))
+    print("BATTERY VOLTAGE RESPONSE")
+    print("Internal voltage ADC:",ssq(r,3,5))
+    adc = int(ssq(r,3,5))
     v = 2.048+(3.3*adc)/256.0
     print("Converted voltage:",v)
 
@@ -293,15 +346,15 @@ def set_logging_trigger_mode():
     print("7 = logging every hour on the hour, and powering down between recordings")
     mode = parse(f"Select mode from above options")
     if 0<=int(mode)<=7:
-        send(f"LM{mode}x",f"set logging trigger mode {mode}")
+        send(f"LM{mode}x",f"SET LOGGING TRIGGER MODE {mode}")
     else:
         print("Invalid mode entered")
 
 def request_logging_trigger_mode():
-    send("Lmx","request logging trigger mode")
+    send("Lmx","LOGGING TRIGGER MODE REQUEST")
 
 def parse_logging_trigger_mode(r):
-    print("Logging trigger mode response: ",end=" ")
+    print("LOGGING TRIGGER MODE RESPONSE",end=" ")
     match r[3]:
         case "0":
             print("0 = no automatic logging")
@@ -323,10 +376,10 @@ def parse_logging_trigger_mode(r):
             print("INVALID RESPONSE")
 
 def request_logging_interval_settings():
-    send("LIx","request logging interval settings")
+    send("LIx","LOGGING INTERVAL SETTINGS REQUEST")
 
 def parse_logging_interval_settings(r):
-    print("Logging interval setting response:")
+    print("LOGGING INTERVAL SETTINGS RESPONSE")
     print("EEPROM interval period (sec):",ssql(r,3,13))
     print("EEPROM interval period (min):",ssql(r,15,25))
     print("RAM interval period (sec):",ssql(r,27,37))
@@ -335,49 +388,74 @@ def parse_logging_interval_settings(r):
 
 def set_logging_interval_period():
     unit = parse("Type unit for reporting interval (s=seconds m=minutes): ")
-    time = parse("Type time value (numeric only): ")
-    if time.isNumeric():
+    time = parse("Type time value (integer only): ")
+    try:
+        value = int(time)
+    except:
+        print(f"{value} is not a valid integer.")
+        return
+    if value>0 and value <9999999999:
         ztime = zero_fill(5,time)
         if "m" in unit:
-            send(f"LPM{ztime}x","logging interval reporting period setting minutes")
+            send(f"LPM{ztime}x","SET LOGGING INTERVAL REPORTING PERIOD MINUTES")
         elif "s" in unit:
-            send(f"LPS{ztime}x","logging interval reporting period setting seconds")
+            send(f"LPS{ztime}x","SET LOGGING INTERVAL REPORTING PERIOD SECONDS")
         else:
             print("Invalid mode entry: must be m or s")
     else:
-        print("Invalid time format: numeric only, no decimal")
+        print(f"{value} must be an integer between 0 and 9999999999 (10 digits).")
 
 def set_logging_threshold():
     thresh = parse("Type mag/arcsec^2 value: ")
+    try:
+        value = float(thresh)
+    except:
+        print(f"{value} is not a valid float.")
+        return
     zthresh = zero_fill_decimal(8,2,thresh)
-    send(f"LPT{zthresh}x","logging threshold setting")
+    send(f"LPT{zthresh}x","SET LOGGING THRESHOLD")
 
 def request_clock_data():
-    send("Lcx","request clock data")
+    send("Lcx","CLOCK DATA REQUEST")
 
 def set_clock_data():
     data = parse("Type data here (lol finish this later): ")
-    send(f"Lc{data}x", "set clock data")
+    send(f"Lc{data}x", "SET CLOCK DATA")
 
 def parse_clock_data(r):
     if r[1]==("C"):
         print("Set command received")
-    print("Clock data repsonse:")
-    print("Date, day of week, time:",ssql(r,3,21))
+    print("CLOCK DATA RESPONSE")
+    print("Date, day of week, time:",ssq(r,3,21))
 
 def put_unit_to_sleep():
-    send("Lsx","put unit to sleep")
+    send("Lsx","PUT UNIT TO SLEEP")
 
 def request_alarm_data():
-    send("Lax","request alarm data")
+    send("Lax","ALARM DATA REQUEST")
 
 def parse_alarm_data(r):
-    print("Alarm data response:")
-    print("Address 07H, seconds:",ssql(r,3,6))
-    print("Address 08H, minutes:",ssql(r,7,10))
-    print("Address 09H, hours:",ssql(r,11,14))
-    print("Address 0AH, day:",ssql(r,15,18))
-    print("Address 0FH, control register:",ssql(r,19,21))
+    print("ALARM DATA RESPONSE")
+    print("Address 07H, seconds:",ssq(r,3,6))
+    print("Address 08H, minutes:",ssq(r,7,10))
+    print("Address 09H, hours:",ssq(r,11,14))
+    print("Address 0AH, day:",ssq(r,15,18))
+    print("Address 0FH, control register:",ssq(r,19,21))
+
+
+##### BOOTLOADER COMMANDS #####
+
+# THESE AREN'T DOCUMENTED IN THE MANUAL, SO I'VE MADE THE EXECUTIVE DECISION NOT TO WORK ON THEM
+
+# def reset_microcontroller():
+#     send("0x19")#should be hex value 19, not string
+
+# def intel_hex_firmware_upgrade_initiation():
+#     send(":")
+
+
+# TODO figure out date/time I/O
+
 
 ##### CONNECT TO DEVICE, SOMEHOW #####
 
@@ -396,6 +474,10 @@ def send(s,exp):
 
 def receive()->str:
     return input("Type possible response code here")
+
+
+
+
 
 
 ##### UTILITIES #####
