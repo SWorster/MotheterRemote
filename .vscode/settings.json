@@ -1,4 +1,15 @@
 {
   "python.analysis.typeCheckingMode": "basic",
-  "python.analysis.autoImportCompletions": true
+  "python.analysis.autoImportCompletions": true,
+  "cSpell.words": [
+    "arcsec",
+    "bootloader",
+    "BOOTLOADER",
+    "EEPROM",
+    "I'VE",
+    "microcontroller",
+    "mpsas",
+    "ssql",
+    "zcal"
+  ]
 }
