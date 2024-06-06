@@ -41,7 +41,7 @@ from pysqm.common import *
 
 '''
 This import section is only for software build purposes.
-Dont worry if some of these are missing in your setup.
+Don't worry if some of these are missing in your setup.
 '''
 
 def relaxed_import(themodule):
@@ -204,7 +204,7 @@ class device(observatory):
     def save_data(self,formatted_data):
         '''
         Save data to file and duplicate to current
-        data file (the one that will be ploted)
+        data file (the one that will be plotted)
         '''
         for each_file in [self.monthly_datafile,self.daily_datafile]:
             if not os.path.exists(each_file):
@@ -268,7 +268,7 @@ class device(observatory):
             Send the data to the datacenter
             '''
 
-            # If the buffer is full, dont append more data.
+            # If the buffer is full, don't append more data.
             if (len(self.DataBuffer)<10000):
                 self.DataBuffer.append(formatted_data)
 
@@ -486,7 +486,7 @@ class SQMLE(SQM):
         self.rx_readout = self.read_data(tries=10)
 
     def search(self):
-        ''' Search SQM LE in the LAN. Return its adress '''
+        ''' Search SQM LE in the LAN. Return its address '''
         self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.s.setblocking(False)
 

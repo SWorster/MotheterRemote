@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-'''
+"""
 PySQM plotting program
 ____________________________
 
@@ -21,22 +21,23 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with PySQM.  If not, see <http://www.gnu.org/licenses/>.
 ____________________________
-'''
+"""
 
-import os,sys
+import os, sys
 
 
 class ArgParser:
-    def __init__(self,inputfile=False):
+    def __init__(self, inputfile=False):
         self.parse_arguments(inputfile)
 
-    def parse_arguments(self,inputfile):
+    def parse_arguments(self, inputfile):
         import argparse
+
         # Return config filename
         self.parser = argparse.ArgumentParser()
-        self.parser.add_argument('-c', '--config', default="config.py")
-        if (inputfile):
-            self.parser.add_argument('-i', '--input', default=None)
+        self.parser.add_argument("-c", "--config", default="config.py")
+        if inputfile:
+            self.parser.add_argument("-i", "--input", default=None)
         args = self.parser.parse_args()
         vars(self).update(args.__dict__)
 
@@ -52,11 +53,11 @@ class ConfigFile:
         # - relative path (inc. filename)
         # - absolute path (exc. filename)
         # - relative path (exc. filename)
-        # - shortcouts like ~ . etc
+        # - shortcuts like ~ . etc
         self.path = path
         self.config = None
 
-    def read_config_file(self,path):
+    def read_config_file(self, path):
         # Get the absolute path
         abspath = os.path.abspath(path)
         # Is a dir? Then add config.py (default filename)
@@ -64,12 +65,14 @@ class ConfigFile:
             abspath += "/config.py"
         # split directory and filename
         directory = os.path.dirname(abspath)
-        filename  = os.path.basename(abspath)
+        filename = os.path.basename(abspath)
 
         old_syspath = sys.path
         sys.path.append(directory)
         import config
+
         self.config = config
+
 
 # Create an object (by default empty) accessible from everywhere
 # After read_config_file is called, GlobalConfig.config will be accessible

@@ -48,7 +48,7 @@ import pysqm.plot
 
 '''
 This import section is only for software build purposes.
-Dont worry if some of these are missing in your setup.
+Don't worry if some of these are missing in your setup.
 '''
 
 def relaxed_import(themodule):
