@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#ignore !/usr/bin/env python
 
 '''
 PySQM main program
@@ -35,6 +35,8 @@ Read input arguments (if any)
 import pysqm.settings as settings
 InputArguments = settings.ArgParser()
 configfilename = InputArguments.config
+if not isinstance(configfilename, str):
+    configfilename = str(configfilename)
 
 # Load config contents into GlobalConfig
 settings.GlobalConfig.read_config_file(configfilename)
@@ -73,7 +75,8 @@ if config._device_type == 'SQM-LE':
 elif config._device_type == 'SQM-LU':
     import serial
 if config._use_mysql == True:
-    import _mysql
+    #import _mysql # BUG this throws a hissyfit
+    pass
 
 
 # Create directories if needed
@@ -132,7 +135,7 @@ def loop():
             except:
                 print('Connection lost')
                 if config._reboot_on_connlost == True:
-                    sleep(600)
+                    time.sleep(600) # BUG squashing attempt by SWW: using time.sleep instead of sleep
                     os.system('reboot.bat')
 
                 time.sleep(1)

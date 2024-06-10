@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# ignore !/usr/bin/env python
 
 """
 PySQM configuration File.

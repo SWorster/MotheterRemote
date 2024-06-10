@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# ignore !/usr/bin/env python
 
 """
 PySQM plotting program
@@ -27,19 +27,31 @@ import os, sys
 
 
 class ArgParser:
+    # creates object to parse command-line arguments
     def __init__(self, inputfile=False):
         self.parse_arguments(inputfile)
 
-    def parse_arguments(self, inputfile):
+    # get arguments from command line
+    def parse_arguments(self, inputfile: bool) -> None:
         import argparse
 
         # Return config filename
-        self.parser = argparse.ArgumentParser()
-        self.parser.add_argument("-c", "--config", default="config.py")
-        if inputfile:
-            self.parser.add_argument("-i", "--input", default=None)
-        args = self.parser.parse_args()
-        vars(self).update(args.__dict__)
+        self.parser = argparse.ArgumentParser()  # create ArgumentParser object
+
+        # lets user add optional argument for config file location (otherwise, it uses the default). this should be stored in the attribute config
+        self.parser.add_argument("-c", "--config", default="config.py", type=str)
+
+        if inputfile:  # true if running plot.py as standalone program
+            # adds field for input data file name
+            self.parser.add_argument("-i", "--input", default=None, type=str)
+
+        args = self.parser.parse_args()  # parse the command line arguments
+
+        # vars(object) returns the __dict__ writable attributes
+        vars(self).update(args.__dict__)  # add the new arguments to the self object
+
+        # BUG squashing attempt by SWW: inserted the next line
+        self.config = vars(self).get("config")
 
     def print_help(self):
         self.parser.print_help()
@@ -55,9 +67,10 @@ class ConfigFile:
         # - relative path (exc. filename)
         # - shortcuts like ~ . etc
         self.path = path
-        self.config = None
+        # BUG squashing attempt by SWW: uncommented the next line
+        # self.config = None
 
-    def read_config_file(self, path):
+    def read_config_file(self, path: str):
         # Get the absolute path
         abspath = os.path.abspath(path)
         # Is a dir? Then add config.py (default filename)

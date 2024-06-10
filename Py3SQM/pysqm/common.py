@@ -33,7 +33,7 @@ import pysqm.settings as settings
 config = settings.GlobalConfig.config
 
 
-def define_ephem_observatory():
+def define_ephem_observatory() -> ephem.Observer:
     """Define the Observatory in Pyephem"""
     OBS = ephem.Observer()
     OBS.lat = config._observatory_latitude * ephem.pi / 180
@@ -42,7 +42,7 @@ def define_ephem_observatory():
     return OBS
 
 
-def remove_linebreaks(data):
+def remove_linebreaks(data: str):
     # Remove line breaks from data
     data = data.replace("\r\n", "")
     data = data.replace("\r", "")
@@ -50,7 +50,7 @@ def remove_linebreaks(data):
     return data
 
 
-def format_value(data, remove_str=" "):
+def format_value(data: str, remove_str=" "):
     # Remove string and spaces from data
     data = remove_linebreaks(data)
     data = data.replace(remove_str, "")
