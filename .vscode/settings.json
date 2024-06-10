@@ -4,8 +4,10 @@
   "cSpell.words": [
     "Abarca",
     "aftermidnight",
+    "allsince",
     "altsun",
     "arcsec",
+    "argparser",
     "axvline",
     "axvspan",
     "Barbas",
@@ -110,6 +112,7 @@
     "timeutc",
     "twinplot",
     "twinx",
+    "userinterface",
     "utcdates",
     "utcdatetime",
     "utcdt",
