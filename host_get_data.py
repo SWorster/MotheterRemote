@@ -1,5 +1,3 @@
-# scp rp3@131.229.147.51:/var/tmp/sqm_macleish/daily_data/20240607_120000_SQM-MacLeish.dat /Users/skyeworster/Desktop
-
 import datetime
 import os
 import argparse
@@ -17,6 +15,7 @@ sensor_dict = {
 sensor_default = "macleish"
 string_names_list = ", ".join(sensor_dict.keys())
 
+# globals
 sensor = sensor_default
 rpi_name = ""
 rpi_ip = ""
@@ -26,6 +25,14 @@ force = False
 
 
 def parse_date(d: str) -> datetime.datetime | None:
+    """Converts a string date in YYYYMMDD format to a datetime object
+
+    Args:
+        d (str): date to be converted, in format YYYYMMDD
+
+    Returns:
+        datetime.datetime | None: corresponding datetime object, or None if not possible
+    """
     try:
         formatted = datetime.datetime.strptime(d, "%Y%m%d")
         return formatted
@@ -34,6 +41,14 @@ def parse_date(d: str) -> datetime.datetime | None:
 
 
 def parse_date_default(d: str) -> datetime.datetime:
+    """Converts a string date in YYYYMMDD format to a datetime object
+
+    Args:
+        d (str): date to be converted, in format YYYYMMDD
+
+    Returns:
+        datetime.datetime: corresponding datetime object, or datetime for today if not possible
+    """
     day = parse_date(d)
     if day == None:
         day = datetime.datetime.today() - datetime.timedelta(days=1)
@@ -41,7 +56,7 @@ def parse_date_default(d: str) -> datetime.datetime:
 
 
 def user_interface() -> None:
-
+    """User-friendly interface. Prompts user for each field."""
     print("Available sensors:", string_names_list)
     s = input("Name of the sensor setup you're connecting to: ")
     set_sensor(s)
@@ -70,7 +85,11 @@ def user_interface() -> None:
             get_today()
 
 
-def get_today():
+def get_today() -> None:
+    """Sends command to retrieve today's (last night's) reading.
+
+    Note that readings are dated by which day they started on, so last night's reading is under yesterday's date even though it finished this morning.
+    """
     yesterday = (datetime.datetime.today() - datetime.timedelta(days=1)).strftime(
         "%Y%m%d"
     )
@@ -79,7 +98,11 @@ def get_today():
     os.system(command)
 
 
-def give_day():
+def give_day() -> None:
+    """Sends command to retrieve the specified day's reading.
+
+    Note that readings are dated by which day they started on, so last night's reading is under yesterday's date even though it finished this morning.
+    """
     d = date.strftime("%Y%m%d")
     command = f"scp {rpi_name}@{rpi_ip}:/var/tmp/sqm_macleish/daily_data/{d}_120000_SQM-MacLeish.dat {target}"
     print(command)
@@ -87,30 +110,31 @@ def give_day():
 
 
 def ui_give_day() -> None:
+    """Takes a date from the user, then gets reading from that date."""
     day = input("To get data from a specific day, type the date in YYYYMMDD format: ")
     set_date(day)
     give_day()
 
 
 def all_since() -> None:
-    # This is horrendously inefficient, as it copies all files then deletes the ones that weren't asked for.
-    # It's also dangerous, because it will overwrite any other daily_data folder in the target directory.
+    """Sends command to retrieve all readings taken on or before the specified date.
+
+    Note that readings are dated by which day they started on, so last night's reading is under yesterday's date even though it finished this morning.
+
+    This is horrendously inefficient, as it copies all files then deletes the ones that weren't asked for. It's also dangerous, because it will overwrite any other daily_data folder in the target directory. However, copying the directory seems to be the only way to avoid having the user type their password a billion times.
+    """
     start = date
     command = f"scp -r {rpi_name}@{rpi_ip}:/var/tmp/sqm_macleish/daily_data {target}"
     print(command)
     os.system(command)
 
-    print("PRINT THIS PLEASE", os.listdir())
-    print("target", target)
     if not os.path.isdir(f"{target}/daily_data"):
         print(
             f"Something went wrong! daily_data wasn't properly copied to target location {target}/daily_data"
         )
-        print(os.listdir())
-        exit()
+        return
     os.chdir(f"{target}/daily_data")
-    files = os.listdir()
-    for file in files:
+    for file in os.listdir():
         file_date = parse_date(file[0:8])
         if isinstance(file_date, datetime.datetime):
             if start > file_date:
@@ -118,6 +142,7 @@ def all_since() -> None:
 
 
 def ui_all_since() -> None:
+    """Takes date from user, then gets all readings on or after that date."""
     since = input(
         "To get data since a specific day, type the date in YYYYMMDD format: "
     )
@@ -126,82 +151,117 @@ def ui_all_since() -> None:
 
 
 def get_all() -> None:
+    """Sends a command to retrieve all readings."""
     print("Getting all data")
     command = f"scp -r {rpi_name}@{rpi_ip}:/var/tmp/sqm_macleish/daily_data {target}"
     print(command)
     os.system(command)
 
 
-def set_date(d: str | None) -> None:
+def set_date(d: str | list[str] | None) -> None:
+    """Sets the date from a string
+
+    Args:
+        d (str | list[str] | None): date to set, or None if no input from command line
+    """
     global date
-    if isinstance(d, str):
-        day = parse_date(d)
-        if day != None:
-            date = day
+    if isinstance(d, list):
+        d = d[0]
+    if d == None or d == "":  # no date entered, default today
+        return
+    day = parse_date_default(d)
+    date = day
 
-    print("Invalid date entered. Setting date to yesterday.")
-    date = datetime.datetime.today() - datetime.timedelta(days=1)
 
+def set_force(f: bool | list[bool] | None) -> None:
+    """Sets force flag. Determines whether to create the target directory if it doesn't already exist.
 
-def set_force(f: bool | None) -> None:
+    Args:
+        f (bool | list[bool] | None): whether to force creation of directory, or None if no input from command line
+    """
+    if isinstance(f, list):
+        f = f[0]
     if f is not None:
         global force
         force = f
 
 
-def set_target(t: str | None, ui: bool) -> None:
+def set_target(t: str | list[str] | None, ui: bool = False) -> None:
+    """Sets target. This is where the files will be saved. Must be reachable from current working directory.
+
+    Args:
+        t (str | list[str] | None): target folder, or None if no input from command line
+        ui (bool, optional): True if this was called through the user interface Defaults to False.
+    """
     global target
-    if t == None or t == "":
+    if isinstance(t, list):
+        t = t[0]
+    if t == None or t == "":  # no input, use default
         return
-    if os.path.isdir(t):
+    if os.path.isdir(t):  # path exists, so use it
         target = str(t)
         return
-    if ui:
+    if ui:  # path doesn't exist, ask user for force flag
         resp = input("This directory does not exist. Would you like to create it? Y/N ")
         if resp == "Y":
             set_force(True)
-    if force:
+    if force:  # force creation
         print(f"Creating directory {t}")
         os.makedirs(t)
         if os.path.isdir(t):
             target = t
-    else:
+    else:  # use current working directory
         print(
             f"{t} is not a valid target. Using current working directory {os.getcwd()}"
         )
 
 
-def set_sensor(s: str | None):
-    global sensor
-    global rpi_name
-    global rpi_ip
-
-    if s is not None:  # if input was given
-        sensor = s
-        if s == "":  # ui pressed enter
-            sensor = sensor_default
-        sensor_info = sensor_dict.get(sensor)  # get corresponding name and ip
-        if sensor_info != None:  # sensor is valid
-            rpi_name = sensor_info[0]  # set info
-            rpi_ip = sensor_info[1]
-            return
-        print(f"Input not in list of sensors, reverting to default ({sensor_default})")
-
-    # no input given, or input was invalid
+def set_sensor_default() -> None:
+    """Sets the sensor to the default. Should only be used from within set_sensor()"""
+    global sensor, rpi_name, rpi_ip
+    print("USING DEFAULT SENSOR")
     sensor = sensor_default
-    sensor_info = sensor_dict.get(sensor)
-
-    if sensor_info != None:  # if it does exist by this point
-        rpi_name = sensor_info[0]  # set info
-        rpi_ip = sensor_info[1]
-    else:
+    info = sensor_dict.get(sensor)
+    print("info", info)
+    if info == None:  # default info not in dictionary
         print(
             "Default sensor not found! Fix this error by modifying host_get_data.py and adding the RPi info to sensor_dict."
         )
         exit()
+    rpi_name = info[0]
+    rpi_ip = info[1]
+
+
+def set_sensor(s: str | list[str] | None) -> None:
+    """Sets the sensor to get readings from. More accurately, this is which RPi we're getting readings from, but I'm too lazy to change "sensor" to "rpi" everywhere.
+
+    Args:
+        s (str | list[str] | None): the sensor to use, or None if no input from command line
+    """
+    global sensor
+    global rpi_name
+    global rpi_ip
+    if isinstance(s, list):
+        s = s[0]
+    print("s", s)
+    if s == None or s == "":  # no input given
+        set_sensor_default()
+        return
+
+    info = sensor_dict.get(s)  # get corresponding name and ip
+    print("info1", info)
+    if info == None:  # no match, use default
+        print("here")
+        set_sensor_default()
+        return
+
+    sensor = s  # set globals
+    rpi_name = info[0]
+    rpi_ip = info[1]
 
 
 def main() -> None:
+    """Parses command line arguments and determines which operation to perform."""
     # create an argparser
     parser = argparse.ArgumentParser(
         prog="host_get_data",
@@ -210,23 +270,29 @@ def main() -> None:
     )
 
     parser.add_argument(
+        "-all",
         "-a",
-        "--all",
         action="store_true",
-        help="Gets all existing readings. If a date is supplied with --d, gets all readings since that date (inclusive)",
+        help="Gets all existing readings. If a date is supplied with --d, gets all readings since that date (inclusive).",
     )
 
     parser.add_argument(
+        "-userinterface",
         "-u",
-        "-ui",
-        "--userinterface",
         action="store_true",
         help="Program runs in user-friendly mode, prompting each input in the command line.",
     )
 
     parser.add_argument(
-        "-s",
+        "-force",
+        "-f",
+        action="store_true",
+        help="If target directory does not exist, forces creation of target directory. Otherwise, current working directory will be used.",
+    )
+
+    parser.add_argument(
         "--sensor",
+        "--s",
         nargs=1,
         type=str,
         help=f"Name of sensor (default={sensor_default}). List of sensors: {string_names_list}",
@@ -235,26 +301,17 @@ def main() -> None:
     parser.add_argument(
         "--date",
         "--d",
-        action="store",
         nargs=1,
         type=str,
-        help="Gets readings for specified date. If --a/--all is supplied, gets all readings since this date (inclusive). Takes a date as argument in YYYYMMDD format. For example '--allsince 20241105' for November 5, 2024",
+        help="Gets readings for specified date. If -a or -all is supplied, gets all readings since this date (inclusive). Takes a date as argument in YYYYMMDD format. For example: '-a --d 20241105' for November 5, 2024.",
     )
 
     parser.add_argument(
-        "--t",
         "--target",
-        action="store",
-        type=str,
-        help="Sets where to store files on the host computer (uses current working directory by default). ex. /Users/username/Desktop",
+        "--t",
         nargs=1,
-    )
-
-    parser.add_argument(
-        "-f",
-        "--force",
-        action="store_true",
-        help="If target directory does not exist, forces creation of target directory. Otherwise, current working directory will be used.",
+        type=str,
+        help="Sets where to store files on the host computer (uses current working directory by default). ex. /Users/username/MotheterRemote",
     )
 
     args = vars(parser.parse_args())
@@ -264,11 +321,13 @@ def main() -> None:
         user_interface()  # ignores all other presets
         exit("program ended")
 
+    # set global variables
     set_force(args.get("force"))
     set_sensor(args.get("sensor"))
     set_date(args.get("date"))
-    set_target(args.get("target"), False)
+    set_target(args.get("target"))
 
+    # decide which operation to perform
     if args.get("all"):
         if args.get("date") is not None:
             all_since()  # date given, do all since
@@ -281,16 +340,3 @@ def main() -> None:
 
 
 main()
-
-
-# if __name__ != "__main__":
-#     user_interface()
-# else:
-#     main()
-
-
-# os.system("ssh rp3@131.229.147.51") # user will need to enter password
-# from subprocess import run
-# output = run("pwd", capture_output=True).stdout ???
-# file_list = os.listdir()
-# # scp user@remote:'/path1/file1 /path2/file2 /path3/file3' /localPath
