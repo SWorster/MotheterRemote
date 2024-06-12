@@ -94,6 +94,7 @@
     "rawdata",
     "RDWR",
     "RXREADOUT",
+    "scandir",
     "shorttype",
     "skyglow",
     "SQMLE",
