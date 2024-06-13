@@ -38,39 +38,39 @@ SITE location
 -------------
 """
 
-_observatory_name = "MacLeish"
-_observatory_latitude = 42.449183
-_observatory_longitude = -72.679909
-_observatory_altitude = 170
-_observatory_horizon = 10  # If Sun is below this altitude, the program will take data
+observatory_name = "MacLeish"
+observatory_latitude = 42.449183
+observatory_longitude = -72.679909
+observatory_altitude = 170
+observatory_horizon = 10  # If Sun is below this altitude, the program will take data
 
-_device_shorttype = "SQM"  # Device STR in the file
-_device_type = "SQM_LU"  # Device type in the Header
-_device_id = _device_type + "-" + _observatory_name  # Long Device lame
-_device_locationname = (
+device_shorttype = "SQM"  # Device STR in the file
+device_type = "SQM_LU"  # Device type in the Header
+device_id = device_type + "-" + observatory_name  # Long Device lame
+device_locationname = (
     "Smith College - MacLeish Field Station"  # Device location in the world
 )
-_data_supplier = (
+data_supplier = (
     "Mariana Abarca / Smith College Biology Department"  # Data supplier (contact)
 )
-_device_addr = "/dev/ttyUSB0"  # Default IP address of the Ethernet device (if not automatically found)
-_measures_to_promediate = 1  # Take the mean of N measures
-_delay_between_measures = 2  # Delay between two measures. In seconds.
-_cache_measures = 1  # Get X measures before writing on screen/file
-_plot_each = 2  # Call the plot function each X measures.
+device_addr = "/dev/ttyUSB0"  # Default IP address of the Ethernet device (if not automatically found)
+measures_to_promediate = 1  # Take the mean of N measures
+delay_between_measures = 2  # Delay between two measures. In seconds.
+cache_measures = 1  # Get X measures before writing on screen/file
+plot_each = 2  # Call the plot function each X measures.
 
-_use_mysql = False  # Set to True if you want to store data on a MySQL db.
-_mysql_host = None  # Host (ip:port / localhost) of the MySQL engine.
-_mysql_user = None  # User with write permission on the db.
-_mysql_pass = None  # Password for that user.
-_mysql_database = None  # Name of the database.
-_mysql_dbtable = None  # Name of the table
-_mysql_port = None  # Port of the MySQL server.
+use_mysql = False  # Set to True if you want to store data on a MySQL db.
+mysql_host = None  # Host (ip:port / localhost) of the MySQL engine.
+mysql_user = None  # User with write permission on the db.
+mysql_pass = None  # Password for that user.
+mysql_database = None  # Name of the database.
+mysql_dbtable = None  # Name of the table
+mysql_port = None  # Port of the MySQL server.
 
-_local_timezone = -4  # UTC+1
-_computer_timezone = -4  # UTC
-_offset_calibration = -0.11  # magnitude = read_magnitude + offset
-_reboot_on_connlost = False  # Reboot if we loose connection
+local_timezone = -4  # UTC+1
+computer_timezone = -4  # UTC
+offset_calibration = -0.11  # magnitude = read_magnitude + offset
+reboot_on_connlost = False  # Reboot if we loose connection
 
 # Monthly (permanent) data
 monthly_data_directory = "/tmp/sqm_macleish/"
@@ -95,7 +95,7 @@ PySQM data center (OPTIONAL)
 """
 
 # Send the data to the data center
-_send_to_datacenter = False
+send_to_datacenter = False
 
 
 """
@@ -109,4 +109,9 @@ limits_sunalt = [-80, 5]  # Degrees
 """
 Email options
 """
-_send_data_by_email = False
+send_data_by_email = False
+
+"""
+DEBUGGING THIS CRAP
+"""
+DEBUG = False

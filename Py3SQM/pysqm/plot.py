@@ -27,6 +27,7 @@ import os, sys
 import ephem
 import numpy as np
 import matplotlib
+import numpy.typing as typ
 
 matplotlib.use("Agg")
 import matplotlib.ticker as ticker
@@ -56,7 +57,7 @@ class Ephemerids(object):
 
         self.Observatory = define_ephem_observatory()
 
-    def ephem_date_to_datetime(self, ephem_date):
+    def ephem_date_to_datetime(self, ephem_date) -> datetime:
         # Convert ephem dates to datetime
         date_, time_ = str(ephem_date).split(" ")
         date_ = date_.split("/")
@@ -71,13 +72,13 @@ class Ephemerids(object):
             int(time_[2]),
         )
 
-    def end_of_the_day(self, thedate):
+    def end_of_the_day(self, thedate: datetime) -> datetime:
         newdate = thedate + timedelta(days=1)
         newdatetime = datetime(newdate.year, newdate.month, newdate.day, 0, 0, 0)
-        newdatetime = newdatetime - timedelta(hours=config._local_timezone)
+        newdatetime = newdatetime - timedelta(hours=config.local_timezone)
         return newdatetime
 
-    def calculate_moon_ephems(self, thedate):
+    def calculate_moon_ephems(self, thedate: datetime):
         # Moon ephemerids
         self.Observatory.horizon = "0"
         self.Observatory.date = str(self.end_of_the_day(thedate))
@@ -120,7 +121,7 @@ class Ephemerids(object):
             self.Observatory.next_setting(ephem.Moon())
         )
 
-    def calculate_twilight(self, thedate, twilight=-18):
+    def calculate_twilight(self, thedate: datetime, twilight: int = -18):
         """
         Changing the horizon forces ephem to
         calculate different types of twilights:
@@ -157,7 +158,7 @@ class SQMData(object):
     class Statistics(object):
         pass
 
-    def __init__(self, filename, Ephem):
+    def __init__(self, filename: str, Ephem) -> None:
         self.all_night_sb = []
         self.all_night_dt = []
         self.all_night_temp = []
@@ -180,7 +181,7 @@ class SQMData(object):
         self.process_rawdata(Ephem)
         self.check_number_of_nights()
 
-    def extract_metadata(self, raw_data_and_metadata):
+    def extract_metadata(self, raw_data_and_metadata: list[str]) -> None:
         from pysqm.common import format_value
 
         metadata_lines = [
@@ -193,7 +194,7 @@ class SQMData(object):
         ][0]
         self.serial_number = format_value(serial_number_line.split(":")[-1])
 
-    def check_validdata(self, data_line):
+    def check_validdata(self, data_line: str) -> bool:
         from pysqm.common import format_value
 
         try:
@@ -204,7 +205,7 @@ class SQMData(object):
         else:
             return True
 
-    def load_rawdata(self, filename):
+    def load_rawdata(self, filename: str) -> None:
         """
         Open the file, read the data and close the file
         """
@@ -217,7 +218,7 @@ class SQMData(object):
         ]
         sqm_file.close()
 
-    def process_datetimes(self, str_datetime):
+    def process_datetimes(self, str_datetime: str) -> datetime:
         """
         Get date and time in a str format
         Return as datetime object
@@ -258,7 +259,7 @@ class SQMData(object):
             localdatetime = self.process_datetimes(line[1])
 
             # Check that datetimes are correct
-            calc_localdatetime = utcdatetime + timedelta(hours=config._local_timezone)
+            calc_localdatetime = utcdatetime + timedelta(hours=config.local_timezone)
             if calc_localdatetime != localdatetime:
                 return 1
 
@@ -277,11 +278,11 @@ class SQMData(object):
             # Night sky background
             night_sb = float(line[5])
             try:
-                config._plot_corrected_nsb
+                config.plot_corrected_nsb
             except AttributeError:
-                config._plot_corrected_data = False
-            if config._plot_corrected_data:
-                night_sb += config._plot_corrected_data * config._offset_calibration
+                config.plot_corrected_data = False
+            if config.plot_corrected_data:
+                night_sb += config.plot_corrected_data * config.offset_calibration
             # Define sun in pyephem
             Sun = ephem.Sun(Ephem.Observatory)
 
@@ -341,10 +342,11 @@ class SQMData(object):
         Useful to summarize night conditions.
         """
 
-        def select_bests(values, number):
+        def select_bests(values: list[float], number: int) -> typ.ArrayLike:
+            a = np.sort(values)[::-1][0:number]
             return np.sort(values)[::-1][0:number]
 
-        def fourier_filter(array, nterms):
+        def fourier_filter(array: typ.ArrayLike, nterms: int) -> typ.ArrayLike:
             """
             Make a fourier filter for the first nterms terms.
             """
@@ -354,12 +356,11 @@ class SQMData(object):
             filtered_array = np.fft.ifft(array_fft)
             return filtered_array
 
-        def window_smooth(x, window_len=10, window="hanning"):
+        def window_smooth(
+            in_x: typ.ArrayLike, window_len: int = 10, window: str = "hanning"
+        )->typ.ArrayLike:
             # http://scipy-cookbook.readthedocs.io/items/SignalSmooth.html
-            ##### BUG FIX, YOU'RE WELCOME
-            if isinstance(x, list):
-                x = np.array(x)
-            ##### END OF BUG FIX - SKYE WEAVER WORSTER
+            x = np.array(in_x)
             if x.ndim != 1:
                 raise ValueError("smooth requires 1-d arrays")
             if x.size < window_len:
@@ -464,8 +465,8 @@ class Plot(object):
             # We need to divide the plotting in two phases
             # (pre-midnight and after-midnight)
             self.thegraph_time.axvspan(
-                Ephem.moon_prev_rise + timedelta(hours=config._local_timezone),
-                Ephem.moon_next_set + timedelta(hours=config._local_timezone),
+                Ephem.moon_prev_rise + timedelta(hours=config.local_timezone),
+                Ephem.moon_next_set + timedelta(hours=config.local_timezone),
                 edgecolor="#d62728",
                 facecolor="#d62728",
                 alpha=0.1,
@@ -473,16 +474,16 @@ class Plot(object):
             )
         else:
             self.thegraph_time.axvspan(
-                Ephem.moon_prev_rise + timedelta(hours=config._local_timezone),
-                Ephem.moon_prev_set + timedelta(hours=config._local_timezone),
+                Ephem.moon_prev_rise + timedelta(hours=config.local_timezone),
+                Ephem.moon_prev_set + timedelta(hours=config.local_timezone),
                 edgecolor="#d62728",
                 facecolor="#d62728",
                 alpha=0.1,
                 clip_on=True,
             )
             self.thegraph_time.axvspan(
-                Ephem.moon_next_rise + timedelta(hours=config._local_timezone),
-                Ephem.moon_next_set + timedelta(hours=config._local_timezone),
+                Ephem.moon_next_rise + timedelta(hours=config.local_timezone),
+                Ephem.moon_next_set + timedelta(hours=config.local_timezone),
                 edgecolor="#d62728",
                 facecolor="#d62728",
                 alpha=0.1,
@@ -494,7 +495,7 @@ class Plot(object):
         Plot vertical lines on the astronomical twilights
         """
         self.thegraph_time.axvline(
-            Ephem.twilight_prev_set + timedelta(hours=config._local_timezone),
+            Ephem.twilight_prev_set + timedelta(hours=config.local_timezone),
             color="black",
             ls="dashdot",
             lw=1,
@@ -502,7 +503,7 @@ class Plot(object):
             clip_on=True,
         )
         self.thegraph_time.axvline(
-            Ephem.twilight_next_rise + timedelta(hours=config._local_timezone),
+            Ephem.twilight_next_rise + timedelta(hours=config.local_timezone),
             color="black",
             ls="dashdot",
             lw=1,
@@ -524,9 +525,9 @@ class Plot(object):
 
         self.thegraph_sunalt.set_title(
             "Sky Brightness ("
-            + config._device_shorttype
+            + config.device_shorttype
             + "-"
-            + config._observatory_name
+            + config.observatory_name
             + ")\n",
             fontsize="x-large",
         )
@@ -571,14 +572,14 @@ class Plot(object):
         else:
             self.thegraph_time = self.thefigure.add_subplot(2, 1, twinplot)
 
-        if config._local_timezone < 0:
-            UTC_offset_label = "-" + str(abs(config._local_timezone))
-        elif config._local_timezone > 0:
-            UTC_offset_label = "+" + str(abs(config._local_timezone))
+        if config.local_timezone < 0:
+            UTC_offset_label = "-" + str(abs(config.local_timezone))
+        elif config.local_timezone > 0:
+            UTC_offset_label = "+" + str(abs(config.local_timezone))
         else:
             UTC_offset_label = ""
 
-        # self.thegraph_time.set_title('Sky Brightness (SQM-'+config._observatory_name+')',\
+        # self.thegraph_time.set_title('Sky Brightness (SQM-'+config.observatory_name+')',\
         # fontsize='x-large')
         self.thegraph_time.set_xlabel(
             "Time (UTC" + UTC_offset_label + ")", fontsize="large"
@@ -702,9 +703,9 @@ class Plot(object):
         self.thegraph_sunalt.text(
             0.00,
             1.015,
-            config._device_shorttype
+            config.device_shorttype
             + "-"
-            + config._observatory_name
+            + config.observatory_name
             + " " * 5
             + "Serial #"
             + str(Data.serial_number),
@@ -739,7 +740,7 @@ class Plot(object):
              transform = self.thegraph_sunalt.transAxes)
         """
 
-    def plot_data_time(self, Data, Ephem):
+    def plot_data_time(self, Data, Ephem) -> None:
         """
         Plot NSB data vs Sun altitude
         """
@@ -825,9 +826,9 @@ class Plot(object):
         self.thegraph_time.text(
             0.00,
             1.015,
-            config._device_shorttype
+            config.device_shorttype
             + "-"
-            + config._observatory_name
+            + config.observatory_name
             + " " * 5
             + "Serial #"
             + str(Data.serial_number),
@@ -875,7 +876,7 @@ def save_stats_to_file(Night, NSBData, Ephem):
 
     Header = (
         "# Summary statistics for "
-        + str(config._device_shorttype + "_" + config._observatory_name)
+        + str(config.device_shorttype + "_" + config.observatory_name)
         + "\n"
         + "# Description of columns (CSV file):\n"
         + "# Col 1: Date\n"
@@ -914,28 +915,28 @@ def save_stats_to_file(Night, NSBData, Ephem):
     statistics_filename = (
         config.summary_data_directory
         + "/Statistics_"
-        + str(config._device_shorttype + "_" + config._observatory_name)
+        + str(config.device_shorttype + "_" + config.observatory_name)
         + ".dat"
     )
 
     print("Writing statistics file")
 
-    def safe_create_file(filename):
+    def safe_create_file(filename: str) -> None:
         if not os.path.exists(filename):
             open(filename, "w").close()
 
-    def read_file(filename):
+    def read_file(filename: str) -> None:
         thefile = open(filename, "r")
         content = thefile.read()
         thefile.close()
         return content
 
-    def write_file(filename, content):
+    def write_file(filename: str, content: str) -> None:
         thefile = open(filename, "w")
         thefile.write(content)
         thefile.close()
 
-    def append_file(filename, content):
+    def append_file(filename: str, content: str) -> None:
         thefile = open(filename, "a")
         thefile.write(content)
         thefile.close()
@@ -948,7 +949,7 @@ def save_stats_to_file(Night, NSBData, Ephem):
 
     # If the file doesnt have a proper header, add it to the beginning
 
-    def valid_line(line):
+    def valid_line(line: str) -> bool:
         if "#" in line:
             return False
         elif line.replace(" ", "") == "":
@@ -976,7 +977,11 @@ def save_stats_to_file(Night, NSBData, Ephem):
     append_file(statistics_filename, formatted_data)
 
 
-def make_plot(input_filename=None, send_emails=False, write_stats=False):
+def make_plot(
+    in_input_filename: str | None = None,
+    send_emails: bool = False,
+    write_stats: bool = False,
+) -> None:
     """
     Main function (allows to execute the program
     from within python.
@@ -987,16 +992,18 @@ def make_plot(input_filename=None, send_emails=False, write_stats=False):
     """
 
     print("Plotting photometer data ...")
-
-    if input_filename is None:
+    input_filename: str
+    if in_input_filename is None:
         input_filename = (
             config.current_data_directory
             + "/"
-            + config._device_shorttype
+            + config.device_shorttype
             + "_"
-            + config._observatory_name
+            + config.observatory_name
             + ".dat"
         )
+    else:
+        input_filename = in_input_filename
 
     # Define the observatory in ephem
     Ephem = Ephemerids()
@@ -1023,8 +1030,8 @@ def make_plot(input_filename=None, send_emails=False, write_stats=False):
             "%s/%s_%s.png"
             % (
                 config.current_data_directory,
-                config._device_shorttype,
-                config._observatory_name,
+                config.device_shorttype,
+                config.observatory_name,
             )
         ),
         str(
@@ -1032,8 +1039,8 @@ def make_plot(input_filename=None, send_emails=False, write_stats=False):
             % (
                 config.daily_graph_directory,
                 str(NSBData.Night).replace("-", ""),
-                config._device_shorttype,
-                config._observatory_name,
+                config.device_shorttype,
+                config.observatory_name,
             )
         ),
     ]

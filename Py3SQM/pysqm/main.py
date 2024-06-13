@@ -26,7 +26,7 @@ ____________________________
 import os,sys
 import time
 import datetime
-import argparse
+import argparse # type: ignore
 
 
 '''
@@ -53,7 +53,7 @@ This import section is only for software build purposes.
 Don't worry if some of these are missing in your setup.
 '''
 
-def relaxed_import(themodule):
+def relaxed_import(themodule:str):
     try: exec('import '+str(themodule))
     except: pass
 
@@ -68,15 +68,14 @@ Conditional imports
 '''
 
 # If the old format (SQM_LE/SQM_LU) is used, replace _ with -
-config._device_type = config._device_type.replace('_','-')
+config.device_type = config.device_type.replace('_','-')
 
-if config._device_type == 'SQM-LE':
-    import socket
-elif config._device_type == 'SQM-LU':
-    import serial
-if config._use_mysql == True:
-    #import _mysql # BUG this throws a hissyfit
-    pass
+if config.device_type == 'SQM-LE':
+    relaxed_import('socket')
+elif config.device_type == 'SQM-LU':
+    relaxed_import('serial')
+if config.use_mysql == True:
+    relaxed_import('_mysql')
 
 
 # Create directories if needed
@@ -90,16 +89,16 @@ Select the device to be used based on user input
 and start the measures
 '''
 
-if config._device_type=='SQM-LU':
+if config.device_type=='SQM-LU':
     mydevice = SQMLU()
-elif config._device_type=='SQM-LE':
+elif config.device_type=='SQM-LE':
     mydevice = SQMLE()
 else:
-    print(('ERROR. Unknown device type '+str(config._device_type)))
+    print(('ERROR. Unknown device type '+str(config.device_type)))
     exit(0)
 
 
-def loop():
+def loop()->None:
     '''
     Ephem is used to calculate moon position (if above horizon)
     and to determine start-end times of the measures
@@ -114,9 +113,9 @@ def loop():
         #print (str(mydevice.local_datetime(utcdt))),
         if mydevice.is_nighttime(observ):
             # If we are in a new night, create the new file.
-            config._send_to_datacenter = False ### Not enabled by default
+            config.send_to_datacenter = False ### Not enabled by default
             try:
-                assert(config._send_to_datacenter == True)
+                assert(config.send_to_datacenter == True)
                 assert(niter == 0)
                 mydevice.save_data_datacenter("NEWFILE")
             except: pass
@@ -126,38 +125,41 @@ def loop():
 
             mydevice.define_filenames()
 
+            timeutc_mean:datetime.datetime
+            timelocal_mean:datetime.datetime
+            temp_sensor:float
+            freq_sensor:float
+            ticks_uC:float
+            sky_brightness:float
             ''' Get values from the photometer '''
             try:
-                timeutc_mean,timelocal_mean,temp_sensor,\
-                freq_sensor,ticks_uC,sky_brightness = \
-                    mydevice.read_photometer(\
-                     Nmeasures=config._measures_to_promediate,PauseMeasures=10)
+                timeutc_mean,timelocal_mean,temp_sensor,freq_sensor,ticks_uC,sky_brightness = mydevice.read_photometer(Nmeasures=config.measures_to_promediate,PauseMeasures=10)
             except:
                 print('Connection lost')
-                if config._reboot_on_connlost == True:
-                    time.sleep(600) # BUG squashing attempt by SWW: using time.sleep instead of sleep
+                if config.reboot_on_connlost == True:
+                    time.sleep(600)
                     os.system('reboot.bat')
 
                 time.sleep(1)
                 mydevice.reset_device()
+                return
 
-            formatted_data = mydevice.format_content(\
-                timeutc_mean,timelocal_mean,temp_sensor,\
-                freq_sensor,ticks_uC,sky_brightness)
+
+            formatted_data = mydevice.format_content(timeutc_mean,timelocal_mean,temp_sensor,freq_sensor,ticks_uC,sky_brightness)
 
             try:
-                assert(config._use_mysql == True)
+                assert(config.use_mysql == True)
                 mydevice.save_data_mysql(formatted_data)
             except: pass
 
             try:
-                assert(config._send_to_datacenter == True)
+                assert(config.send_to_datacenter == True)
                 mydevice.save_data_datacenter(formatted_data)
             except: pass
 
-            mydevice.data_cache(formatted_data,number_measures=config._cache_measures,niter=niter)
+            mydevice.data_cache(formatted_data,number_measures=config.cache_measures,niter=niter)
 
-            if niter%config._plot_each == 0:
+            if niter%config.plot_each == 0:
                 ''' Each X minutes, plot a new graph '''
                 try: pysqm.plot.make_plot(send_emails=False,write_stats=False)
                 except:
@@ -168,7 +170,7 @@ def loop():
                 DaytimePrint=True
 
             MainDeltaSeconds = (datetime.datetime.now()-StartDateTime).total_seconds()
-            time.sleep(max(1,config._delay_between_measures-MainDeltaSeconds))
+            time.sleep(max(1,config.delay_between_measures-MainDeltaSeconds))
 
         else:
             ''' Daytime, print info '''
@@ -179,7 +181,7 @@ def loop():
                 DaytimePrint=False
             if niter>0:
                 mydevice.flush_cache()
-                if config._send_data_by_email==True:
+                if config.send_data_by_email==True:
                     try: pysqm.plot.make_plot(send_emails=True,write_stats=True)
                     except:
                         print('Warning: Error plotting data / sending email.')
@@ -195,7 +197,7 @@ def loop():
 
             # Send data that is still in the datacenter buffer
             try:
-                assert(config._send_to_datacenter == True)
+                assert(config.send_to_datacenter == True)
                 mydevice.save_data_datacenter("")
             except: pass
 

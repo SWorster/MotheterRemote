@@ -36,13 +36,14 @@ config = settings.GlobalConfig.config
 def define_ephem_observatory() -> ephem.Observer:
     """Define the Observatory in Pyephem"""
     OBS = ephem.Observer()
-    OBS.lat = config._observatory_latitude * ephem.pi / 180
-    OBS.lon = config._observatory_longitude * ephem.pi / 180
-    OBS.elev = config._observatory_altitude
+    # was ephem.pi
+    OBS.lat = config.observatory_latitude * math.pi / 180
+    OBS.lon = config.observatory_longitude * math.pi / 180
+    OBS.elev = config.observatory_altitude
     return OBS
 
 
-def remove_linebreaks(data: str):
+def remove_linebreaks(data: str) -> str:
     # Remove line breaks from data
     data = data.replace("\r\n", "")
     data = data.replace("\r", "")
@@ -50,7 +51,7 @@ def remove_linebreaks(data: str):
     return data
 
 
-def format_value(data: str, remove_str=" "):
+def format_value(data: str, remove_str: str = " ") -> str:
     # Remove string and spaces from data
     data = remove_linebreaks(data)
     data = data.replace(remove_str, "")
@@ -58,13 +59,22 @@ def format_value(data: str, remove_str=" "):
     return data
 
 
-def format_value_list(data, remove_str=" "):
+def format_value_list(data: list[str], remove_str: str = " ") -> list[list[str]]:
     # Remove string and spaces from data array/list
-    data = [format_value(line, remove_str).split(";") for line in data]
-    return data
+    data1 = [format_value(line, remove_str).split(";") for line in data]
+    return data1
 
 
-def set_decimals(number, dec=3):
+def set_decimals(number: float, dec: int = 3) -> str:
+    """Gets string representation of a float with the specified number of decimal places
+
+    Args:
+        number (float): the number to convert
+        dec (int, optional): number of decimal places. Defaults to 3.
+
+    Returns:
+        str: the number as a string
+    """
     str_number = str(number)
     int_, dec_ = str_number.split(".")
     while len(dec_) <= dec:
@@ -74,38 +84,40 @@ def set_decimals(number, dec=3):
 
 
 class observatory(object):
-    def read_datetime(self):
+    def read_datetime(self) -> datetime.datetime:
         # Get UTC datetime from the computer.
-        utc_dt = datetime.datetime.utcnow()
-        # utc_dt = datetime.datetime.now() - datetime.timedelta(hours=config._computer_timezone)
+        # utc_dt = datetime.datetime.now(datetime.UTC) # commented this, uncommented next
+        utc_dt = datetime.datetime.now() - datetime.timedelta(
+            hours=config.computer_timezone
+        )
         # time.localtime(); daylight_saving=_.tm_isdst>0
         return utc_dt
 
-    def local_datetime(self, utc_dt):
+    def local_datetime(self, utc_dt: datetime.datetime) -> datetime.datetime:
         # Get Local datetime from the computer, without daylight saving.
-        return utc_dt + datetime.timedelta(hours=config._local_timezone)
+        return utc_dt + datetime.timedelta(hours=config.local_timezone)
 
-    def calculate_sun_altitude(self, OBS, timeutc):
+    def calculate_sun_altitude(self, OBS: ephem.Observer, timeutc: datetime.datetime):
         # Calculate Sun altitude
         OBS.date = ephem.date(timeutc)
         Sun = ephem.Sun(OBS)
         return Sun.alt
 
-    def next_sunset(self, OBS):
+    def next_sunset(self, OBS: ephem.Observer):
         # Next sunset calculation
         previous_horizon = OBS.horizon
-        OBS.horizon = str(config._observatory_horizon)
+        OBS.horizon = str(config.observatory_horizon)
         next_setting = OBS.next_setting(ephem.Sun()).datetime()
         next_setting = next_setting.strftime("%Y-%m-%d %H:%M:%S")
         OBS.horizon = previous_horizon
         return next_setting
 
-    def is_nighttime(self, OBS):
+    def is_nighttime(self, OBS: ephem.Observer) -> bool:
         # Is nighttime (sun below a given altitude)
         timeutc = self.read_datetime()
         if (
             self.calculate_sun_altitude(OBS, timeutc) * 180.0 / math.pi
-            > config._observatory_horizon
+            > config.observatory_horizon
         ):
             return False
         else:

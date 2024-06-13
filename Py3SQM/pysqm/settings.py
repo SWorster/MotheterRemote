@@ -28,7 +28,7 @@ import os, sys
 
 class ArgParser:
     # creates object to parse command-line arguments
-    def __init__(self, inputfile=False):
+    def __init__(self, inputfile: bool = False):
         self.parse_arguments(inputfile)
 
     # get arguments from command line
@@ -58,7 +58,7 @@ class ArgParser:
 
 
 class ConfigFile:
-    def __init__(self, path="config.py"):
+    def __init__(self, path: str = "config.py"):
         # Guess the selected dir and config filename
         # Should accept:
         # - absolute path (inc. filename)
@@ -78,9 +78,9 @@ class ConfigFile:
             abspath += "/config.py"
         # split directory and filename
         directory = os.path.dirname(abspath)
-        filename = os.path.basename(abspath)
+        filename = os.path.basename(abspath)  # type: ignore
 
-        old_syspath = sys.path
+        old_syspath = sys.path  # type: ignore
         sys.path.append(directory)
         import config
 
