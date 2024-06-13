@@ -1,3 +1,6 @@
+# runs on host computer, parses messages as they come in
+
+
 ##### SIMPLE READINGS AND INFO REQUESTS #####
 def parse_reading(r: str) -> None:
     print("READING RESULT")
@@ -293,13 +296,3 @@ def sort_response(r: str) -> None:
             sort_L(r)
         case _:
             pass
-
-
-##### DRIVER CODE #####
-def main():
-    while True:
-        response = input()
-        sort_response(response)
-
-
-main()
