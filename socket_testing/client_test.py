@@ -145,3 +145,6 @@ class SQMLU:
 
     def read_calibration(self, tries: int = 1) -> str:
         return self.send_command("cx", tries)
+
+
+setup()
