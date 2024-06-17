@@ -9,20 +9,19 @@ _meta_len_ = None
 
 
 def setup():
+    s = socket.socket()
+    host = socket.gethostname()
+    s.bind((host, port))
     sensor = SQMLU()
     while True:
-        s = socket.socket()
         c, addr = s.accept()
-        print(f"Connected to {addr[0]} {addr[1]}")
+        print(f"Connected to {repr(addr[1])}")
         c.listen(5)
 
         msg = c.recv(1024).decode()
         resp = sensor.send_command(msg)
 
-        s = socket.socket()
-        s.connect(("131.229.152.158", port))
         s.send(resp.encode())
-        s.close()
 
 
 class SQMLU:

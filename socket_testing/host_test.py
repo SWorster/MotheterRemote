@@ -4,11 +4,9 @@ import parse_response
 
 port = 12345
 
-
 s = socket.socket()
-print("Socket successfully created")
 s.connect(("131.229.152.158", port))
-# put the socket into listening mode
+print("Socket successfully created")
 while True:
     c, addr = s.accept()
     print("Got connection from", addr)
