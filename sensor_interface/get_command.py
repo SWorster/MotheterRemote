@@ -1,24 +1,24 @@
-# gets user input commands, sends them??
-import re
+# runs on host computer, generates a command from user interface
+import argparse
 
 
-##### SIMPLE READINGS AND INFO REQUESTS #####
 def request_reading() -> None:
+    """requests a reading"""
     send("rx", "REQUEST READING")
 
 
 def request_cal_info() -> None:
+    """requests calibration information"""
     send("cx", "REQUEST CALIBRATION INFORMATION")
 
 
 def request_unit_info() -> None:
+    """requests unit information"""
     send("ix", "REQUEST UNIT INFORMATION")
 
 
-##### ARM/DISARM CALIBRATIONS #####
-
-
 def send_arm_cal_command() -> None:
+    """Sends an arm calibration command"""
     mode = parse(
         "1 = arm light calibration\n2 = arm dark calibration\n3 = disarm calibration\nSelect an option: "
     )
@@ -33,15 +33,15 @@ def send_arm_cal_command() -> None:
             print(f"INVALID MODE {mode}, must be 1/2/3")
 
 
-##### INTERVALS AND THRESHOLDS #####
-
-
 def request_interval_settings() -> None:
+    """Sends interval setting request. Prompts two responses: reading w/ serial, and interval setting response"""
     send("Ix", "INTERVAL SETTINGS REQUEST")
-    # two responses: reading w/ serial, and interval setting response
 
 
 def set_interval_report_period() -> None:
+    """set interval report period"""
+    import re
+
     print(
         "This command sets the interval report period in the RAM by default. This change will not persist through a reboot.\nYou can choose to set this interval in the EEPROM so that the system will boot with this new interval.\nHowever, the EEPROM only has 1 million erase/write cycles, so please test your settings with just RAM before committing to EEPROM."
     )
@@ -73,6 +73,9 @@ def set_interval_report_period() -> None:
 
 
 def set_interval_report_threshold() -> None:
+    """set interval report threshold"""
+    import re
+
     print(
         "This command sets the interval report threshold in the RAM by default. This change will not persist through a reboot.\nYou can choose to set this interval in the EEPROM so that the system will boot with this new interval.\nHowever, the EEPROM only has 1 million erase/write cycles, so please test your settings with just RAM before committing to EEPROM."
     )
@@ -96,10 +99,8 @@ def set_interval_report_threshold() -> None:
     send(f"{boot}{with_zeroes}x", "SET INTERVAL REPORT THRESHOLD")
 
 
-##### MANUAL CALIBRATION #####
-
-
 def man_cal_set_light_offset() -> None:
+    """manually set calibration: light offset"""
     value = parse("Type offset value in mag/arcsec^2 (float): ")
     try:
         float(value)
@@ -111,6 +112,7 @@ def man_cal_set_light_offset() -> None:
 
 
 def man_cal_set_light_temperature() -> None:
+    """manually set calibration: light temperature"""
     value = parse("Type temperature value in °C (float): ")
     try:
         float(value)
@@ -122,6 +124,7 @@ def man_cal_set_light_temperature() -> None:
 
 
 def man_cal_set_dark_period() -> None:
+    """manually set calibration: dark period"""
     value = parse("Type period value in seconds (float): ")
     try:
         float(value)
@@ -133,6 +136,7 @@ def man_cal_set_dark_period() -> None:
 
 
 def man_cal_set_dark_temperature() -> None:
+    """manually set calibration: dark temperature"""
     value = parse("Type temperature value in °C (float): ")
     try:
         float(value)
@@ -143,14 +147,13 @@ def man_cal_set_dark_temperature() -> None:
     send(f"zcal8{hashes}x", "MANUAL CALIBRATION - SET DARK TEMPERATURE")
 
 
-##### SIMULATION COMMANDS #####
-
-
 def request_simulation_values() -> None:
+    """get simulation values"""
     send("sx", "REQUEST INTERNAL SIMULATION VALUES")
 
 
 def request_simulation_calculation() -> None:
+    """runs a simulation"""
     counts = parse("Number of simulated counts: ")
     frequency = parse("Frequency in Hz: ")
     temp = parse("Temperature ADC in °C: ")
@@ -163,9 +166,6 @@ def request_simulation_calculation() -> None:
     )
 
 
-##### DATA LOGGER COMMANDS #####
-
-
 def request_ID() -> None:
     send("L0x", "REPORT ID REQUEST")
 
@@ -174,7 +174,8 @@ def request_logging_pointer() -> None:
     send("L1x", "LOGGING POINTER REQUEST")
 
 
-def erase_flash_chip() -> None:  # no corresponding response
+def erase_flash_chip() -> None:
+    """erases the flash chip. does not produce a response"""
     sure = parse(
         "This action is irreversible. Are you sure you want to erase the entire flash memory? To proceed, type ERASE. To cancel, type anything else."
     )
@@ -210,6 +211,7 @@ def request_battery_voltage() -> None:
 
 
 def set_logging_trigger_mode() -> None:
+    """sets logging trigger mode"""
     print("0 = no automatic logging")
     print("1 = logging granularity in seconds and not powering down")
     print("2 = logging granularity in minutes and powering down between recordings")
@@ -242,6 +244,7 @@ def request_logging_interval_settings() -> None:
 
 
 def set_logging_interval_period() -> None:
+    """sets logging interval period"""
     unit = parse("Type unit for reporting interval (s=seconds m=minutes): ")
     time = parse("Type time value (integer only): ")
     try:
@@ -262,6 +265,7 @@ def set_logging_interval_period() -> None:
 
 
 def set_logging_threshold() -> None:
+    """sets logging light measurement threshold"""
     thresh = parse("Type mag/arcsec^2 value: ")
     try:
         float(thresh)
@@ -276,6 +280,7 @@ def request_clock_data() -> None:
     send("Lcx", "CLOCK DATA REQUEST")
 
 
+# TODO figure out date/time I/O
 def set_clock_data() -> None:
     data = parse("Type data here (lol finish this later): ")
     send(f"Lc{data}x", "SET CLOCK DATA")
@@ -289,24 +294,15 @@ def request_alarm_data() -> None:
     send("Lax", "ALARM DATA REQUEST")
 
 
-##### BOOTLOADER COMMANDS #####
-
-# THESE AREN'T DOCUMENTED IN THE MANUAL, SO I'VE MADE THE EXECUTIVE DECISION NOT TO WORK ON THEM
-
-# def reset_microcontroller():
-#     send("0x19")#should be hex value 19, not string
-
-# def intel_hex_firmware_upgrade_initiation():
-#     send(":")
-
-
-# TODO figure out date/time I/O
-
-
-##### UTILITIES #####
-
-
 def parse(text: str) -> str:
+    """Allows quick exit from user interface. Checks if user typed a trigger word, halting execution if one is found. Otherwise, simply passes input string.
+
+    Args:
+        text (str): input string to check
+
+    Returns:
+        str: input string
+    """
     r = input(text)
     exit_codes = ["exit", "quit"]
     for code in exit_codes:
@@ -317,8 +313,18 @@ def parse(text: str) -> str:
 
 
 def zero_fill_decimal(value: str, whole_len: int, dec_len: int) -> str:
+    """Pads string representation of float with zeroes to left and right to comply with command formatting
+
+    Args:
+        value (str): number to pad (string representation of integer)
+        whole_len (int): length to make integer portion
+        dec_len (int): length to make decimal portion
+
+    Returns:
+        str: padded number
+    """
     whole = int(value)
-    decimal = (int(value) - whole) * pow(10, dec_len)
+    decimal = (float(value) - whole) * pow(10, dec_len)
     num = whole
     count = 0
     while num >= 10:
@@ -329,6 +335,15 @@ def zero_fill_decimal(value: str, whole_len: int, dec_len: int) -> str:
 
 
 def zero_fill(value: str, length: int) -> str:
+    """Pads number with zeroes to the left, to comply with command formatting
+
+    Args:
+        value (str): number to pad (string representation of integer)
+        length (int): how long to make the string
+
+    Returns:
+        str: padded number
+    """
     difference = length - len(value)
     if difference < 0:
         return "INCOMPATIBLE"
@@ -338,14 +353,32 @@ def zero_fill(value: str, length: int) -> str:
     return f"{zeroes}{value}"
 
 
-def ssq(s: str, first: int, last: int) -> str:  # subsequence
-    output = s[first : last + 1]  # manual endpoints are all inclusive
-    return output  # and it's easier to adapt in one place than in several dozen.
+def ssq(s: str, first: int, last: int) -> str:
+    """Get subsequence of string with inclusive endpoints. Most interval values in the manual are listed this way, so this makes things much easier to code. Also strips whitespace for nicer printing.
+
+    Args:
+        s (str): string to subsequence
+        first (int): start index (inclusive)
+        last (int): end index (inclusive)
+
+    Returns:
+        str: subsequence, with whitespace stripped
+    """
+    output = s[first : last + 1]
+    return output
 
 
-def ssql(
-    s: str, first: int, last: int
-) -> str:  # subsequence with left split to remove 0
+def ssql(s: str, first: int, last: int) -> str:
+    """Get subsequence of string with inclusive endpoints. Strips all leading zeroes on left. Also strips whitespace for nicer printing.
+
+    Args:
+        s (str): string to subsequence
+        first (int): start index (inclusive)
+        last (int): end index (inclusive)
+
+    Returns:
+        str: subsequence, with whitespace and left zeros stripped
+    """
     output = s[first : last + 1]
     return output.lstrip("0")
 
@@ -353,10 +386,15 @@ def ssql(
 ##### CONNECT TO DEVICE, SOMEHOW #####
 
 
-def send(command: str, category: str) -> None:
-    sure = parse(
-        f"\nDo you wish to send the following {category} command (y/n): {command}   "
-    )
+def send(command: str, category: str | None = None) -> None:
+    sure = ""
+    if category != None:
+        sure = parse(
+            f"\nDo you wish to send the following {category} command (y/n): {command}   "
+        )
+    else:
+        sure = parse(f"\nDo you wish to send the following command (y/n): {command}   ")
+
     if "y" in sure:
         print("(simulated) command sent")
     else:
@@ -365,6 +403,7 @@ def send(command: str, category: str) -> None:
 
 ##### SELECT SEND #####
 def command_menu() -> None:
+    """User interface command menu"""
     print(
         "\nCategories:\n1 = simple readings and info requests\n2 = arm/disarm calibrations\n3 = interval and threshold settings\n4 = manual calibration\n5 = simulation commands\n6 = data logging commands\n7 = data logging utilities\n8 = bootloader commands (not yet implemented)"
     )
@@ -511,12 +550,38 @@ def command_menu() -> None:
             print(f"{cat} is not a valid choice.")
 
 
-##### DRIVER CODE #####
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        prog="get_command.py",
+        description="Sends a command to the raspberry pi",
+        epilog=f"If no argument given, runs user interface",
+    )
 
+    parser.add_argument(
+        "command",
+        nargs="?",
+        type=str,
+        help=f"To send a command you've already made, just give it as an argument",
+    )
 
-def main():
-    while True:
+    args = vars(parser.parse_args())
+    command = args.get("command")
+
+    if command == None:  # no input, use user interface
         command_menu()
+    else:  # send given command
+        send(command)
 
 
-main()
+def from_socket(command: str) -> None:
+    print("yippee this worked")
+    send(command)
+
+
+# def main():
+
+#     while True:
+#         command_menu()
+
+
+# main()

@@ -1,4 +1,6 @@
 import socket
+from sensor_interface import get_command
+
 
 s = socket.socket()
 print("Socket successfully created")
@@ -17,5 +19,6 @@ while True:
     print("Got connection from", addr)
     c.send("Thank you for connecting".encode())
     msg = c.recv(1024)
-    print(msg.decode())
+    get_command.from_socket(msg.decode())
+    # print(msg.decode())
     c.close()
