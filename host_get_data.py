@@ -116,29 +116,19 @@ def ui_give_day() -> None:
     give_day()
 
 
-def all_since() -> None:
+def better_all_since() -> None:
     """Sends command to retrieve all readings taken on or before the specified date.
 
     Note that readings are dated by which day they started on, so last night's reading is under yesterday's date even though it finished this morning.
-
-    This is horrendously inefficient, as it copies all files then deletes the ones that weren't asked for. It's also dangerous, because it will overwrite any other daily_data folder in the target directory. However, copying the directory seems to be the only way to avoid having the user type their password a billion times.
     """
     start = date
-    command = f"scp -r {rpi_name}@{rpi_ip}:/var/tmp/sqm_macleish/daily_data {target}"
-    print(command)
-    os.system(command)
-
-    if not os.path.isdir(f"{target}/daily_data"):
-        print(
-            f"Something went wrong! daily_data wasn't properly copied to target location {target}/daily_data"
-        )
-        return
-    os.chdir(f"{target}/daily_data")
-    for file in os.listdir():
-        file_date = parse_date(file[0:8])
-        if isinstance(file_date, datetime.datetime):
-            if start > file_date:
-                os.remove(file)
+    today = datetime.datetime.today()
+    dates = [start + datetime.timedelta(n) for n in range(int((today - start).days))]
+    for d in dates:
+        d_str = d.strftime("%Y%m%d")
+        command = f"scp {rpi_name}@{rpi_ip}:/var/tmp/sqm_macleish/daily_data/{d_str}_120000_SQM-MacLeish.dat {target}"
+        print(command)
+        os.system(command)
 
 
 def ui_all_since() -> None:
@@ -147,7 +137,7 @@ def ui_all_since() -> None:
         "To get data since a specific day, type the date in YYYYMMDD format: "
     )
     set_date(since)
-    all_since()
+    better_all_since()
 
 
 def get_all() -> None:
@@ -330,7 +320,7 @@ def main() -> None:
     # decide which operation to perform
     if args.get("all"):
         if args.get("date") is not None:
-            all_since()  # date given, do all since
+            better_all_since()  # date given, do all since
         else:
             get_all()
     elif args.get("date") is not None:  # date given
