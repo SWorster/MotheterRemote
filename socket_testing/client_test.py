@@ -12,6 +12,7 @@ def setup():
     s = socket.socket()
     host = socket.gethostname()
     s.bind((host, port))
+    s.listen(5)
     sensor = SQMLU()
     while True:
         c, addr = s.accept()
