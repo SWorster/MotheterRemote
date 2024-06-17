@@ -1,26 +1,21 @@
 import socket
-import sys
-
-sys.path.append("/sensor_interface")
-from socket_testing.get_command import from_socket
-
-s = socket.socket()
-print("Socket successfully created")
+import get_command
+import parse_response
 
 port = 12345
 
-s.bind(("", port))
-print("socket bound to %s" % (port))
 
-# put the socket into listening mode
-s.listen(5)
-print("socket is listening")
-
-while True:
-    c, addr = s.accept()
-    print("Got connection from", addr)
-    c.send("Thank you for connecting".encode())
-    msg = c.recv(1024)
-    from_socket(msg.decode())
-    # print(msg.decode())
-    c.close()
+def setup():
+    s = socket.socket()
+    print("Socket successfully created")
+    s.connect(("131.229.152.158", port))
+    # put the socket into listening mode
+    while True:
+        c, addr = s.accept()
+        print("Got connection from", addr)
+        msg = get_command.command_from_host()
+        c.send(msg.encode())
+        resp = c.recv(1024)
+        get_command.from_socket(resp.decode())
+        parse_response.sort_response(resp.decode())
+        c.close()

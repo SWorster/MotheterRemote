@@ -471,6 +471,3 @@ def sort_response(r: str) -> None:
             sort_L(r)
         case _:
             pass
-
-
-sort_response("La,000,128,128,128,001")
