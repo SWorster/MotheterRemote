@@ -1,5 +1,5 @@
 import socket
-import sensor_interface.parse_response as parse_response
+import socket_testing.parse_response as parse_response
 
 MSGLEN = 2048
 
