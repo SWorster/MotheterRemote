@@ -13,7 +13,7 @@ def setup():
     while True:
         s = socket.socket()
         c, addr = s.accept()
-        print(f"Connected to {addr}")
+        print(f"Connected to {addr[0]} {addr[1]}")
         c.listen(5)
 
         msg = c.recv(1024).decode()
