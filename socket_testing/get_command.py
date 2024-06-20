@@ -1,7 +1,7 @@
 # runs on host computer, generates a command from user interface
 import argparse
 
-ui = True
+ui = False
 # True = user interface. no arg provided
 # False = arg provided by host or some other program
 
