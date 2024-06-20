@@ -13,14 +13,15 @@ def setup():
     host = socket.gethostname()
     s.bind((host, port))
     s.listen(5)
-    sensor = SQMLU()
+    # sensor = SQMLU()
     while True:
         c, addr = s.accept()
         print(f"Connected to {repr(addr[1])}")
         c.listen(5)
 
         msg = c.recv(1024).decode()
-        resp = sensor.send_command(msg)
+        # resp = sensor.send_command(msg)
+        resp = "got " + msg
 
         s.send(resp.encode())
 
