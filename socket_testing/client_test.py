@@ -118,6 +118,7 @@ class SQMLU:
 
     def send_command(self, command: str, tries: int = 1) -> str:
         """Read the serial number, firmware version"""
+        print(".", end="")
         msg: str = ""
         self.s.write(f"{command}".encode())
         time.sleep(1)

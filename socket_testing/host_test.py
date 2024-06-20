@@ -3,9 +3,9 @@ import get_command
 import parse_response
 
 port = 12345
-
+print("test")
 s = socket.socket()
-s.connect(("131.229.152.158", port))
+s.connect(("131.229.147.51", port))
 print("Socket successfully created")
 while True:
     c, addr = s.accept()
