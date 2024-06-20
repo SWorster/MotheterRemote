@@ -9,5 +9,3 @@ s = f"ssh {name}@{ip} 'python3 {path}/{filename} {command}'"
 print(s)
 
 os.system(f"ssh {name}@{ip} 'python3 {path}/{filename} {command}'")
-
-# os.system(f"ssh {name}@{ip} 'cd {path} ; python3 {filename} {command} '")

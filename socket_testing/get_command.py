@@ -1,9 +1,16 @@
 # runs on host computer, generates a command from user interface
 import argparse
+import datetime
+import os
 
 ui = False
 # True = user interface. no arg provided
 # False = arg provided by host or some other program
+
+path = "MotheterRemote/socket_testing"
+filename = "get_command.py"
+name = "rp3"
+ip = "131.229.147.51"
 
 
 def request_reading() -> str:
@@ -45,7 +52,6 @@ def request_interval_settings() -> str:
 
 def set_interval_report_period() -> str:
     """set interval report period"""
-    import re
 
     print(
         "This command sets the interval report period in the RAM by default. This change will not persist through a reboot.\nYou can choose to set this interval in the EEPROM so that the system will boot with this new interval.\nHowever, the EEPROM only has 1 million erase/write cycles, so please test your settings with just RAM before committing to EEPROM."
@@ -59,27 +65,29 @@ def set_interval_report_period() -> str:
         boot = "p"
 
     interval = parse("Reporting interval (as integer only): ")
-    value = "".join(re.findall(r"\d+", interval))
     try:
-        time = int(value)
+        time = int(interval)
+        print(time)
     except:
-        print(f"{value} is not a valid integer.")
+        print(f"{interval} is not a valid integer.")
         return ""
 
     unit = parse("Unit for time value (s=seconds, m=minutes, h=hours): ")
     if "m" in unit:
+        print("m")
         time = time * 60
     elif "h" in unit:
+        print("h")
         time = time * 3600
     elif "s" not in unit:
         print("Assuming default (seconds)")
-    with_zeroes = zero_fill(value, 10)
-    return send(f"{boot}{with_zeroes}{time}x", "SET INTERVAL REPORT PERIOD")
+    print(time)
+    with_zeroes = zero_fill(time, 10)
+    return send(f"{boot}{with_zeroes}x", "SET INTERVAL REPORT PERIOD")
 
 
 def set_interval_report_threshold() -> str:
     """set interval report threshold"""
-    import re
 
     print(
         "This command sets the interval report threshold in the RAM by default. This change will not persist through a reboot.\nYou can choose to set this interval in the EEPROM so that the system will boot with this new interval.\nHowever, the EEPROM only has 1 million erase/write cycles, so please test your settings with just RAM before committing to EEPROM."
@@ -93,11 +101,10 @@ def set_interval_report_threshold() -> str:
         boot = "p"
 
     threshold = parse("Reporting threshold in mag/arcsec^2: ")
-    value = "".join(re.findall(r"[\d]*[.][\d]+", threshold))
     try:
-        float(value)
+        float(threshold)
     except:
-        print(f"{value} is not a valid float.")
+        print(f"{threshold} is not a valid float.")
         return ""
 
     with_zeroes = zero_fill_decimal(threshold, 8, 2)
@@ -294,8 +301,19 @@ def request_clock_data() -> str:
 
 # TODO figure out date/time I/O
 def set_clock_data() -> str:
-    data = parse("Type data here (lol finish this later): ")
-    return send(f"Lc{data}x", "SET CLOCK DATA")
+    date_str = parse("Type date in YYYYMMDD format: ")
+    time_str = parse("Type time in HHMMSS format: ")
+
+    date = ""
+    try:
+        date = datetime.datetime.strptime(f"{date_str}{time_str}", "%Y%m%d%H%M%S")
+
+    except Exception:
+        print("Incorrectly formatted date, using today's date")
+        date = datetime.datetime.today()
+
+    dt = date.strftime("%Y-%m-%d %w %H:%M:%S")
+    return send(f"Lc{dt}x", "SET CLOCK DATA")
 
 
 def put_unit_to_sleep() -> str:
@@ -335,18 +353,25 @@ def zero_fill_decimal(value: str, whole_len: int, dec_len: int) -> str:
     Returns:
         str: padded number
     """
-    whole = int(value)
-    decimal = (float(value) - whole) * pow(10, dec_len)
-    num = whole
+    if "." in value:  # if decimal
+        # int_str, dec_str = value.split(".")[1]
+        dec_str = ("%.2f" % float(value)).split(".")[1]
+        int_str = value.split(".")[0]
+        print(int_str, dec_str)
+    else:
+        int_str = int(value)
+        dec_str = "0" * dec_len
+
+    num = round(float(value))
     count = 0
     while num >= 10:
         num = num % 10
         count += 1
     hashes = "0" * (whole_len - count)
-    return f"{hashes}{whole}.{decimal}"
+    return f"{hashes}{int_str}.{dec_str}"
 
 
-def zero_fill(value: str, length: int) -> str:
+def zero_fill(value: str | int, length: int) -> str:
     """Pads number with zeroes to the left, to comply with command formatting
 
     Args:
@@ -356,6 +381,9 @@ def zero_fill(value: str, length: int) -> str:
     Returns:
         str: padded number
     """
+    if isinstance(value, int):
+        value = str(value)
+
     difference = length - len(value)
     if difference < 0:
         return "INCOMPATIBLE"
@@ -411,7 +439,7 @@ def send_ui(command: str, category: str | None = None) -> str:
         category = f" {category} "
 
     sure = parse(
-        f"\nDo you wish to send the following{category}command (y/n): {command}"
+        f"\nDo you wish to send the following{category}command (y/n): {command}   "
     )
     if "y" not in sure:
         print("command NOT sent")
@@ -434,11 +462,16 @@ def send(command: str, category: str | None = None) -> str:
         send_ui(command, category)
 
     print(f"sending command {command}")
+    s = f"ssh {name}@{ip} 'python3 {path}/{filename} {command}'"
+    print(s)
+    os.system(s)
+
     return command
 
 
 def command_menu() -> str:
     """User interface command menu"""
+    print(f"Sending command to {name}@{ip}, with program {filename} at {path}")
     print(
         "\nCategories:\n1 = simple readings and info requests\n2 = arm/disarm calibrations\n3 = interval and threshold settings\n4 = manual calibration\n5 = simulation commands\n6 = data logging commands\n7 = data logging utilities\n8 = bootloader commands (not yet implemented)"
     )
@@ -560,7 +593,7 @@ def command_menu() -> str:
         case "0":
             print("Welcome to the secret debugging command menu!")
             print(
-                "Commands:\n1 = parse\n2 = zero fill\n3 = zero fill decimal\n4 =  subsequence\n5 = subsequence left strip"
+                "Commands:\n1 = parse\n2 = zero fill\n3 = zero fill decimal\n4 = subsequence\n5 = subsequence left strip"
             )
             cat0 = parse(f"Select a command: ")
             match cat0:
