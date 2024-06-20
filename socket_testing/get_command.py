@@ -2,7 +2,8 @@
 import argparse
 
 ui = True
-from_host = False
+# True = user interface. no arg provided
+# False = arg provided by host or some other program
 
 
 def request_reading() -> str:
@@ -394,33 +395,48 @@ def ssql(s: str, first: int, last: int) -> str:
     return output.lstrip("0")
 
 
-##### CONNECT TO DEVICE, SOMEHOW #####
+def send_ui(command: str, category: str | None = None) -> str:
+    """confirms whether user wants to send this command
+
+    Args:
+        command (str): the command to send
+        category (str | None, optional): the type of command. Defaults to None.
+
+    Returns:
+        str: the command to send
+    """
+    if category == None:
+        category = " "
+    else:
+        category = f" {category} "
+
+    sure = parse(
+        f"\nDo you wish to send the following{category}command (y/n): {command}"
+    )
+    if "y" not in sure:
+        print("command NOT sent")
+        exit()  # stop execution
+
+    return command
 
 
 def send(command: str, category: str | None = None) -> str:
-    if from_host:
-        return command
+    """sends the command
 
-    if not ui:
-        print(f"sent command {command}, hypothetically")
+    Args:
+        command (str): the command to send
+        category (str | None, optional): the type of command. Defaults to None.
 
-    sure = ""
-    if category != None:
-        sure = parse(
-            f"\nDo you wish to send the following {category} command (y/n): {command}   "
-        )
-    else:
-        sure = parse(f"\nDo you wish to send the following command (y/n): {command}   ")
+    Returns:
+        str: _description_
+    """
+    if ui:  # check before sending
+        send_ui(command, category)
 
-    if "y" in sure:
-        print("(simulated) command sent")
-        return command
-    else:
-        print("command NOT sent")
-        return ""
+    print(f"sending command {command}")
+    return command
 
 
-##### SELECT SEND #####
 def command_menu() -> str:
     """User interface command menu"""
     print(
@@ -576,7 +592,15 @@ def command_menu() -> str:
     return ""
 
 
-if __name__ == "__main__":
+def from_socket(command: str) -> None:
+    global ui
+    ui = False
+    print("yippee this worked")
+    send(command)
+
+
+# if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         prog="get_command.py",
         description="Sends a command to the raspberry pi",
@@ -594,19 +618,11 @@ if __name__ == "__main__":
     command = args.get("command")
 
     if command == None:  # no input, use user interface
+        global ui
+        ui = True
         command_menu()
     else:  # send given command
         send(command)
 
 
-def from_socket(command: str) -> None:
-    global ui
-    ui = False
-    print("yippee this worked")
-    send(command)
-
-
-def command_from_host() -> str:
-    global from_host
-    from_host = True
-    return command_menu()
+main()

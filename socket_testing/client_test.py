@@ -9,21 +9,38 @@ _meta_len_ = None
 
 
 def setup():
-    s = socket.socket()
-    host = socket.gethostname()
-    s.bind((host, port))
-    s.listen(5)
-    # sensor = SQMLU()
+    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    serversocket.bind((socket.gethostname(), port))
+    serversocket.listen(5)
     while True:
-        c, addr = s.accept()
-        print(f"Connected to {repr(addr[1])}")
-        c.listen(5)
+        clientsocket, address = serversocket.accept()
+        print(clientsocket)
+        print(address)
 
-        msg = c.recv(1024).decode()
-        # resp = sensor.send_command(msg)
-        resp = "got " + msg
 
-        s.send(resp.encode())
+#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#     # host = socket.gethostname()
+#     s.bind(("", port))  # was host,port
+#     s.listen(5)
+#     # sensor = SQMLU()
+#     while True:
+#         c, addr = s.accept()
+#         print(f"Connected to {repr(addr[1])}")
+#         c.listen(5)
+
+#         msg = c.recv(1024).decode()
+#         # resp = sensor.send_command(msg)
+#         resp = "got " + msg
+
+#         s.send(resp.encode())
+
+
+def to_server():
+    pass
+
+
+def from_server():
+    pass
 
 
 class SQMLU:
