@@ -17,7 +17,7 @@ client_repo_path = configs.client_repo_path
 def client(command: str):
     s = f"ssh {sensor_name}@{sensor_addr} 'python3 {client_repo_path}/rpi_listener.py'"
     print(s)
-    os.system(s)
+    # os.system(s)
     time.sleep(5)
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket object
     server_ip = configs.sensor_addr  # server's IP address
