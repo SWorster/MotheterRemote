@@ -404,9 +404,15 @@ if __name__ == "__main__":
         print("command is not a string. command:", command)
         exit()
 
+    r=None
     if device_type == "SQM-LU":
         d = SQMLU()
-        d.send_command(command)
+        r = d.send_command(command)
     if device_type == "SQM-LE":
         d = SQMLE()
-        d.send_command(command)
+        r = d.send_command(command)
+
+    if isinstance(r,str):
+        s = f"ssh {"sworster"}@{"131.229.152.158"} 'echo {r}'"
+        print(s)
+        os.system(s)
