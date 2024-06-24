@@ -5,23 +5,23 @@ import time
 import os
 
 # create a socket object
-os.system("echo listening...")
+os.system("echo listening...1")
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 server_ip = configs.sensor_addr
-os.system("echo listening...")
+os.system("echo listening...2")
 port = configs.socket_port
 
-os.system("echo listening...")
+os.system("echo listening...3")
 server.bind((server_ip, port))  # bind the socket to a specific address and port
-os.system("echo listening...")
+os.system("echo listening...4")
 server.listen(5)  # listen for incoming connections
 os.system(f"echo 'Listening on {server_ip}:{port}'")
 
 client_socket, client_address = server.accept()  # accept incoming connections
 os.system(f"echo 'Accepted connection from {client_address[0]}:{client_address[1]}'")
 
-timeout = time.time() + 60 * 5  # 5 minutes from now
+timeout = time.time() + 60 * 1  # 5 minutes from now
 test = 0
 
 while True:

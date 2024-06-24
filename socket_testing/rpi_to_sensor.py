@@ -98,13 +98,13 @@ class SQMLE(SQM):
         try:
             print(("Trying fixed device address %s ... " % str(device_addr)))
             self.addr = device_addr
-            self.port = 10001
+            self.port = LE_PORT
             self.start_connection()
         except:
             print("Trying auto device address ...")
             self.addr = self.search()
             print(("Found address %s ... " % str(self.addr)))
-            self.port = 10001
+            self.port = LE_PORT
             self.start_connection()
 
         # Clearing buffer
@@ -250,13 +250,13 @@ class SQMLU(SQM):
         try:
             print(("Trying fixed device address %s ... " % str(device_addr)))
             self.addr = device_addr
-            self.bauds = 115200
+            self.bauds = LU_BAUD
             self.start_connection()
         except:
             print("Trying auto device address ...")
             self.addr = self.search()
             print(("Found address %s ... " % str(self.addr)))
-            self.bauds = 115200
+            self.bauds = LU_BAUD
             self.start_connection()
 
         # Clearing buffer
@@ -291,7 +291,7 @@ class SQMLU(SQM):
 
         used_port = None
         for port in ports:
-            conn_test = serial.Serial(port, 115200, timeout=1)
+            conn_test = serial.Serial(port, LU_BAUD, timeout=1)
             conn_test.write("ix".encode())
             # was conn_test.readline()[0] == "i"
             if conn_test.readline().decode()[0] == "i":

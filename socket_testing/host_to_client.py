@@ -7,11 +7,7 @@ import configs
 import socket
 
 sensor_name = configs.sensor_name
-
-if configs.ddns_over_ip:
-    sensor_addr = configs.sensor_ddns
-else:
-    sensor_addr = configs.sensor_ip
+sensor_addr = configs.sensor_addr
 
 host_data_path = configs.host_data_path
 client_data_path = configs.client_data_path
@@ -22,7 +18,7 @@ def client(command: str):
     s = f"ssh {sensor_name}@{sensor_addr} 'python3 {client_repo_path}/rpi_listener.py'"
     print(s)
     os.system(s)
-    time.sleep(1)
+    time.sleep(5)
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket object
     server_ip = configs.sensor_addr  # server's IP address
     server_port = configs.socket_port
