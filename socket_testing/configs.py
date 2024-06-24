@@ -25,4 +25,4 @@ device_addr = "/dev/ttyUSB0"
 
 debug = True  # whether to raise exceptions if something goes a little sideways
 
-socket_port = 40001
+socket_port = 40002

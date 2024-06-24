@@ -31,18 +31,21 @@ def client(command: str):
         response = client.recv(1024)  # receive message from the server
         response = response.decode("utf-8")
 
-        # if server sent us "closed" in the payload, we break out of the loop and close our socket
-        if response.lower() == "closed":
-            break
-
         print(f"Received: {response}")
+
+        # if server sent us "closed" in the payload, we break out of the loop and close our socket
+        if "closed" in response.lower():
+            print("received order to close socket")
+            client.close()
+            print("Connection to server closed")
+            break
 
     # close client socket (connection to the server)
     client.close()
     print("Connection to server closed")
 
 
-def send(command: str) -> None:
+def send_ssh(command: str) -> None:
     """sends a command from the host to the client RPi
 
     Args:
