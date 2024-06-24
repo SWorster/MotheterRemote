@@ -51,16 +51,16 @@ class SQM:
         data = data.replace(" ", "")
         return data
 
-    def metadata_process(self, msg: str, sep: str = ",") -> None:
-        # Separate the output array in items
-        msg = self.format_value(msg)
-        msg_array = msg.split(sep)
+    # def metadata_process(self, msg: str, sep: str = ",") -> None:
+    #     # Separate the output array in items
+    #     msg = self.format_value(msg)
+    #     msg_array = msg.split(sep)
 
-        # Get Photometer identification codes
-        self.protocol_number = int(self.format_value(msg_array[1]))
-        self.model_number = int(self.format_value(msg_array[2]))
-        self.feature_number = int(self.format_value(msg_array[3]))
-        self.serial_number = int(self.format_value(msg_array[4]))
+    #     # Get Photometer identification codes
+    #     self.protocol_number = int(self.format_value(msg_array[1]))
+    #     self.model_number = int(self.format_value(msg_array[2]))
+    #     self.feature_number = int(self.format_value(msg_array[3]))
+    #     self.serial_number = int(self.format_value(msg_array[4]))
 
     def start_connection(self):
         """Start photometer connection"""
@@ -202,7 +202,7 @@ class SQMLE(SQM):
             msg = byte_msg.decode()
             assert len(msg) == _meta_len_ or _meta_len_ == None
             assert letter in msg
-            self.metadata_process(msg)
+            # self.metadata_process(msg)
         except:
             if tries <= 0:
                 print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
@@ -225,7 +225,7 @@ class SQMLE(SQM):
             assert byte_msg != None
             msg = byte_msg.decode()
             assert len(msg) == _meta_len_ or _meta_len_ == None
-            self.metadata_process(msg)
+            # self.metadata_process(msg)
         except:
             if tries <= 0:
                 print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
@@ -347,7 +347,7 @@ class SQMLU(SQM):
             msg = byte_msg.decode()
             assert len(msg) == _meta_len_ or _meta_len_ == None
             assert letter in msg
-            self.metadata_process(msg)
+            # self.metadata_process(msg)
         except:
             if tries <= 0:
                 print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
@@ -370,7 +370,7 @@ class SQMLU(SQM):
             assert byte_msg != None
             msg = byte_msg.decode()
             assert len(msg) == _meta_len_ or _meta_len_ == None
-            self.metadata_process(msg)
+            # self.metadata_process(msg)
         except:
             if tries <= 0:
                 print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
