@@ -13,10 +13,10 @@ port = configs.socket_port
 
 server.bind((server_ip, port))  # bind the socket to a specific address and port
 server.listen(5)  # listen for incoming connections
-print(f"Listening on {server_ip}:{port}")
+os.system(f"echo 'Listening on {server_ip}:{port}'")
 
 client_socket, client_address = server.accept()  # accept incoming connections
-print(f"Accepted connection from {client_address[0]}:{client_address[1]}")
+os.system(f"echo 'Accepted connection from {client_address[0]}:{client_address[1]}'")
 
 timeout = time.time() + 60 * 5  # 5 minutes from now
 test = 0
@@ -33,7 +33,7 @@ while True:
         client_socket.send("closed".encode("utf-8"))
         break
 
-    print(f"Received: {request}")
+    os.system(f"echo 'Received: {request}'")
 
     msg = rpi_to_sensor.to_sensor(request)
     if msg != "":
@@ -43,5 +43,5 @@ while True:
         break
 
 client_socket.close()
-print("Connection to client closed")
+os.system("echo 'Connection to client closed'")
 server.close()
