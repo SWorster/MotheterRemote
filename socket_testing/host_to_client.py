@@ -16,14 +16,23 @@ client_data_path = configs.client_data_path
 client_repo_path = configs.client_repo_path
 
 
-def send(s: str):
-    os.system(
-        f"ssh {sensor_name}@{sensor_addr} 'python3 {client_repo_path}/rpi_to_sensor.py {s}'"
-    )
+def send(command: str) -> None:
+    """sends a command from the host to the client RPi
+
+    Args:
+        s (str): command to send
+    """
+    if command == "":
+        print("Message empty, not sending")
+        return
+    s = f"ssh {sensor_name}@{sensor_addr} 'python3 {client_repo_path}/rpi_to_sensor.py {command}'"
+    print(s)
+    os.system(s)
 
 
 # if __name__ == "__main__":
-def main():
+def main() -> None:
+    """parses arguments"""
     parser = argparse.ArgumentParser(
         prog="get_command.py",
         description="Sends a command to the raspberry pi",
@@ -36,20 +45,23 @@ def main():
         type=str,
         help="To send a command you've already made, just give it as an argument",
     )
+
     parser.add_argument(
         "-get", "-g", action="store_true", help="syncs data from sensor"
     )
+
     parser.add_argument("-ui", "-u", action="store_true", help="enables user interface")
 
     args = vars(parser.parse_args())
 
     get = args.get("get")
-    if get:
+    if isinstance(get, bool) and get:
         s = f"rsync -avz -e ssh {sensor_name}@{sensor_addr}:{client_data_path} {host_data_path}"
+        print(s)
         os.system(s)
 
     ui = args.get("ui")
-    if ui:
+    if isinstance(ui, bool) and ui:
         command = ui_commands.command_menu()
         send(command)
         return

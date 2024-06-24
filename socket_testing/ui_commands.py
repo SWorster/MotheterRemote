@@ -1,6 +1,6 @@
 # runs on host computer, generates a command from user interface
 import datetime
-import socket_testing.configs as configs
+import configs
 
 path = "MotheterRemote/socket_testing"
 filename = "get_command.py"
@@ -689,4 +689,5 @@ def command_menu() -> str:
     return ""
 
 
-command_menu()
+if __name__ == "__main__":
+    command_menu()
