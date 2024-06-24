@@ -11,3 +11,11 @@ ddns_over_ip = True
 
 sensor_is_wifi = True
 sensor_is_cellular = False
+
+
+observatory_name = "macleish"
+device_type = "SQM-LU"
+device_id = device_type + "-" + observatory_name
+device_addr = "/dev/ttyUSB0"
+
+debug = True  # whether to raise exceptions if something goes a little sideways

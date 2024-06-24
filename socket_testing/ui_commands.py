@@ -687,7 +687,3 @@ def command_menu() -> str:
         case _:
             print(f"{resp} is not a valid choice.")
     return ""
-
-
-if __name__ == "__main__":
-    command_menu()
