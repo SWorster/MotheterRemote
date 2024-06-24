@@ -8,7 +8,7 @@ import configs
 
 
 # config imports
-device_type = configs.device_type
+device_type = configs.device_type.replace("_", "-")
 device_addr = configs.device_addr
 device_id = configs.device_id
 DEBUG = configs.debug
@@ -20,16 +20,6 @@ SOCK_BUF = 256
 _meta_len_ = None  # Default, to ignore the length of the read string.
 
 
-def relaxed_import(themodule: str) -> None:
-    try:
-        exec("import " + str(themodule))
-    except:
-        pass
-
-
-# If the old format (SQM_LE/SQM_LU) is used, replace _ with -
-device_type = device_type.replace("_", "-")
-
 if device_type == "SQM-LE":
     import socket
 elif device_type == "SQM-LU":
@@ -37,9 +27,6 @@ elif device_type == "SQM-LU":
 
 
 class SQM:
-    def read_data(self, tries: int = 1) -> str:
-        return ""
-
     def read_photometer(self, Nmeasures: int = 1, PauseMeasures: int = 2) -> str:
         # Get the raw data from the photometer and process it.
         raw_data = self.read_data(tries=10)
@@ -87,6 +74,18 @@ class SQM:
         self.close_connection()
         time.sleep(0.1)
         self.start_connection()
+
+    def read_something(self, tries: int, letter: str) -> str:
+        return ""
+
+    def read_data(self, tries: int = 1) -> str:
+        return self.read_something(tries, "r")
+
+    def read_metadata(self, tries: int = 1) -> str:
+        return self.read_something(tries, "i")
+
+    def read_calibration(self, tries: int = 1) -> str:
+        return self.read_something(tries, "c")
 
 
 class SQMLE(SQM):
@@ -216,15 +215,6 @@ class SQMLE(SQM):
             print(("Sensor info: " + str(msg)), end=" ")
         return msg
 
-    def read_data(self, tries: int = 1) -> str:
-        return self.read_something(tries, "r")
-
-    def read_metadata(self, tries: int = 1) -> str:
-        return self.read_something(tries, "i")
-
-    def read_calibration(self, tries: int = 1) -> str:
-        return self.read_something(tries, "c")
-
 
 class SQMLU(SQM):
     def __init__(self):
@@ -294,8 +284,7 @@ class SQMLU(SQM):
 
     def start_connection(self):
         """Start photometer connection"""
-
-        self.s = serial.Serial(self.addr, 115200, timeout=2)
+        self.s = serial.Serial(self.addr, LU_BAUD, timeout=2)
 
     def close_connection(self):
         """End photometer connection"""
@@ -347,12 +336,3 @@ class SQMLU(SQM):
             msg = self.read_something(tries - 1, letter)
             print(("Sensor info: " + str(msg)), end=" ")
         return msg
-
-    def read_data(self, tries: int = 1) -> str:
-        return self.read_something(tries, "r")
-
-    def read_metadata(self, tries: int = 1) -> str:
-        return self.read_something(tries, "i")
-
-    def read_calibration(self, tries: int = 1) -> str:
-        return self.read_something(tries, "c")
