@@ -25,8 +25,10 @@ def client(command: str):
     time.sleep(1)
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket object
     server_ip = configs.sensor_addr  # server's IP address
-    server_port = 12345
+    server_port = configs.socket_port
+    print("socket created")
     client.connect((server_ip, server_port))  # establish connection with server
+    print("connected")
 
     while True:
         client.send(command.encode("utf-8")[:1024])
@@ -89,15 +91,12 @@ def main() -> None:
         os.system(s)
 
     ui = args.get("ui")
+    command = args.get("command")
     if isinstance(ui, bool) and ui:
         command = ui_commands.command_menu()
-        send(command)
-        return
 
-    command = args.get("command")
     if command != None:
-        send(command)
-        return
+        client(command)
 
 
 main()

@@ -386,6 +386,7 @@ class SQMLU(SQM):
 
 
 def to_sensor(command: str) -> str:
+    print("rpi_to_sensor.to_sensor()")
     r = None
     if device_type == "SQM-LU":
         d = SQMLU()
