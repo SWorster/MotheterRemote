@@ -5,9 +5,13 @@ import time
 import ui_commands
 import configs
 import socket
+import parse_response
 
 sensor_name = configs.sensor_name
 sensor_addr = configs.sensor_addr
+
+socket_msg_size = configs.socket_msg_size
+socket_encoding = configs.socket_encoding
 
 host_data_path = configs.host_data_path
 client_data_path = configs.client_data_path
@@ -27,22 +31,23 @@ def client(command: str):
     print("connected")
 
     while True:
-        client.send(command.encode("utf-8")[:1024])
-        response = client.recv(1024)  # receive message from the server
-        response = response.decode("utf-8")
+        client.send(command.encode(socket_encoding)[:socket_msg_size])
+        response = client.recv(socket_msg_size)  # receive message from the server
+        response = response.decode(socket_encoding)
 
         print(f"Received: {response}")
+        print(parse_response.sort_response(response))
 
         # if server sent us "closed" in the payload, we break out of the loop and close our socket
         if "closed" in response.lower():
             print("received order to close socket")
             client.close()
-            print("Connection to server closed")
+            print("Connection to RPi closed")
             break
 
     # close client socket (connection to the server)
     client.close()
-    print("Connection to server closed")
+    print("Connection to RPi closed")
 
 
 def send_ssh(command: str) -> None:

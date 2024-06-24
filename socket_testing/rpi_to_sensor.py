@@ -5,6 +5,7 @@ import struct
 import socket
 import serial
 import configs
+import argparse
 
 # import argparse
 
@@ -13,6 +14,10 @@ device_type = configs.device_type.replace("_", "-")
 device_addr = configs.device_addr
 device_id = configs.device_id
 DEBUG = configs.debug
+
+host_addr = configs.host_addr
+host_name = configs.host_name
+
 
 # constants
 LU_BAUD = 115200
@@ -28,99 +33,72 @@ elif device_type == "SQM-LU":
 
 
 class SQM:
-    def read_photometer(self, Nmeasures: int = 1, PauseMeasures: int = 2) -> str:
-        # Get the raw data from the photometer and process it.
-        raw_data = self.read_data(tries=10)
-
-        # Just to show on screen that the program is alive and running
-        sys.stdout.write(".")
-        sys.stdout.flush()
-        return raw_data
-
-    def remove_linebreaks(self, data: str) -> str:
-        # Remove line breaks from data
-        data = data.replace("\r\n", "")
-        data = data.replace("\r", "")
-        data = data.replace("\n", "")
-        return data
-
-    def format_value(self, data: str, remove_str: str = " ") -> str:
-        # Remove string and spaces from data
-        data = self.remove_linebreaks(data)
-        data = data.replace(remove_str, "")
-        data = data.replace(" ", "")
-        return data
-
-    # def metadata_process(self, msg: str, sep: str = ",") -> None:
-    #     # Separate the output array in items
-    #     msg = self.format_value(msg)
-    #     msg_array = msg.split(sep)
-
-    #     # Get Photometer identification codes
-    #     self.protocol_number = int(self.format_value(msg_array[1]))
-    #     self.model_number = int(self.format_value(msg_array[2]))
-    #     self.feature_number = int(self.format_value(msg_array[3]))
-    #     self.serial_number = int(self.format_value(msg_array[4]))
-
-    def start_connection(self):
+    def start_connection(self) -> None:
         """Start photometer connection"""
         pass
 
-    def close_connection(self):
+    def close_connection(self) -> None:
         """End photometer connection"""
         pass
 
-    def reset_device(self):
-        """Restart connection"""
+    def reset_device(self) -> None:
+        """Connection reset"""
         self.close_connection()
         time.sleep(0.1)
         self.start_connection()
 
-    def read_something(self, tries: int, letter: str) -> str:
-        return ""
+    def clear_buffer(self):
+        print(("Clearing buffer ... |"), end=" ")  # clear buffer
+        buffer_data = self.read_buffer()
+        print((buffer_data), end=" ")
+        print("| ... DONE")
 
-    def read_data(self, tries: int = 1) -> str:
-        return self.read_something(tries, "r")
+    def read_buffer(self) -> bytes | None:
+        pass
 
-    def read_metadata(self, tries: int = 1) -> str:
-        return self.read_something(tries, "i")
+    def how_to_send(self, command: str) -> None:
+        pass
 
-    def read_calibration(self, tries: int = 1) -> str:
-        return self.read_something(tries, "c")
+    def send_command(self, command: str, tries: int = 3) -> str:
+        msg: str = ""
+        self.how_to_send(command)
+        # self.s.send(command.encode())
+        time.sleep(1)
+        byte_msg = self.read_buffer()
+        try:  # Sanity check
+            assert byte_msg != None
+            msg = byte_msg.decode()
+            assert len(msg) == _meta_len_ or _meta_len_ == None
+        except:
+            if tries <= 0:
+                print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
+                if DEBUG:
+                    raise
+                return ""
+            time.sleep(1)
+            self.reset_device()
+            time.sleep(1)
+            msg = self.send_command(command, tries - 1)
+            print(("Sensor info: " + str(msg)), end=" ")
+        return msg
 
 
 class SQMLE(SQM):
-    def __init__(self):
-        """
-        Search the photometer in the network and
-        read its metadata
-        """
+    def __init__(self) -> None:
+        """Search the photometer in the network and read its metadata"""
         try:
             print(("Trying fixed device address %s ... " % str(device_addr)))
             self.addr = device_addr
-            self.port = LE_PORT
-            self.start_connection()
         except:
             print("Trying auto device address ...")
             self.addr = self.search()
             print(("Found address %s ... " % str(self.addr)))
-            self.port = LE_PORT
-            self.start_connection()
+        self.port = LE_PORT
+        self.start_connection()
 
-        # Clearing buffer
-        print(("Clearing buffer ... |"), end=" ")
-        buffer_data = self.read_buffer()
-        print((buffer_data), end=" ")
-        print("| ... DONE")
-        print("Reading test data (ix,cx,rx)...")
-        time.sleep(1)
-        self.ix_readout = self.read_metadata(tries=10)
-        time.sleep(1)
-        self.cx_readout = self.read_calibration(tries=10)
-        time.sleep(1)
-        self.rx_readout = self.read_data(tries=10)
+        self.clear_buffer()
 
-    def search(self):
+    def search(self) -> list[None] | str:
         """Search SQM LE in the LAN. Return its address"""
         self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.s.setblocking(False)
@@ -137,6 +115,7 @@ class SQMLE(SQM):
         while True:
             try:
                 (buf, addr) = self.s.recvfrom(30)
+                # BUG: the 3rd hex character probably doesn't correspond to the 3rd bytes character. However, I'm not working with an SQM-LE so I've made the command decision to ignore this.
                 # was buf[3].decode("hex")
                 if buf.decode("hex")[3] == "f7":
                     # was buf[24:30].encode("hex")
@@ -155,23 +134,22 @@ class SQMLE(SQM):
             print("ERR. Device not found!")
             raise
         else:
-            return addr[0]
+            return str(addr[0])  # was addr[0]
 
     def start_connection(self) -> None:
         """Start photometer connection"""
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.settimeout(20)
         self.s.connect((self.addr, int(self.port)))
-        # self.s.settimeout(1)
+        # self.s.settimeout(1) # idk why this is commented
 
     def close_connection(self) -> None:
         """End photometer connection"""
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0))
 
-        # Check until there is no answer from device
         request = ""
         r = True
-        while r:
+        while r:  # wait until device stops responding
             r = self.read_buffer()
             request += str(r)
         self.s.close()
@@ -185,94 +163,35 @@ class SQMLE(SQM):
             pass
         return msg
 
-    def reset_device(self) -> None:
-        """Connection reset"""
-        # print('Trying to reset connection')
-        self.close_connection()
-        self.start_connection()
+    def how_to_send(self, command: str) -> None:
+        """how the SQM_LE sends a command to the sensor
 
-    def read_something(self, tries: int = 1, letter: str = "r") -> str:
-        """Read the serial number, firmware version"""
-        msg: str = ""
-        self.s.send(f"{letter}x".encode())
-        time.sleep(1)
-        byte_msg = self.read_buffer()
-        try:  # Sanity check
-            assert byte_msg != None
-            msg = byte_msg.decode()
-            assert len(msg) == _meta_len_ or _meta_len_ == None
-            assert letter in msg
-            # self.metadata_process(msg)
-        except:
-            if tries <= 0:
-                print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
-                if DEBUG:
-                    raise
-                return ""
-            time.sleep(1)
-            self.reset_device()
-            time.sleep(1)
-            msg = self.read_something(tries - 1, letter)
-            print(("Sensor info: " + str(msg)), end=" ")
-        return msg
-
-    def send_command(self, command: str, tries: int = 3) -> str:
-        msg: str = ""
+        Args:
+            command (str): the command to send
+        """
         self.s.send(command.encode())
-        time.sleep(1)
-        byte_msg = self.read_buffer()
-        try:  # Sanity check
-            assert byte_msg != None
-            msg = byte_msg.decode()
-            assert len(msg) == _meta_len_ or _meta_len_ == None
-            # self.metadata_process(msg)
-        except:
-            if tries <= 0:
-                print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
-                if DEBUG:
-                    raise
-                return ""
-            time.sleep(1)
-            self.reset_device()
-            time.sleep(1)
-            msg = self.send_command(command, tries - 1)
-            print(("Sensor info: " + str(msg)), end=" ")
-        return msg
 
 
 class SQMLU(SQM):
-    def __init__(self):
-        """
-        Search the photometer and
-        read its metadata
-        """
-
+    def __init__(self) -> None:
+        """Search for the photometer and read its metadata"""
         try:
             print(("Trying fixed device address %s ... " % str(device_addr)))
             self.addr = device_addr
-            self.bauds = LU_BAUD
-            self.start_connection()
-        except:
-            print("Trying auto device address ...")
+        except:  # device not at that address
+            print("Searching for device address ...")
             self.addr = self.search()
             print(("Found address %s ... " % str(self.addr)))
-            self.bauds = LU_BAUD
-            self.start_connection()
+        self.bauds = LU_BAUD
+        self.start_connection()
 
         # Clearing buffer
         print(("Clearing buffer ... |"), end=" ")
         buffer_data = self.read_buffer()
         print((buffer_data), end=" ")
         print("| ... DONE")
-        print("Reading test data (ix,cx,rx)...")
-        time.sleep(1)
-        self.ix_readout = self.read_metadata(tries=10)
-        time.sleep(1)
-        self.cx_readout = self.read_calibration(tries=10)
-        time.sleep(1)
-        self.rx_readout = self.read_data(tries=10)
 
-    def search(self):
+    def search(self) -> str:
         """
         Photometer search.
         Name of the port depends on the platform.
@@ -306,28 +225,20 @@ class SQMLU(SQM):
         else:
             return used_port
 
-    def start_connection(self):
+    def start_connection(self) -> None:
         """Start photometer connection"""
         self.s = serial.Serial(self.addr, LU_BAUD, timeout=2)
 
-    def close_connection(self):
+    def close_connection(self) -> None:
         """End photometer connection"""
-        # Check until there is no answer from device
         request = ""
         r = True
-        while r:
+        while r:  # wait until device stops responding
             r = self.read_buffer()
             request += str(r)
-
         self.s.close()
 
-    def reset_device(self):
-        """Connection reset"""
-        # print('Trying to reset connection')
-        self.close_connection()
-        self.start_connection()
-
-    def read_buffer(self):
+    def read_buffer(self) -> bytes | None:
         """Read the data"""
         msg = None
         try:
@@ -336,57 +247,24 @@ class SQMLU(SQM):
             pass
         return msg
 
-    def read_something(self, tries: int = 1, letter: str = "r") -> str:
-        """Read the serial number, firmware version"""
-        msg: str = ""
-        self.s.write(f"{letter}x".encode())
-        time.sleep(1)
-        byte_msg = self.read_buffer()
-        try:  # Sanity check
-            assert byte_msg != None
-            msg = byte_msg.decode()
-            assert len(msg) == _meta_len_ or _meta_len_ == None
-            assert letter in msg
-            # self.metadata_process(msg)
-        except:
-            if tries <= 0:
-                print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
-                if DEBUG:
-                    raise
-                return ""
-            time.sleep(1)
-            self.reset_device()
-            time.sleep(1)
-            msg = self.read_something(tries - 1, letter)
-            print(("Sensor info: " + str(msg)), end=" ")
-        return msg
+    def how_to_send(self, command: str) -> None:
+        """how the SQM_LU sends a command to the sensor
 
-    def send_command(self, command: str, tries: int = 3) -> str:
-        msg: str = ""
+        Args:
+            command (str): the command to send
+        """
         self.s.write(command.encode())
-        time.sleep(1)
-        byte_msg = self.read_buffer()
-        try:  # Sanity check
-            assert byte_msg != None
-            msg = byte_msg.decode()
-            assert len(msg) == _meta_len_ or _meta_len_ == None
-            # self.metadata_process(msg)
-        except:
-            if tries <= 0:
-                print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
-                if DEBUG:
-                    raise
-                return ""
-            time.sleep(1)
-            self.reset_device()
-            time.sleep(1)
-            msg = self.send_command(command, tries - 1)
-            print(("Sensor info: " + str(msg)), end=" ")
-        return msg
 
 
 def to_sensor(command: str) -> str:
-    print("rpi_to_sensor.to_sensor()")
+    """Sends a command to the sensor and returns the sensor's response
+
+    Args:
+        command (str): command for sensor
+
+    Returns:
+        str: sensor's response
+    """
     r = None
     if device_type == "SQM-LU":
         d = SQMLU()
@@ -400,35 +278,29 @@ def to_sensor(command: str) -> str:
     return ""
 
 
-# if __name__ == "__main__":
-#     """parses arguments"""
-#     parser = argparse.ArgumentParser(
-#         prog="get_command.py",
-#         description="Sends a command to the raspberry pi",
-#         epilog=f"If no argument given, runs user interface",
-#     )
+if __name__ == "__main__":
+    """This file is designed to run only on the RPi that is directly hooked up to the sensor. If it is run as main, it will just parse your arguments and print the sensor response."""
+    parser = argparse.ArgumentParser(
+        prog="rpi_to_sensor.py",
+        description="Sends a command to the sensor. If run as main, prints result.",
+        epilog=f"If no argument given, runs user interface",
+    )
 
-#     parser.add_argument(
-#         "command",
-#         nargs="?",
-#         type=str,
-#         help="To send a command you've already made, just give it as an argument",
-#     )
-#     args = vars(parser.parse_args())
-#     command = args.get("command")
-#     if not isinstance(command, str):
-#         print("command is not a string. command:", command)
-#         exit()
+    parser.add_argument(
+        "command",
+        nargs="?",
+        type=str,
+        help="To send a command you've already made, just give it as an argument",
+    )
+    args = vars(parser.parse_args())
+    command = args.get("command")
+    if not isinstance(command, str):
+        print("command is not a string. command:", command)
+        exit()
 
-#     r = None
-#     if device_type == "SQM-LU":
-#         d = SQMLU()
-#         r = d.send_command(command)
-#     if device_type == "SQM-LE":
-#         d = SQMLE()
-#         r = d.send_command(command)
-
-#     if isinstance(r,str):
-#         s = f"ssh {"skyeworster"}@{"131.229.152.158"} 'echo {r}'"
-#         print(s)
-#         os.system(s)
+    r = to_sensor(command)
+    print(f"Sensor response: {r}")
+    # if r != "":
+    #     s = f"ssh {host_name}@{host_addr} 'echo {r}'"
+    #     print(s)
+    #     os.system(s)
