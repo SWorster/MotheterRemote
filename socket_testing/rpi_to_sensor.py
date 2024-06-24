@@ -5,7 +5,7 @@ import struct
 import socket
 import serial
 import configs
-
+import argparse
 
 # config imports
 device_type = configs.device_type.replace("_", "-")
@@ -215,6 +215,29 @@ class SQMLE(SQM):
             print(("Sensor info: " + str(msg)), end=" ")
         return msg
 
+    def send_command(self, command: str, tries: int = 3) -> str:
+        msg: str = ""
+        self.s.send(command.encode())
+        time.sleep(1)
+        byte_msg = self.read_buffer()
+        try:  # Sanity check
+            assert byte_msg != None
+            msg = byte_msg.decode()
+            assert len(msg) == _meta_len_ or _meta_len_ == None
+            self.metadata_process(msg)
+        except:
+            if tries <= 0:
+                print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
+                if DEBUG:
+                    raise
+                return ""
+            time.sleep(1)
+            self.reset_device()
+            time.sleep(1)
+            msg = self.send_command(command, tries - 1)
+            print(("Sensor info: " + str(msg)), end=" ")
+        return msg
+
 
 class SQMLU(SQM):
     def __init__(self):
@@ -336,3 +359,54 @@ class SQMLU(SQM):
             msg = self.read_something(tries - 1, letter)
             print(("Sensor info: " + str(msg)), end=" ")
         return msg
+
+    def send_command(self, command: str, tries: int = 3) -> str:
+        msg: str = ""
+        self.s.write(command.encode())
+        time.sleep(1)
+        byte_msg = self.read_buffer()
+        try:  # Sanity check
+            assert byte_msg != None
+            msg = byte_msg.decode()
+            assert len(msg) == _meta_len_ or _meta_len_ == None
+            self.metadata_process(msg)
+        except:
+            if tries <= 0:
+                print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
+                if DEBUG:
+                    raise
+                return ""
+            time.sleep(1)
+            self.reset_device()
+            time.sleep(1)
+            msg = self.send_command(command, tries - 1)
+            print(("Sensor info: " + str(msg)), end=" ")
+        return msg
+
+
+if __name__ == "__main__":
+    """parses arguments"""
+    parser = argparse.ArgumentParser(
+        prog="get_command.py",
+        description="Sends a command to the raspberry pi",
+        epilog=f"If no argument given, runs user interface",
+    )
+
+    parser.add_argument(
+        "command",
+        nargs="?",
+        type=str,
+        help="To send a command you've already made, just give it as an argument",
+    )
+    args = vars(parser.parse_args())
+    command = args.get("command")
+    if not isinstance(command, str):
+        print("command is not a string. command:", command)
+        exit()
+
+    if device_type == "SQM-LU":
+        d = SQMLU()
+        d.send_command(command)
+    if device_type == "SQM-LE":
+        d = SQMLE()
+        d.send_command(command)
