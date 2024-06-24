@@ -53,6 +53,7 @@ while True:
         break
 
 client_socket.close()
+server.close()
 echo("Connection to client closed")
 # os.system("echo 'Connection to client closed'")
 server.close()
