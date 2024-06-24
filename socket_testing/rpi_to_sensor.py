@@ -5,7 +5,8 @@ import struct
 import socket
 import serial
 import configs
-import argparse
+
+# import argparse
 
 # config imports
 device_type = configs.device_type.replace("_", "-")
@@ -384,27 +385,8 @@ class SQMLU(SQM):
         return msg
 
 
-if __name__ == "__main__":
-    """parses arguments"""
-    parser = argparse.ArgumentParser(
-        prog="get_command.py",
-        description="Sends a command to the raspberry pi",
-        epilog=f"If no argument given, runs user interface",
-    )
-
-    parser.add_argument(
-        "command",
-        nargs="?",
-        type=str,
-        help="To send a command you've already made, just give it as an argument",
-    )
-    args = vars(parser.parse_args())
-    command = args.get("command")
-    if not isinstance(command, str):
-        print("command is not a string. command:", command)
-        exit()
-
-    r=None
+def to_sensor(command: str) -> str:
+    r = None
     if device_type == "SQM-LU":
         d = SQMLU()
         r = d.send_command(command)
@@ -412,7 +394,40 @@ if __name__ == "__main__":
         d = SQMLE()
         r = d.send_command(command)
 
-    if isinstance(r,str):
-        s = f"ssh {"sworster"}@{"131.229.152.158"} 'echo {r}'"
-        print(s)
-        os.system(s)
+    if isinstance(r, str):
+        return r
+    return ""
+
+
+# if __name__ == "__main__":
+#     """parses arguments"""
+#     parser = argparse.ArgumentParser(
+#         prog="get_command.py",
+#         description="Sends a command to the raspberry pi",
+#         epilog=f"If no argument given, runs user interface",
+#     )
+
+#     parser.add_argument(
+#         "command",
+#         nargs="?",
+#         type=str,
+#         help="To send a command you've already made, just give it as an argument",
+#     )
+#     args = vars(parser.parse_args())
+#     command = args.get("command")
+#     if not isinstance(command, str):
+#         print("command is not a string. command:", command)
+#         exit()
+
+#     r = None
+#     if device_type == "SQM-LU":
+#         d = SQMLU()
+#         r = d.send_command(command)
+#     if device_type == "SQM-LE":
+#         d = SQMLE()
+#         r = d.send_command(command)
+
+#     if isinstance(r,str):
+#         s = f"ssh {"skyeworster"}@{"131.229.152.158"} 'echo {r}'"
+#         print(s)
+#         os.system(s)
