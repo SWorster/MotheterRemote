@@ -28,3 +28,17 @@ def from_client():
 #     get_command.from_socket(resp.decode())
 #     parse_response.sort_response(resp.decode())
 #     c.close()
+
+
+def send_ssh(command: str) -> None:
+    """DEPRECATED sends a command from the host to the client RPi
+
+    Args:
+        s (str): command to send
+    """
+    if command == "":
+        print("Message empty, not sending")
+        return
+    s = f"ssh {rpi_name}@{rpi_addr} 'python3 {rpi_repo_path}/rpi_to_sensor.py {command}'"
+    print(s)
+    os.system(s)

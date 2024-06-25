@@ -19,7 +19,7 @@ rpi_repo_path = configs.rpi_repo_path
 
 
 def server(command: str) -> None:
-    s = f"ssh {rpi_name}@{rpi_addr} 'python3 -m {rpi_repo_path}/rpi_listener.py'"
+    s = f"ssh {rpi_name}@{rpi_addr} 'python3 -m {rpi_repo_path}/rpi_listener.py {configs.so_port}'"
     print(s)
     os.system(s)
     time.sleep(5)
@@ -45,20 +45,6 @@ def server(command: str) -> None:
     # close client socket (connection to the server)
     client.close()
     print("Connection to RPi closed")
-
-
-def send_ssh(command: str) -> None:
-    """DEPRECATED sends a command from the host to the client RPi
-
-    Args:
-        s (str): command to send
-    """
-    if command == "":
-        print("Message empty, not sending")
-        return
-    s = f"ssh {rpi_name}@{rpi_addr} 'python3 {rpi_repo_path}/rpi_to_sensor.py {command}'"
-    print(s)
-    os.system(s)
 
 
 def main() -> None:

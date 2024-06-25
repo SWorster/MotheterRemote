@@ -78,3 +78,7 @@ def main() -> None:
     if isinstance(port, int):
         global so_port
         so_port = port
+
+
+if __name__ == "__main__":
+    main()
