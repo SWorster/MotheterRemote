@@ -65,7 +65,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         prog="rpi_listener.py",
         description="Handles RPi comms with host computer, using socket",
-        epilog=f"Can give port number as argument, or defaults to ",
+        epilog=f"Can give port number as argument, or defaults to number in configs.py",
     )
     parser.add_argument(
         "port",

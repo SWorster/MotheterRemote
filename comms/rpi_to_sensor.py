@@ -47,10 +47,13 @@ class SQM:
         self.start_connection()
 
     def clear_buffer(self):
-        print(("Clearing buffer ... |"), end=" ")  # clear buffer
+        # print(("Clearing buffer ... |"), end=" ")  # clear buffer
+        # print((buffer_data), end=" ")
+        # print("| ... DONE")
         buffer_data = self.read_buffer()
-        print((buffer_data), end=" ")
-        print("| ... DONE")
+        s = "Clearing buffer ... | " + str(buffer_data) + " | ... DONE"
+        if s != "Clearing buffer ... | b'' | ... DONE":
+            print(s)
 
     def read_buffer(self) -> bytes | None:
         pass
@@ -88,10 +91,12 @@ class SQMLE(SQM):
     def __init__(self) -> None:
         """Search the photometer in the network and read its metadata"""
         try:
-            print(("Trying fixed device address %s ... " % str(device_addr)))
+            # print(("Trying fixed device address %s ... " % str(device_addr)))
             self.addr = device_addr
         except:
-            print("Trying auto device address ...")
+            print(
+                f"Device not found on {device_addr}, searching for device address ..."
+            )
             self.addr = self.search()
             print(("Found address %s ... " % str(self.addr)))
         self.port = LE_PORT
@@ -177,20 +182,17 @@ class SQMLU(SQM):
     def __init__(self) -> None:
         """Search for the photometer and read its metadata"""
         try:
-            print(("Trying fixed device address %s ... " % str(device_addr)))
+            # print(("Trying fixed device address %s ... " % str(device_addr)))
             self.addr = device_addr
         except:  # device not at that address
-            print("Searching for device address ...")
+            print(
+                f"Device not found on {device_addr}, searching for device address ..."
+            )
             self.addr = self.search()
             print(("Found address %s ... " % str(self.addr)))
         self.bauds = LU_BAUD
         self.start_connection()
-
-        # Clearing buffer
-        print(("Clearing buffer ... |"), end=" ")
-        buffer_data = self.read_buffer()
-        print((buffer_data), end=" ")
-        print("| ... DONE")
+        self.clear_buffer()
 
     def search(self) -> str:
         """
