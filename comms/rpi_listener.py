@@ -54,6 +54,7 @@ def listen() -> None:
     c.close()
     s.close()
     echo("Connection to host closed")
+    exit()
 
 
 def echo(s: str):
