@@ -7,15 +7,15 @@ import configs
 import socket
 import parse_response
 
-sensor_name = configs.sensor_name
-sensor_addr = configs.sensor_addr
+sensor_name = configs.rpi_name
+sensor_addr = configs.rpi_addr
 
-socket_msg_size = configs.socket_msg_size
-socket_encoding = configs.socket_encoding
+socket_msg_size = configs.so_msg_size
+socket_encoding = configs.so_encoding
 
 host_data_path = configs.host_data_path
-client_data_path = configs.client_data_path
-client_repo_path = configs.client_repo_path
+client_data_path = configs.rpi_data_path
+client_repo_path = configs.rpi_repo_path
 
 
 def client(command: str):
@@ -24,8 +24,8 @@ def client(command: str):
     # os.system(s)
     time.sleep(5)
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket object
-    server_ip = configs.sensor_addr  # server's IP address
-    server_port = configs.socket_port
+    server_ip = configs.rpi_addr  # server's IP address
+    server_port = configs.so_port
     print("socket created")
     client.connect((server_ip, server_port))  # establish connection with server
     print("connected")

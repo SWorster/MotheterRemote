@@ -1,17 +1,12 @@
-# runs on host computer, generates a command from user interface
+"""Generates a correctly-formatted command based on user input.
+Can be run directly, which will print the output to the terminal.
+Can be run from another program using command_menu(), which returns the command to send.
+"""
+
 import datetime
-import configs
 
-path = "MotheterRemote/socket_testing"
-filename = "get_command.py"
-
-sensor = configs.sensor
-sensor_name = configs.sensor_name
-sensor_ip = configs.sensor_ip
-sensor_ddns = configs.sensor_ddns
-
-path = "MotheterRemote/socket_testing"
-filename = "get_command.py"
+# if run as stand-alone program, print to terminal without trying to send
+to_terminal = False
 
 
 def request_reading() -> str:
@@ -48,7 +43,6 @@ def request_interval_settings() -> str:
 
 def set_interval_report_period() -> str:
     """set interval report period"""
-
     print(
         "This command sets the interval report period in the RAM by default. This change will not persist through a reboot.\nYou can choose to set this interval in the EEPROM so that the system will boot with this new interval.\nHowever, the EEPROM only has 1 million erase/write cycles, so please test your settings with just RAM before committing to EEPROM."
     )
@@ -294,7 +288,6 @@ def request_clock_data() -> str:
     return send("Lcx", "CLOCK DATA REQUEST")
 
 
-# TODO figure out date/time I/O
 def set_clock_data() -> str:
     date_str = parse("Type date in YYYYMMDD format: ")
     time_str = parse("Type time in HHMMSS format: ")
@@ -426,8 +419,11 @@ def send(command: str, category: str | None = None) -> str:
         category (str | None, optional): the type of command. Defaults to None.
 
     Returns:
-        str: _description_
+        str: the command to send
     """
+    # if run as stand-alone, don't do sending behavior
+    if to_terminal:
+        return command
     if category == None:
         category = " "
     else:
@@ -651,7 +647,6 @@ def debugging() -> str:
 
 def command_menu() -> str:
     """User interface command menu"""
-
     print(
         "\nCategories:\n\
         1 = simple readings and info requests\n\
@@ -687,3 +682,14 @@ def command_menu() -> str:
         case _:
             print(f"{resp} is not a valid choice.")
     return ""
+
+
+def main() -> None:
+    """Does all UI behavior without sending the command, instead printing it to the terminal."""
+    global to_terminal
+    to_terminal = True
+    print(command_menu())
+
+
+if __name__ == "__main__":
+    main()

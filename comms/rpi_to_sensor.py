@@ -7,14 +7,11 @@ import serial
 import configs
 import argparse
 
-# import argparse
 
 # config imports
 device_type = configs.device_type.replace("_", "-")
 device_addr = configs.device_addr
-device_id = configs.device_id
 DEBUG = configs.debug
-
 host_addr = configs.host_addr
 host_name = configs.host_name
 
@@ -23,7 +20,7 @@ host_name = configs.host_name
 LU_BAUD = 115200
 LE_PORT = 10001
 SOCK_BUF = 256
-_meta_len_ = None  # Default, to ignore the length of the read string.
+# _meta_len_ = None  # Default, to ignore the length of the read string.
 
 
 if device_type == "SQM-LE":
@@ -33,6 +30,8 @@ elif device_type == "SQM-LU":
 
 
 class SQM:
+    """Shared methods for SQM devices"""
+
     def start_connection(self) -> None:
         """Start photometer connection"""
         pass
@@ -68,7 +67,7 @@ class SQM:
         try:  # Sanity check
             assert byte_msg != None
             msg = byte_msg.decode()
-            assert len(msg) == _meta_len_ or _meta_len_ == None
+            # assert len(msg) == _meta_len_ or _meta_len_ == None
         except:
             if tries <= 0:
                 print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
@@ -84,6 +83,8 @@ class SQM:
 
 
 class SQMLE(SQM):
+    """WARNING: this code hasn't been tested, because I don't have an SQM-LE to test with."""
+
     def __init__(self) -> None:
         """Search the photometer in the network and read its metadata"""
         try:
