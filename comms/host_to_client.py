@@ -26,9 +26,8 @@ def client(command: str):
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket object
     server_ip = configs.rpi_addr  # server's IP address
     server_port = configs.so_port
-    print("socket created")
+    print("Socket created...")
     client.connect((server_ip, server_port))  # establish connection with server
-    print("connected")
 
     while True:
         client.send(command.encode(socket_encoding)[:socket_msg_size])

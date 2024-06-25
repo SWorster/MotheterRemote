@@ -44,6 +44,11 @@ while True:
         break
 
     echo(f"Received: {request}")
+    arr = request.split("\n")
+    first = request[0]
+    second = request[1]
+    print(first)
+    print(second)
     msg = rpi_to_sensor.to_sensor(request)
     if msg != "":
         echo(f"Sending response {msg}")
