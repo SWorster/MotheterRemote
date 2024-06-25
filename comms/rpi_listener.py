@@ -62,6 +62,7 @@ def echo(s: str):
 
 def main() -> None:
     """parses arguments"""
+    global so_port
     parser = argparse.ArgumentParser(
         prog="rpi_listener.py",
         description="Handles RPi comms with host computer, using socket",
@@ -78,10 +79,8 @@ def main() -> None:
     port = args.get("port")
     if isinstance(port, str):
         print("port is string, whoops")
-        global so_port
         so_port = int(port)
     if isinstance(port, int):
-        global so_port
         so_port = port
     echo(f"using port {so_port}")
     listen()
