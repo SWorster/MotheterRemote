@@ -14,7 +14,7 @@ host_addr = "131.229.152.158"  # ip or ddns, either should work #TODO should tes
 Using DDNS is strongly recommended, as the RPi's IP may change unpredictably. This code will use whichever address you prioritize, but you should store both of them here anyways as a backup.
 #? find a way to auto-update the most recent IP for the RPi and store it here?
 """
-rpi_repo_path = "MotheterRemote/comms"  # path to this repo directory
+rpi_repo = "MotheterRemote/comms"  # path to this repo directory
 rpi_data_path = "/var/tmp/sqm_macleish/"  # path where data gets saved (NOT in repo)
 rpi_name = "rp3"
 rpi_ip = "131.229.147.51"

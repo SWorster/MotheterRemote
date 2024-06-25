@@ -7,6 +7,7 @@ import configs
 import socket
 import parse_response
 import random
+import threading
 
 rpi_name = configs.rpi_name
 rpi_addr = configs.rpi_addr
@@ -17,35 +18,32 @@ so_port = configs.so_port
 
 host_data_path = configs.host_data_path
 rpi_data_path = configs.rpi_data_path
-rpi_repo_path = configs.rpi_repo_path
+rpi_repo = configs.rpi_repo
 
 
-def party_mode() -> None:
+def generate_port() -> None:
     global so_port
     so_port = random.randint(10000, 65353)
 
 
-def run_remote():
-    print("run_remote")
-    s = f"ssh {rpi_name}@{rpi_addr} 'cd {rpi_repo_path}; python3 -m rpi_listener {configs.so_port}'"
+def start_listener():
+    s = f"ssh {rpi_name}@{rpi_addr} 'cd {rpi_repo}; python3 -m rpi_listener {so_port}'"
     print(s)
     os.system(s)
 
 
-def server(command: str) -> None:
-    print("server")
+def start_socket(command: str) -> None:
     time.sleep(2)
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket object
-    server_ip = configs.rpi_addr  # server's IP address
     print("Socket created...")
-    client.connect((server_ip, so_port))  # establish connection with server
+    client.connect((rpi_addr, so_port))  # establish connection with server
 
     while True:
         client.send(command.encode(so_encoding)[:so_msg_size])
         response = client.recv(so_msg_size)  # receive message from the server
         response = response.decode(so_encoding)
-        print(f"Received: {response}")
         data = response.split("\n")[0]
+        print(f"Received: {data}")
         parse_response.sort_response(data)  # print formatted data to console
 
         # if server sent us "closed" in the payload, we break out of the loop and close our socket
@@ -59,13 +57,9 @@ def server(command: str) -> None:
 
 
 def run_thing(command: str):
-    import threading
 
-    print("port", so_port)
-    party_mode()
-    print("port", so_port)
-    t1 = threading.Thread(target=run_remote)
-    t2 = threading.Thread(target=server, args=[command])
+    t1 = threading.Thread(target=start_listener)
+    t2 = threading.Thread(target=start_socket, args=[command])
 
     t1.start()
     t2.start()
@@ -93,7 +87,9 @@ def main() -> None:
     if isinstance(ui, bool) and ui:  # if user wants interface
         command = ui_commands.command_menu()  # get command from user
     if command != None:  # if there's a command to send, send it
+        generate_port()
         run_thing(command)
+
     else:  # if no arguments/flags, just get data
         s = f"rsync -avz -e ssh {rpi_name}@{rpi_addr}:{rpi_data_path} {host_data_path}"
         print(s)
