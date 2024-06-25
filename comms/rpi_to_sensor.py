@@ -47,9 +47,6 @@ class SQM:
         self.start_connection()
 
     def clear_buffer(self):
-        # print(("Clearing buffer ... |"), end=" ")  # clear buffer
-        # print((buffer_data), end=" ")
-        # print("| ... DONE")
         buffer_data = self.read_buffer()
         s = "Clearing buffer ... | " + str(buffer_data) + " | ... DONE"
         if s != "Clearing buffer ... | b'' | ... DONE":
@@ -64,13 +61,11 @@ class SQM:
     def send_command(self, command: str, tries: int = 3) -> str:
         msg: str = ""
         self.how_to_send(command)
-        # self.s.send(command.encode())
         time.sleep(1)
         byte_msg = self.read_buffer()
         try:  # Sanity check
             assert byte_msg != None
             msg = byte_msg.decode()
-            # assert len(msg) == _meta_len_ or _meta_len_ == None
         except:
             if tries <= 0:
                 print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
@@ -91,7 +86,6 @@ class SQMLE(SQM):
     def __init__(self) -> None:
         """Search the photometer in the network and read its metadata"""
         try:
-            # print(("Trying fixed device address %s ... " % str(device_addr)))
             self.addr = device_addr
         except:
             print(
@@ -182,7 +176,6 @@ class SQMLU(SQM):
     def __init__(self) -> None:
         """Search for the photometer and read its metadata"""
         try:
-            # print(("Trying fixed device address %s ... " % str(device_addr)))
             self.addr = device_addr
         except:  # device not at that address
             print(

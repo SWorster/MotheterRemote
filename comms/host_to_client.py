@@ -9,6 +9,7 @@ import parse_response
 import random
 import threading
 
+t1: threading.Thread | None = None
 rpi_name = configs.rpi_name
 rpi_addr = configs.rpi_addr
 
@@ -44,9 +45,7 @@ def start_socket(command: str) -> None:
         response = response.decode(so_encoding)
         data = response.split("\n")[0]
         print(f"Received: {data}")
-        formatted_data = parse_response.sort_response(
-            data
-        )  # print formatted data to console
+        formatted_data = parse_response.sort_response(data)
 
         # if server sent us "closed" in the payload, we break out of the loop and close our socket
         if "closed" in response.lower():
@@ -56,6 +55,8 @@ def start_socket(command: str) -> None:
     # close client socket (connection to the server)
     client.close()
     print("Connection to RPi closed")
+    if isinstance(t1, threading.Thread):
+        t1.join()
     print(formatted_data)
 
 

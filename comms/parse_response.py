@@ -14,9 +14,9 @@ def parse_reading(r: str) -> str:
         "READING RESULTS",
         f"Light measurement: {ssq(r, 2, 8)}",
         f"        Frequency: {ssql(r, 10, 21)}",
-        f"  Period (counts): {ssql(r, 23, 33)}",
-        f" Period (seconds): {ssql(r, 35, 46)}",
-        f"      Temperature: {ssq(r, 48, 54)}",
+        f"  Period (counts): {ssq(r, 23, 33)}",
+        f" Period (seconds): {ssq(r, 35, 46)}",
+        f"      Temperature: {ssql(r, 48, 54)}",
     ]
     if len(r) >= 63:
         lst.append(f"    Serial number: {ssq(r, 56, 63)}")

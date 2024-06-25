@@ -44,8 +44,8 @@ def listen() -> None:
         echo(f"Received: {request}")
         msg = rpi_to_sensor.to_sensor(request)
         if msg != "":
-            echo(f"Sending {msg}")
             response = msg.encode(utf8)  # convert string to bytes
+            echo(f"Sending {response}")
             c.send(response)
             c.send("closed".encode(utf8))
             break
