@@ -5,10 +5,10 @@ import time
 import os
 
 # config settings
-server_ip = configs.rpi_addr
-port = configs.so_port
-socket_msg_size = configs.so_msg_size
-socket_encoding = configs.so_encoding
+rpi_addr = configs.rpi_addr
+so_port = configs.so_port
+so_msg_size = configs.so_msg_size
+so_encoding = configs.so_encoding
 TTL = configs.TTL  # minutes to wait before quitting
 TRIES = configs.TRIES  # number of attempts to make
 
@@ -20,9 +20,9 @@ def echo(s: str):
 
 echo("Activating listener...")
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind((server_ip, port))  # bind the socket to a specific address and port
+server.bind((rpi_addr, so_port))  # bind the socket to a specific address and port
 server.listen(5)  # listen for incoming connections
-echo(f"Listening on {server_ip}:{port}")
+echo(f"Listening on {rpi_addr}:{so_port}")
 
 client, client_address = server.accept()  # accept incoming connections
 echo(f"Accepted connection from {client_address[0]}:{client_address[1]}")
@@ -36,25 +36,20 @@ while True:
         break
     test = test - 1
 
-    request_bytes = client.recv(socket_msg_size)
-    request = request_bytes.decode(socket_encoding)
+    request_bytes = client.recv(so_msg_size)
+    request = request_bytes.decode(so_encoding)
 
     if request.lower() == "close":
-        client.send("closed".encode(socket_encoding))
+        client.send("closed".encode(so_encoding))
         break
 
     echo(f"Received: {request}")
-    arr = request.split("\n")
-    first = request[0]
-    second = request[1]
-    print(first)
-    print(second)
     msg = rpi_to_sensor.to_sensor(request)
     if msg != "":
         echo(f"Sending response {msg}")
-        response = msg.encode(socket_encoding)  # convert string to bytes
+        response = msg.encode(so_encoding)  # convert string to bytes
         client.send(response)
-        client.send("closed".encode(socket_encoding))
+        client.send("closed".encode(so_encoding))
         break
 
 client.close()
