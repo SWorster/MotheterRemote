@@ -1,7 +1,7 @@
 # runs on host computer, generates a command from user interface
 import argparse
 import os
-import time
+import time  # type: ignore
 import ui_commands
 import configs
 import socket
