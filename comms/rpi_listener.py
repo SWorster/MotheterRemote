@@ -79,6 +79,7 @@ def main() -> None:
         global so_port
         so_port = port
     echo(f"using port {so_port}")
+    listen()
 
 
 if __name__ == "__main__":
