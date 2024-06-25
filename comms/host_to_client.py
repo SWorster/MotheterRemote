@@ -21,8 +21,8 @@ rpi_repo_path = configs.rpi_repo_path
 def server(command: str) -> None:
     s = f"ssh {rpi_name}@{rpi_addr} 'python3 -m {rpi_repo_path}/rpi_listener.py {configs.so_port}'"
     print(s)
-    os.system(s)
-    time.sleep(10)
+    # os.system(s)
+    # time.sleep(10)
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket object
     server_ip = configs.rpi_addr  # server's IP address
     server_port = configs.so_port

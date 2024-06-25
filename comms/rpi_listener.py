@@ -78,7 +78,7 @@ def main() -> None:
     if isinstance(port, int):
         global so_port
         so_port = port
-    echo(f"using port {port}")
+    echo(f"using port {so_port}")
 
 
 if __name__ == "__main__":
