@@ -13,7 +13,7 @@ rpi_name = configs.rpi_name
 rpi_addr = configs.rpi_addr
 
 so_msg_size = configs.so_msg_size
-so_encoding = configs.so_encoding
+so_encoding = configs.utf8
 so_port = configs.so_port
 
 host_data_path = configs.host_data_path

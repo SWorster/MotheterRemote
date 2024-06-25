@@ -10,13 +10,13 @@ import argparse
 rpi_addr = configs.rpi_addr
 so_port = configs.so_port
 so_msg_size = configs.so_msg_size
-so_encoding = configs.so_encoding
+utf8 = configs.utf8
 TTL = configs.TTL  # minutes to wait before quitting
 TRIES = configs.TRIES  # number of attempts to make
 
 
 def listen() -> None:
-    echo("Activating listener...")
+    echo("LISTENER:")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((rpi_addr, so_port))  # bind the socket to a specific address and port
     s.listen(5)  # listen for incoming connections
@@ -35,19 +35,19 @@ def listen() -> None:
         test = test - 1
 
         request_bytes = c.recv(so_msg_size)
-        request = request_bytes.decode(so_encoding)
+        request = request_bytes.decode(utf8)
 
         if request.lower() == "close":
-            c.send("closed".encode(so_encoding))
+            c.send("closed".encode(utf8))
             break
 
         echo(f"Received: {request}")
         msg = rpi_to_sensor.to_sensor(request)
         if msg != "":
-            echo(f"Sending response {msg}")
-            response = msg.encode(so_encoding)  # convert string to bytes
+            echo(f"Sending {msg}")
+            response = msg.encode(utf8)  # convert string to bytes
             c.send(response)
-            c.send("closed".encode(so_encoding))
+            c.send("closed".encode(utf8))
             break
     c.close()
     s.close()
@@ -56,8 +56,7 @@ def listen() -> None:
 
 def echo(s: str):
     """fancy print statement"""
-    pr = f"LISTENER: {s}".rjust(80)
-    os.system(f"echo '{pr}'")
+    os.system(f"echo '{s.rjust(100)}'")
 
 
 def main() -> None:
@@ -77,12 +76,8 @@ def main() -> None:
 
     args = vars(parser.parse_args())  # get arguments from command line
     port = args.get("port")
-    if isinstance(port, str):
-        print("port is string, whoops")
-        so_port = int(port)
     if isinstance(port, int):
         so_port = port
-    echo(f"using port {so_port}")
     listen()
 
 

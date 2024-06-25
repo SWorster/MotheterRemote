@@ -44,7 +44,7 @@ If you get an error about a port already being in use, it means that the port on
 #! working on a fix for this right now"""
 so_port = 42042
 so_msg_size = 1024  # should be power of 2
-so_encoding = "utf-8"  # don't change this unless you REALLY know what you're doing.
+utf8 = "utf-8"  # don't change this unless you REALLY know what you're doing.
 
 
 """settings for rpi_listener.py"""
