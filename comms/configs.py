@@ -42,7 +42,7 @@ debug = True  # whether to raise exceptions if something goes a little sideways
 """Socket info. Most of this should stay the same, with the exception of socket port. That value can be changed to just about anything between 0 and 65353. Five-digit ports are recommended, as there's less chance of a conflict with some other service.
 If you get an error about a port already being in use, it means that the port on the device that DIDN'T throw the error is being used. This is because it can take a few minutes for a port to actually close. The easy-but-not-kosher fix for this is to change the socket port number here and on the RPI (or git commit, go to the RPi, git pull). The better solution is something I'm working on now, TBD.
 #! working on a fix for this right now"""
-so_port = 40003
+so_port = 42069
 so_msg_size = 1024  # should be power of 2
 so_encoding = "utf-8"  # don't change this unless you REALLY know what you're doing.
 
