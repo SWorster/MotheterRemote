@@ -44,7 +44,9 @@ def start_socket(command: str) -> None:
         response = response.decode(so_encoding)
         data = response.split("\n")[0]
         print(f"Received: {data}")
-        parse_response.sort_response(data)  # print formatted data to console
+        formatted_data = parse_response.sort_response(
+            data
+        )  # print formatted data to console
 
         # if server sent us "closed" in the payload, we break out of the loop and close our socket
         if "closed" in response.lower():
@@ -54,6 +56,7 @@ def start_socket(command: str) -> None:
     # close client socket (connection to the server)
     client.close()
     print("Connection to RPi closed")
+    print(formatted_data)
 
 
 def run_thing(command: str):
