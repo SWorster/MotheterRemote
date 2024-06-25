@@ -57,6 +57,7 @@ def start_socket(command: str) -> None:
     print("Connection to RPi closed")
     if isinstance(t1, threading.Thread):
         t1.join()
+    time.sleep(0.1)
     print(formatted_data)
 
 
