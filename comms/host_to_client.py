@@ -33,7 +33,7 @@ def start_listener():
 
 
 def start_socket(command: str) -> None:
-    time.sleep(2)
+    time.sleep(1)
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket object
     print("Socket created...")
     client.connect((rpi_addr, so_port))  # establish connection with server

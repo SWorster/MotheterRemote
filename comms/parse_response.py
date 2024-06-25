@@ -1,7 +1,7 @@
 # runs on host computer, parses messages as they come in
 
 
-def parse_reading(r: str) -> None:
+def parse_reading(r: str) -> str:
     """Parses a single reading of information
 
     Example request: rx
@@ -10,7 +10,7 @@ def parse_reading(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    result_lst = [
+    lst = [
         "READING RESULTS",
         f"Light measurement: {ssq(r, 2, 8)}",
         f"        Frequency: {ssql(r, 10, 21)}",
@@ -19,12 +19,11 @@ def parse_reading(r: str) -> None:
         f"      Temperature: {ssq(r, 48, 54)}",
     ]
     if len(r) >= 63:
-        result_lst.append(f"            Serial number: {ssq(r, 56, 63)}")
-    result = "\n".join(result_lst)
-    print(result)
+        lst.append(f"    Serial number: {ssq(r, 56, 63)}")
+    return "\n".join(lst)
 
 
-def parse_cal_info(r: str) -> None:
+def parse_cal_info(r: str) -> str:
     """Parses calibration information
 
     Example request: cx
@@ -33,7 +32,7 @@ def parse_cal_info(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    result_lst = [
+    lst = [
         "CALIBRATION INFORMATION",
         f"            Light calibration offset: {ssql(r, 2, 13)}",
         f"             Dark calibration period: {ssql(r, 15, 26)}",
@@ -41,11 +40,10 @@ def parse_cal_info(r: str) -> None:
         f"  Light sensor offset (manufacturer): {ssql(r, 36, 47)}",
         f" Temperature during dark calibration: {ssq(r, 49, 55)}",
     ]
-    result = "\n".join(result_lst)
-    print(result)
+    return "\n".join(lst)
 
 
-def parse_unit_information(r: str) -> None:
+def parse_unit_information(r: str) -> str:
     """Parses calibration information
 
     Example request: ix
@@ -54,19 +52,19 @@ def parse_unit_information(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    result_lst = [
+    lst = [
         "UNIT INFORMATION",
         f"Protocol number: {ssq(r, 2, 9)}",
         f"   Model number: {ssq(r, 11, 18)}",
         f" Feature number: {ssq(r, 20, 27)}",
         f"  Serial number: {ssq(r, 29, 36)}",
     ]
-    result = "\n".join(result_lst)
-    print(result)
+    return "\n".join(lst)
 
 
-def parse_arm_cal_command(r: str) -> None:
+def parse_arm_cal_command(r: str) -> str:
     """Parses arm calibration commands
+
 
     Example request: zcalAx
     Example message: zAaL
@@ -74,39 +72,40 @@ def parse_arm_cal_command(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    print("ARM CALIBRATION:")
+    lst = ["ARM CALIBRATION:"]
     match r[1]:
         case "A":
-            print("Light calibration ".upper(), end="")
+            lst.append("Light calibration ".upper())
         case "B":
-            print("Dark calibration ".upper(), end="")
+            lst.append("Dark calibration ".upper())
         case "x":
-            print("All calibration modes ".upper(), end="")
+            lst.append("All calibration modes ".upper())
         case _:
-            print(f"INVALID RESPONSE {r[1]}", end="")
+            lst.append(f"INVALID RESPONSE {r[1]}")
 
     match r[2]:
         case "a":
-            print("Armed!".upper())
+            lst[1] = lst[1] + " ARMED!"
         case "d":
-            print("Disarmed!".upper())
+            lst[1] = lst[1] + " DISARMED!"
         case _:
-            print(f"INVALID RESPONSE {r[2]}", end="")
+            lst[1] = lst[1] + f"INVALID RESPONSE {r[2]}"
 
     match r[3]:
         case "L":
-            print(
+            lst.append(
                 "LOCKED. Wait for unlock before calibrating after Arm command, firmware upgrades are disabled."
             )
         case "U":
-            print(
+            lst.append(
                 "UNLOCKED. Calibrate immediately after Arm command, Enable firmware upgrade."
             )
         case _:
-            print(f"INVALID RESPONSE {r[3]}")
+            lst.append(f"INVALID RESPONSE {r[3]}")
+    return "\n".join(lst)
 
 
-def parse_interval_settings(r: str) -> None:
+def parse_interval_settings(r: str) -> str:
     """Parses interval settings
 
     This is the response for Ix, set period, and set threshold. Ix will also produce rx responses at the intervals specified, which are not handled here.
@@ -117,7 +116,7 @@ def parse_interval_settings(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    result_lst = [
+    lst = [
         f"INTERVAL SETTINGS",
         f"Interval period EEPROM: {ssql(r, 2, 12)}",
         f"   Interval period RAM: {ssql(r, 14, 24)}",
@@ -125,11 +124,10 @@ def parse_interval_settings(r: str) -> None:
         f"      Threshold EEPROM: {ssql(r, 26, 37)}",
         f"         Threshold RAM: {ssql(r, 39, 50)}",
     ]
-    result = "\n".join(result_lst)
-    print(result)
+    return "\n".join(lst)
 
 
-def parse_manual_cal(r: str) -> bool:
+def parse_manual_cal(r: str) -> str:
     """Parses manual calibration results
 
     Example request: zcal500000017.60x
@@ -138,23 +136,22 @@ def parse_manual_cal(r: str) -> bool:
     Args:
         r (str): message from unit
     """
-    print("MANUAL CALIBRATION RESULTS")
+    lst = ["MANUAL CALIBRATION RESULTS"]
     match r[2]:
         case "5":
-            print("Light Magnitude:", ssql(r, 4, 15))
+            lst.append(f"Light Magnitude: {ssql(r, 4, 15)}")
         case "6":
-            print("Light Temperature:", ssql(r, 4, 9))
+            lst.append(f"Light Temperature: {ssql(r, 4, 9)}")
         case "7":
-            print("Dark Period:", ssql(r, 4, 15))
+            lst.append(f"Dark Period: {ssql(r, 4, 15)}")
         case "8":
-            print("Dark Temperature:", ssql(r, 4, 9))
+            lst.append(f"Dark Temperature: {ssql(r, 4, 9)}")
         case _:
-            print("INVALID RESPONSE")
-            return False
-    return True
+            lst.append("INVALID RESPONSE")
+    return "\n".join(lst)
 
 
-def parse_simulation_values(r: str) -> None:
+def parse_simulation_values(r: str) -> str:
     """Parses internal values
 
     Example request: sx
@@ -163,16 +160,16 @@ def parse_simulation_values(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    result_lst = [
+    lst = [
         "INTERNAL SIMULATION VALUES",
         f"          Number of counts: {ssql(r, 2, 12)}",
         f"            Frequency (Hz): {ssql(r, 14, 24)}",
         f"           Temperature ADC: {ssql(r, 26, 37)}",
     ]
-    print("\n".join(result_lst))
+    return "\n".join(lst)
 
 
-def parse_simulation_calculation(r: str) -> None:
+def parse_simulation_calculation(r: str) -> str:
     """Parses simulation calculation results
 
     Example request: S,0000000360,0000000360,0000000360x
@@ -181,7 +178,7 @@ def parse_simulation_calculation(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    result_lst = [
+    lst = [
         "SIMULATION VALUES",
         f"Number of counts: {ssql(r, 2, 12)}",
         f"  Frequency (Hz): {ssq(r, 14, 23)}",
@@ -193,11 +190,11 @@ def parse_simulation_calculation(r: str) -> None:
         f" Period (seconds): {ssql(r, 73, 84)}",
         f"      Temperature: {ssql(r, 86, 91)}",
     ]
-    print("\n".join(result_lst))
+    return "\n".join(lst)
 
 
 ##### DATA LOGGER COMMANDS #####
-def sort_L(r: str) -> None:
+def sort_L(r: str) -> str:
     """Hands response to corresponding parser
 
     Args:
@@ -205,30 +202,30 @@ def sort_L(r: str) -> None:
     """
     match r[1]:
         case "0":
-            parse_ID(r)
+            return parse_ID(r)
         case "1":
-            parse_logging_pointer(r)
+            return parse_logging_pointer(r)
         case "3":
-            parse_log_one_record(r)
+            return parse_log_one_record(r)
         case "4":
-            parse_return_one_record(r)
+            return parse_return_one_record(r)
         case "5":
-            parse_battery_voltage(r)
+            return parse_battery_voltage(r)
         case "M":
-            parse_logging_trigger_mode(r)
+            return parse_logging_trigger_mode(r)
         case "I":
-            parse_logging_interval_settings(r)
+            return parse_logging_interval_settings(r)
         case "c":
-            parse_clock_data(r)
+            return parse_clock_data(r)
         case "C":
-            parse_clock_data(r)
+            return parse_clock_data(r)
         case "a":
-            parse_alarm_data(r)
+            return parse_alarm_data(r)
         case _:
-            print(f"INVALID RESPONSE {r}")
+            return f"INVALID RESPONSE {r}"
 
 
-def parse_ID(r: str) -> None:
+def parse_ID(r: str) -> str:
     """Parses ID response
 
     Example request: L0x
@@ -237,12 +234,15 @@ def parse_ID(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    print("REPORT ID")
-    print("Manufacturer ID:", ssq(r, 3, 5))
-    print("      Device ID:", ssq(r, 7, 9))
+    lst = [
+        "REPORT ID",
+        f"Manufacturer ID: {ssq(r, 3, 5)}",
+        f"      Device ID: {ssq(r, 7, 9)}",
+    ]
+    return "\n".join(lst)
 
 
-def parse_logging_pointer(r: str) -> None:
+def parse_logging_pointer(r: str) -> str:
     """Parses logging pointer
 
     Example request: L1x
@@ -251,11 +251,10 @@ def parse_logging_pointer(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    print("LOGGING POINTER")
-    print("Pointer position:", ssq(r, 3, 8))
+    return f"LOGGING POINTER\nPointer position: {ssq(r, 3, 8)}"
 
 
-def parse_log_one_record(r: str) -> None:
+def parse_log_one_record(r: str) -> str:
     """Parses logging record response
 
     Example request: L3x
@@ -264,11 +263,10 @@ def parse_log_one_record(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    print("LOG ONE RECORD RESPONSE")
-    print("Pointer position:", ssq(r, 3, 8))
+    return f"LOG ONE RECORD RESPONSE\nPointer position: {ssq(r, 3, 8)}"
 
 
-def parse_return_one_record(r: str) -> None:
+def parse_return_one_record(r: str) -> str:
     """Parses record result
 
     Example request: L40000000000x
@@ -277,7 +275,7 @@ def parse_return_one_record(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    result_lst = [
+    lst = [
         "RETURN ONE RECORD RESPONSE",
         f"               Date: {ssq(r,3,10)}",
         f"        Day of week: {r[12]}",
@@ -286,10 +284,10 @@ def parse_return_one_record(r: str) -> None:
         f"        Temperature: {ssq(r, 29, 35)}",
         f"Battery voltage ADC: {ssq(r, 37, 39)}",
     ]
-    print("\n".join(result_lst))
+    return "\n".join(lst)
 
 
-def parse_battery_voltage(r: str) -> None:
+def parse_battery_voltage(r: str) -> str:
     """Parses battery voltage
 
     Example request: L5x
@@ -298,14 +296,13 @@ def parse_battery_voltage(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    print("BATTERY VOLTAGE")
-    print("Internal voltage ADC:", ssq(r, 3, 5))
     adc = int(ssq(r, 3, 5))
     v = 2.048 + (3.3 * adc) / 256.0
-    print("Converted voltage:", v)
+    lst = ["BATTERY VOLTAGE", f"Internal voltage ADC: {adc}", f"Converted voltage: {v}"]
+    return "\n".join(lst)
 
 
-def parse_logging_trigger_mode(r: str) -> None:
+def parse_logging_trigger_mode(r: str) -> str:
     """Parses logging trigger responses
 
     Sent when trigger modes are read or set (LMx and LM_x commands)
@@ -315,41 +312,42 @@ def parse_logging_trigger_mode(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    print("LOGGING TRIGGER MODE RESPONSE", end=" ")
+    lst = ["LOGGING TRIGGER MODE RESPONSE"]
     match r[3]:
         case "0":
-            print("0 = no automatic logging")
+            lst.append("0 = no automatic logging")
         case "1":
-            print("1 = logging granularity in seconds and not powering down")
+            lst.append("1 = logging granularity in seconds and not powering down")
         case "2":
-            print(
+            lst.append(
                 "2 = logging granularity in minutes and powering down between recordings"
             )
         case "3":
-            print(
+            lst.append(
                 "3 = logging every 5 minutes on the 1/12th hour, and powering down between recordings"
             )
         case "4":
-            print(
+            lst.append(
                 "4 = logging every 10 minutes on the 1/6th hour, and powering down between recordings"
             )
         case "5":
-            print(
+            lst.append(
                 "5 = logging every 15 minutes on the 1/4 hour, and powering down between recordings"
             )
         case "6":
-            print(
+            lst.append(
                 "6 = logging every 30 minutes on the 1/2 hour, and powering down between recordings"
             )
         case "7":
-            print(
+            lst.append(
                 "7 = logging every hour on the hour, and powering down between recordings"
             )
         case _:
-            print("INVALID RESPONSE")
+            lst.append("INVALID RESPONSE")
+    return " ".join(lst)
 
 
-def parse_logging_interval_settings(r: str) -> None:
+def parse_logging_interval_settings(r: str) -> str:
     """Parses logging interval
 
     Sent when intervals are read or set (LIx and LI_x commands)
@@ -359,7 +357,7 @@ def parse_logging_interval_settings(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    result_lst = [
+    lst = [
         "LOGGING INTERVAL SETTINGS",
         f"EEPROM interval period (sec): {ssql(r, 3, 13)}",
         f"EEPROM interval period (min): {ssql(r, 15, 25)}",
@@ -367,10 +365,10 @@ def parse_logging_interval_settings(r: str) -> None:
         f"   RAM interval period (min): {ssql(r, 39, 49)}",
         f"   RAM light threshold value: {ssql(r, 51, 62)}",
     ]
-    print("\n".join(result_lst))
+    return "\n".join(lst)
 
 
-def parse_clock_data(r: str) -> None:
+def parse_clock_data(r: str) -> str:
     """Parses clock data
 
     Send when intervals are read or set (LCx and Lcx commands)
@@ -381,18 +379,19 @@ def parse_clock_data(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    print("CLOCK DATA RESPONSE")
+    head = "CLOCK DATA RESPONSE"
     if r[1] == ("C"):
-        print("Set command received")
-    result_lst = [
+        head = head + "\nSet command received"
+    lst = [
+        head,
         f"       Date: {ssq(r,3,10)}",
         f"Day of week: {r[12]}",
         f"       Time: {ssq(r,14,21)}",
     ]
-    print("\n".join(result_lst))
+    return "\n".join(lst)
 
 
-def parse_alarm_data(r: str) -> None:
+def parse_alarm_data(r: str) -> str:
     """Parses alarm data
 
     Example request: Lax
@@ -401,7 +400,7 @@ def parse_alarm_data(r: str) -> None:
     Args:
         r (str): message from unit
     """
-    result_lst = [
+    lst = [
         "ALARM DATA RESPONSE",
         f"         Address 07H seconds: {ssq(r, 3, 5)}",
         f"         Address 08H minutes: {ssq(r, 7, 9)}",
@@ -409,7 +408,7 @@ def parse_alarm_data(r: str) -> None:
         f"             Address 0AH day: {ssq(r,15,17)}",
         f"Address 0FH control register: {ssq(r,19,20)}",
     ]
-    print("\n".join(result_lst))
+    return "\n".join(lst)
 
 
 ##### UTILITIES #####
@@ -443,7 +442,7 @@ def ssql(s: str, first: int, last: int) -> str:
     return output.lstrip("0").strip()
 
 
-def sort_response(r: str) -> None:
+def sort_response(r: str) -> str:
     """Sorts all messages from machine to the corresponding parser
 
     Args:
@@ -451,23 +450,23 @@ def sort_response(r: str) -> None:
     """
     match r[0]:
         case "r":
-            parse_reading(r)
+            return parse_reading(r)
         case "c":
-            parse_cal_info(r)
+            return parse_cal_info(r)
         case "z":
             if r[1] == (","):
-                parse_manual_cal(r)
+                return parse_manual_cal(r)
             else:
-                parse_arm_cal_command(r)
+                return parse_arm_cal_command(r)
         case "i":
-            parse_unit_information(r)
+            return parse_unit_information(r)
         case "I":
-            parse_interval_settings(r)
+            return parse_interval_settings(r)
         case "s":
-            parse_simulation_values(r)
+            return parse_simulation_values(r)
         case "S":
-            parse_simulation_calculation(r)
+            return parse_simulation_calculation(r)
         case "L":
-            sort_L(r)
+            return sort_L(r)
         case _:
-            pass
+            return ""
