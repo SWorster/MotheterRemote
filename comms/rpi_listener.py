@@ -56,7 +56,7 @@ def listen() -> None:
 
 def echo(s: str):
     """fancy print statement"""
-    os.system(f"echo '{s}'")
+    os.system(f"echo '        LISTENER: {s}'")
 
 
 def main() -> None:
