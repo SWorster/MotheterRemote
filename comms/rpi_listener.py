@@ -75,6 +75,10 @@ def main() -> None:
 
     args = vars(parser.parse_args())  # get arguments from command line
     port = args.get("port")
+    if isinstance(port, str):
+        print("port is string, whoops")
+        global so_port
+        so_port = int(port)
     if isinstance(port, int):
         global so_port
         so_port = port

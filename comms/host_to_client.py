@@ -61,7 +61,9 @@ def server(command: str) -> None:
 def run_thing(command: str):
     import threading
 
+    print("port", so_port)
     party_mode()
+    print("port", so_port)
     t1 = threading.Thread(target=run_remote)
     t2 = threading.Thread(target=server, args=[command])
 
