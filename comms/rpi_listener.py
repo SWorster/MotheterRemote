@@ -5,7 +5,6 @@ import time
 import os
 import argparse
 
-
 # config settings
 rpi_addr = configs.rpi_addr
 so_port = configs.so_port

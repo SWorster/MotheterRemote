@@ -1,0 +1,23 @@
+# import os
+import subprocess
+import sys
+
+# os.system("hostname -I")
+
+# cmd = ["hostname", "-I"]
+
+
+os_in_use = sys.platform
+print(os_in_use)
+cmd = ""
+# match os_in_use:
+#     case
+
+# if os_in_use=="darwin":
+#     pass
+
+cmd = ["ipconfig", "getifaddr", "en0"]
+output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
+s = output.decode()
+print(output)
+print(s)
