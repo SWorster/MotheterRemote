@@ -28,6 +28,13 @@ else:
 rpi_is_wifi = True  # if the RPi uses a wifi connection
 rpi_is_cellular = False  # if the RPi uses a cellular connection
 rpi_is_radio = False  # if the RPi uses LoRa to talk to an accessory RPi
+rpi_lora_port = ""
+
+"""Info about accessory RPi, if it exists"""
+acc_repo = "MotheterRemote/comms"  # path to this repo directory
+acc_data_path = "/var/tmp/sqm_macleish/"  # path where data gets saved (NOT in repo)
+acc_image_path = "/var/tmp/images/"  # path where camera images saved (NOT in repo)
+acc_lora_port = ""
 
 #! info about accessory RPi should go here, if/when we get to that point
 
