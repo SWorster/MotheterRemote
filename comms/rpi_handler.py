@@ -1,9 +1,10 @@
 import configs
-
-# import lora_parent
+import lora_parent
 import sensor
 import threading
-import serial
+import rpi_wifi
+
+# import serial
 
 radio = configs.rpi_is_radio
 wifi = configs.rpi_is_wifi
@@ -15,22 +16,46 @@ EOF = "\r"
 
 
 class Input:
+    """interface for different host connections"""
+
     def __init__(self):
         if wifi:
             self = Wifi()
         elif cellular:
             self = Cellular()
 
-    def send_to_host(self, m: str): ...
+    def host_to_rpi(self) -> str: ...
+
+    def rpi_to_host(self, m: str): ...
 
 
-class Wifi(Input): ...
+class Wifi(Input):
+    """handles wifi connection"""
+
+    def __init__(self):
+        self.conn = rpi_wifi.sock()
+
+    def host_to_rpi(self) -> str:
+        return self.conn.recv()
+
+    def rpi_to_host(self, m: str):
+        self.conn.send(m)
 
 
-class Cellular(Input): ...
+class Cellular(Input):
+    """handles cellular connection"""
+
+    def __init__(self):
+        pass
+
+    def host_to_rpi(self) -> str: ...
+
+    def rpi_to_host(self, m: str): ...
 
 
 class Output:
+    """interface for output connections"""
+
     def __init__(self):
         if radio:
             self = Radio()
@@ -39,65 +64,42 @@ class Output:
 
     def rpi_to_client(self, m: str): ...
 
-    def client_to_rpi(self, m: str | None = None) -> str: ...
+    def client_to_rpi(self) -> str: ...
 
 
 class Radio(Output):  # client = rpi over lora
+    """handles radio connection"""
+
     def __init__(self):
-        self.s = serial.Serial(ADDR, BAUD, timeout=None)
-        self.t1 = threading.Thread(self.listen())  # listener in background
-
-    def start_listen(self) -> None:
-        try:
-            self.t1.start()
-        except RuntimeError:
-            print("already running listen()")
-
-    def listen(self) -> None:
-        self.live = True
-        while self.live:
-            full_msg = self.s.read_until(EOF.encode())
-            msg_arr = full_msg.decode().split(EOL)
-            for msg in msg_arr:
-                self.client_to_rpi(msg)
-
-    def send(self, msg: str | list[str] = "test") -> None:
-        if isinstance(msg, list):
-            m = EOL.join(msg)
-        else:
-            m = msg
-        self.s.write((m + EOF).encode())
+        self.device = lora_parent.Ser()
 
     def rpi_to_client(self, m: str):
-        self.send(m)
+        self.device.send(m)
 
-    def client_to_rpi(self, m: str | None = None) -> str: ...
+    def client_to_rpi(self) -> str:
+        msg_arr = self.device.return_collected()
+        return EOL.join(msg_arr)
 
 
 class Direct(Output):  # in this case client=sensor
+    """handles sensor connection"""
+
     def __init__(self):
         self.device = sensor.SQM()
 
     def rpi_to_client(self, m: str):
-        resp = self.device.send_command(m)
-        self.client_to_rpi(resp)
+        self.device.send_command(m)
 
-    def client_to_rpi(self, m: str | None = None) -> str:
-        # because this is always/only triggered when we send a message to the sensor, we need to just return the string we get from the rpi_to_client function. the only reason this is so weird is because it needs to cooperate with the class it inherits from
-        if m != None:
-            return m
-        return ""
-
-    # def forward(self, m: str) -> str:
-    #     return self.device.send_command(m)
-
-    # def receive(self, m: str) -> str:
-    #     return m
+    def client_to_rpi(self) -> str:
+        msg_arr = self.device.return_collected()
+        return EOL.join(msg_arr)
 
 
 class Handler(Input, Output):
-    # inherits methods from both input and output classes
+    """the handler class. inherits methods from both input and output classes so that it can run everything"""
+
     def __init__(self):
+        """start input/output listeners"""
         self.t1 = threading.Thread(self.listen_host())
         self.t2 = threading.Thread(self.listen_client())
         self.t1.start()
@@ -114,39 +116,6 @@ class Handler(Input, Output):
             self.rpi_to_host(m)
 
     def host_to_rpi(self) -> str: ...
-
-    def client_to_rpi(self, m: str | None = None) -> str: ...
-
     def rpi_to_host(self, m: str): ...
-
+    def client_to_rpi(self) -> str: ...
     def rpi_to_client(self, m: str): ...
-
-
-# def rpi_to_host():
-#     if wifi:
-#         send_wifi()
-#     elif cellular:
-#         send_cell()
-
-
-# def host_to_rpi():
-#     if wifi:
-#         listen_wifi()
-#     elif cellular:
-#         listen_cell()
-
-
-# def rpi_to_client():
-#     if radio:
-#         send_radio()
-#     else:
-#         send_direct()
-
-
-# def client_to_rpi():
-#     if radio:
-#         listen_radio()
-#     else:
-#         listen_direct()
-
-# def send_wifi():

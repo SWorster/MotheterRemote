@@ -61,12 +61,12 @@ class SQM:
     def read_buffer(self) -> bytes | None:
         pass
 
-    def how_to_send(self, command: str) -> None:
+    def send_command(self, command: str) -> None:
         pass
 
-    def send_command(self, command: str, tries: int = 3) -> str:
+    def send_and_receive(self, command: str, tries: int = 3) -> str:
         msg: str = ""
-        self.how_to_send(command)
+        self.send_command(command)
         time.sleep(1)
         byte_msg = self.read_buffer()
         try:  # Sanity check
@@ -81,30 +81,36 @@ class SQM:
             time.sleep(1)
             self.reset_device()
             time.sleep(1)
-            msg = self.send_command(command, tries - 1)
+            msg = self.send_and_receive(command, tries - 1)
             print(("Sensor info: " + str(msg)), end=" ")
         return msg
 
-    def start_continuous_read(self):
+    def start_continuous_read(self) -> None:
+        self.data: list[str]
         self.live = True
         self.t1 = threading.Thread(self.listen())  # listener in background
         self.t1.start()
-        print("tread t1", self.t1.is_alive)
 
-    def stop_continuous_read(self):
+    def stop_continuous_read(self) -> None:
         self.live = False
-        print("tread t1", self.t1.is_alive)
+        self.t1.join()
 
     def listen(self):
+        self.live
         while self.live:
-            time.sleep(1)
+            time.sleep(0.1)
             byte_msg = self.read_buffer()
             try:
                 assert byte_msg != None
                 msg = byte_msg.decode()
-                print(msg)
+                self.data.append(msg)
             except:
                 pass
+
+    def return_collected(self) -> list[str]:
+        d = self.data
+        self.data.clear()
+        return d
 
 
 class SQMLE(SQM):
@@ -190,7 +196,7 @@ class SQMLE(SQM):
             pass
         return msg
 
-    def how_to_send(self, command: str) -> None:
+    def send_command(self, command: str) -> None:
         """how the SQM_LE sends a command to the sensor
 
         Args:
@@ -270,7 +276,7 @@ class SQMLU(SQM):
             pass
         return msg
 
-    def how_to_send(self, command: str) -> None:
+    def send_command(self, command: str) -> None:
         """how the SQM_LU sends a command to the sensor
 
         Args:
@@ -300,5 +306,5 @@ if __name__ == "__main__":
         exit()
 
     d = SQM()  # create device
-    resp = d.send_command(command)
+    resp = d.send_and_receive(command)
     print(f"Sensor response: {resp}")

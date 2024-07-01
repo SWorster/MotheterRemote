@@ -24,7 +24,7 @@ class Ser:
             full_msg = self.s.read_until(EOF.encode())
             msg_arr = full_msg.decode().split(EOL)
             for msg in msg_arr:
-                resp = self.device.send_command(msg)  # get response from device
+                resp = self.device.send_and_receive(msg)  # get response from device
                 self.send(resp)  # forward response over radio
 
     def send(self, msg: str | list[str] = "test") -> None:

@@ -10,9 +10,10 @@ EOF = "\r"
 
 class Ser:
     def __init__(self):
+        self.data: list[str]
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
         self.t1 = threading.Thread(self.listen())  # listener in background
-        # self.t1.start()
+        self.t1.start()
 
     def start_listen(self) -> None:
         try:
@@ -26,7 +27,7 @@ class Ser:
             full_msg = self.s.read_until(EOF.encode())
             msg_arr = full_msg.decode().split(EOL)
             for msg in msg_arr:
-                print(msg)
+                self.data.append(msg)
 
     def send(self, msg: str | list[str] = "test") -> None:
         if isinstance(msg, list):
@@ -34,6 +35,11 @@ class Ser:
         else:
             m = msg
         self.s.write((m + EOF).encode())
+
+    def return_collected(self) -> list[str]:
+        d = self.data
+        self.data.clear()
+        return d
 
     def send_loop(self) -> None:  # ui for debugging only
         while True:
