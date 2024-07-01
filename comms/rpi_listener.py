@@ -1,6 +1,6 @@
 import socket
 import configs
-import rpi_to_sensor
+import sensor
 import time
 import os
 import argparse
@@ -41,7 +41,7 @@ def listen() -> None:
             break
 
         echo(f"Received: {request}")
-        msg = rpi_to_sensor.to_sensor(request)
+        msg = sensor.send_command(request)
         if msg != "":
             response = msg.encode(utf8)  # convert string to bytes
             data = msg.split("\n")[0]
