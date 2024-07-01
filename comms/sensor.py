@@ -8,9 +8,11 @@ import time
 import struct
 import socket
 import serial
-import configs
 import argparse
 import threading
+
+# module imports
+import configs
 
 # config imports
 device_type = configs.device_type.replace("_", "-")
@@ -18,12 +20,9 @@ device_addr = configs.device_addr
 DEBUG = configs.debug
 host_addr = configs.host_addr
 host_name = configs.host_name
-
-
-# constants
-LU_BAUD = 115200
-LE_PORT = 10001
-SOCK_BUF = 256
+LU_BAUD = configs.LU_BAUD
+LE_PORT = configs.LE_PORT
+SOCK_BUF = configs.SOCK_BUF
 # _meta_len_ = None  # Default, to ignore the length of the read string.
 
 

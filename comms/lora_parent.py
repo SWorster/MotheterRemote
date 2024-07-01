@@ -4,12 +4,14 @@ Handles LoRa communications from main RPi.
 
 import serial
 import threading
+
+# module imports
 import configs
 
 ADDR = configs.rpi_lora_port
-BAUD = 115200
-EOL = "\n"
-EOF = "\r"
+BAUD = configs.BAUD
+EOL = configs.EOL
+EOF = configs.EOF
 
 
 class Ser:

@@ -52,20 +52,23 @@ acc_repo = "MotheterRemote/comms"  # path to this repo directory
 acc_data_path = "/var/tmp/sqm_macleish/"  # where sensor stores its data (NOT in repo)
 acc_image_path = "/var/tmp/images/"  # where sensor stores its images (NOT in repo)
 acc_lora_port = "/dev/ttyUSB0"  # accessory RPI's LoRa port
-
+BAUD = 115200  # baud rate
+EOL = "\n"  # end of line character
+EOF = "\r"  # end of file character (marks end of a message)
 
 """Sensor device information"""
 observatory_name = "macleish"
 device_type = "SQM-LU"  # must be SQM-LU or SQM-LE
 device_addr = "/dev/ttyUSB0"  # port on RPi that connects to the sensor
 debug = True  # whether to raise exceptions if something goes a little sideways
-
+LU_BAUD = 115200  # baud rate, for SQM-LU
+LE_PORT = 10001  # port number, for SQM-LE
+SOCK_BUF = 256  # socket buffer size
 
 """Socket info"""
 so_port = 42069  # this gets overwritten in most of the code, so it's just a backup
 so_msg_size = 1024  # should be power of 2
 utf8 = "utf-8"  # encoding method. don't change this unless you REALLY know what you're doing.
-
 
 """settings for rpi_listener.py"""
 TTL = 5  # minutes to wait before quitting

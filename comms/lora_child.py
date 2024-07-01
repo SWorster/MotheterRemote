@@ -4,13 +4,15 @@ Runs on an accessory RPi that communicates to the main RPi using LoRa radio. Thi
 
 import serial
 import threading
+
+# module imports
 import configs
 import sensor
 
 ADDR = configs.acc_lora_port
-BAUD = 115200
-EOL = "\n"  # end of line character
-EOF = "\r"  # end of file character (marks end of a message)
+BAUD = configs.BAUD
+EOL = configs.EOL
+EOF = configs.EOF
 
 
 class Ser:

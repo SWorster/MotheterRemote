@@ -3,11 +3,11 @@ Handles WiFi communication for the RPi.
 """
 
 import socket
-import configs
-
-# import sensor
 import time
 import threading
+
+# module imports
+import configs
 
 # config settings
 rpi_addr = configs.rpi_addr

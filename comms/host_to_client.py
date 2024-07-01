@@ -5,14 +5,16 @@ Runs on host computer, sends a command and gets responses.
 import argparse
 import os
 import time
+import random
+import threading
+
+# python module imports
 import ui_commands
 import configs
 import socket
 import parse_response
-import random
-import threading
 
-t1: threading.Thread | None = None
+# values from config file
 rpi_name = configs.rpi_name
 rpi_addr = configs.rpi_addr
 
@@ -24,19 +26,29 @@ host_data_path = configs.host_data_path
 rpi_data_path = configs.rpi_data_path
 rpi_repo = configs.rpi_repo
 
+# global
+t1: threading.Thread | None = None
+
 
 def generate_port() -> None:
+    """generates random serial port"""
     global so_port
     so_port = random.randint(10000, 65353)
 
 
 def start_listener():
+    """sends command to prompt RPi to start listening"""
     s = f"ssh {rpi_name}@{rpi_addr} 'cd {rpi_repo}; python3 -m rpi_listener {so_port}'"
     print(s)
     os.system(s)
 
 
 def start_socket(command: str) -> None:
+    """to be reworked: handles socket communication
+
+    Args:
+        command (str): command to send
+    """
     time.sleep(1)
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket object
     print("Socket created...")
@@ -65,6 +77,11 @@ def start_socket(command: str) -> None:
 
 
 def run_thing(command: str):
+    """starts listeners
+
+    Args:
+        command (str): command to send
+    """
 
     t1 = threading.Thread(target=start_listener)
     t2 = threading.Thread(target=start_socket, args=[command])

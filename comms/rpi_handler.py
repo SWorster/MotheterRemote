@@ -3,9 +3,9 @@ This handler runs on the main RPi, which is either directly connected to the sen
 """
 
 import threading
-import configs
 
-# import files for I/O options
+# module imports
+import configs
 import rpi_wifi
 import lora_parent
 import sensor
@@ -14,9 +14,9 @@ radio = configs.rpi_is_radio
 wifi = configs.rpi_is_wifi
 cellular = configs.rpi_is_cellular
 ADDR = configs.rpi_lora_port
-BAUD = 115200
-EOL = "\n"
-EOF = "\r"
+BAUD = configs.BAUD
+EOL = configs.EOL
+EOF = configs.EOF
 
 
 class Input:
