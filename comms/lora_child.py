@@ -1,3 +1,7 @@
+"""
+Runs on an accessory RPi that communicates to the main RPi using LoRa radio. This is not part of a relay: this RPi must be directly connected to the sensor.
+"""
+
 import serial
 import threading
 import configs

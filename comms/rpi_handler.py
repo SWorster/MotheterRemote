@@ -1,10 +1,14 @@
+"""
+This handler runs on the main RPi, which is either directly connected to the sensor or is acting as a middleman for a radio-capable RPi. It 
+"""
+
+import threading
 import configs
+
+# import files for I/O options
+import rpi_wifi
 import lora_parent
 import sensor
-import threading
-import rpi_wifi
-
-# import serial
 
 radio = configs.rpi_is_radio
 wifi = configs.rpi_is_wifi
@@ -26,7 +30,7 @@ class Input:
 
     def host_to_rpi(self) -> str: ...
 
-    def rpi_to_host(self, m: str): ...
+    def rpi_to_host(self, m: str) -> None: ...
 
 
 class Wifi(Input):
@@ -38,7 +42,7 @@ class Wifi(Input):
     def host_to_rpi(self) -> str:
         return self.conn.recv()
 
-    def rpi_to_host(self, m: str):
+    def rpi_to_host(self, m: str) -> None:
         self.conn.send(m)
 
 
@@ -50,7 +54,7 @@ class Cellular(Input):
 
     def host_to_rpi(self) -> str: ...
 
-    def rpi_to_host(self, m: str): ...
+    def rpi_to_host(self, m: str) -> None: ...
 
 
 class Output:
@@ -62,7 +66,7 @@ class Output:
         else:
             self = Direct()
 
-    def rpi_to_client(self, m: str): ...
+    def rpi_to_client(self, m: str) -> None: ...
 
     def client_to_rpi(self) -> str: ...
 
@@ -73,7 +77,7 @@ class Radio(Output):  # client = rpi over lora
     def __init__(self):
         self.device = lora_parent.Ser()
 
-    def rpi_to_client(self, m: str):
+    def rpi_to_client(self, m: str) -> None:
         self.device.send(m)
 
     def client_to_rpi(self) -> str:
@@ -87,7 +91,7 @@ class Direct(Output):  # in this case client=sensor
     def __init__(self):
         self.device = sensor.SQM()
 
-    def rpi_to_client(self, m: str):
+    def rpi_to_client(self, m: str) -> None:
         self.device.send_command(m)
 
     def client_to_rpi(self) -> str:
@@ -116,6 +120,6 @@ class Handler(Input, Output):
             self.rpi_to_host(m)
 
     def host_to_rpi(self) -> str: ...
-    def rpi_to_host(self, m: str): ...
+    def rpi_to_host(self, m: str) -> None: ...
     def client_to_rpi(self) -> str: ...
-    def rpi_to_client(self, m: str): ...
+    def rpi_to_client(self, m: str) -> None: ...

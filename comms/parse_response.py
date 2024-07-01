@@ -1,4 +1,6 @@
-# runs on host computer, parses messages as they come in
+"""
+Runs on host computer, parses messages as they come in. Can be called using sort_response(str), but can't be run as main.
+"""
 
 
 def parse_reading(r: str) -> str:

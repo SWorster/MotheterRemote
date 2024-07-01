@@ -1,4 +1,5 @@
-"""Generates a correctly-formatted command based on user input.
+"""
+Generates a correctly-formatted command based on user input.
 Can be run directly, which will print the output to the terminal.
 Can be run from another program using command_menu(), which returns the command to send.
 """

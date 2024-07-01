@@ -1,3 +1,7 @@
+"""
+Handles WiFi communication for the RPi.
+"""
+
 import socket
 import configs
 

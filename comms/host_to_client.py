@@ -1,4 +1,7 @@
-# runs on host computer, generates a command from user interface
+"""
+Runs on host computer, sends a command and gets responses.
+"""
+
 import argparse
 import os
 import time

@@ -1,3 +1,7 @@
+"""
+Runs on the RPi that is directly connected to the sensor.
+"""
+
 import os  # type: ignore
 import sys
 import time

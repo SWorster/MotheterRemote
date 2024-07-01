@@ -1,3 +1,7 @@
+"""
+Handles LoRa communications from main RPi.
+"""
+
 import serial
 import threading
 import configs
