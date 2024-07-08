@@ -50,7 +50,7 @@ else:
 
 rpi_is_cellular = False  # if the RPi uses a cellular connection
 
-rpi_is_radio = True  # if the RPi uses LoRa to talk to an accessory RPi
+rpi_is_radio = False  # if the RPi uses LoRa to talk to an accessory RPi
 rpi_lora_port = "/dev/tty.usbmodem578E0230291"  # main RPi's port to the LoRa device
 
 """Info about accessory RPi, if it exists"""

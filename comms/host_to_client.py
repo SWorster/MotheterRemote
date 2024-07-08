@@ -130,6 +130,7 @@ class Connection:
     def return_collected(self) -> list[str]: ...
     def rsync(self) -> None: ...
     def send(self, m: str) -> None: ...
+    def close(self) -> None: ...
 
 
 class Wifi(Connection):
@@ -169,6 +170,7 @@ class Wifi(Connection):
         return msg
 
     def close(self) -> None:
+        print("closing connection")
         self.s.close()
         self.c.close()
 
@@ -215,6 +217,7 @@ class Ethernet(Connection):
         return msg
 
     def close(self) -> None:
+        print("closing connection")
         self.s.close()
         self.c.close()
 
@@ -255,6 +258,7 @@ def main() -> None:
         command = ui_commands.command_menu()  # get command from user
         global global_ui
         global_ui = True
+        conn = Connection()
     if command != None:  # if there's a command to send, send it
         conn = Connection()
         conn.send(command)
