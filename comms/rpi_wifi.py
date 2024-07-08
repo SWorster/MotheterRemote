@@ -17,6 +17,10 @@ utf8 = configs.utf8
 TTL = configs.TTL  # minutes to wait before quitting
 TRIES = configs.TRIES  # number of attempts to make
 timeout = time.time() + 60 * TTL
+ethernet = configs.rpi_is_ethernet  # we can adapt this program to work with ethernet
+rpi_hostname = configs.rpi_hostname
+if ethernet:
+    rpi_addr = rpi_hostname + ".local"
 
 
 class sock:

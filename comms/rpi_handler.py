@@ -11,6 +11,7 @@ import lora_parent
 import sensor
 
 radio = configs.rpi_is_radio
+ethernet = configs.rpi_is_ethernet
 wifi = configs.rpi_is_wifi
 cellular = configs.rpi_is_cellular
 ADDR = configs.rpi_lora_port
@@ -27,10 +28,25 @@ class Input:
             self = Wifi()
         elif cellular:
             self = Cellular()
+        elif ethernet:
+            self = Ethernet()
 
     def host_to_rpi(self) -> str: ...
 
     def rpi_to_host(self, m: str) -> None: ...
+
+
+class Ethernet(Input):
+    """handles ethernet connection"""
+
+    def __init__(self):
+        self.conn = rpi_wifi.sock()
+
+    def host_to_rpi(self) -> str:
+        return self.conn.recv()
+
+    def rpi_to_host(self, m: str) -> None:
+        self.conn.send(m)
 
 
 class Wifi(Input):
@@ -128,7 +144,6 @@ class Handler(Input, Output):
 
 
 def main():
-    print("here")
     h = Handler()
     print(f"started handler {h}")
 
