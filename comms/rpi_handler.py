@@ -40,9 +40,7 @@ class Ethernet(Input):
     """handles ethernet connection"""
 
     def __init__(self):
-        print("HERE")
         self.conn = rpi_wifi.sock()
-        print("MADE SOCK")
 
     def host_to_rpi(self) -> str:
         return self.conn.recv()
@@ -55,6 +53,7 @@ class Wifi(Input):
     """handles wifi connection"""
 
     def __init__(self):
+        print("HERE")
         self.conn = rpi_wifi.sock()
         print("initializing wifi connection")
 
@@ -121,7 +120,10 @@ class Direct(Output):  # in this case client=sensor
 class Handler(Input, Output):
     """the handler class. inherits methods from both input and output classes so that it can run everything"""
 
-    def __init__(self):
+    # def __init__(self):
+    #     pass
+
+    def setup(self) -> None:
         """start input/output listeners"""
         self.t1 = threading.Thread(target=self.listen_host)
         self.t2 = threading.Thread(target=self.listen_client)
@@ -148,6 +150,7 @@ class Handler(Input, Output):
 
 def main():
     h = Handler()
+    h.setup()
     print(f"started handler {h}")
 
 
