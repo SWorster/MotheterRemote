@@ -1,5 +1,5 @@
 """
-This handler runs on the main RPi, which is either directly connected to the sensor or is acting as a middleman for a radio-capable RPi. It 
+This handler runs on the main RPi, which is either directly connected to the sensor or is acting as a middleman for a radio-capable RPi. It
 """
 
 import threading
@@ -123,3 +123,12 @@ class Handler(Input, Output):
     def rpi_to_host(self, m: str) -> None: ...
     def client_to_rpi(self) -> str: ...
     def rpi_to_client(self, m: str) -> None: ...
+
+
+def main():
+    h = Handler()
+    print(f"started handler {h}")
+
+
+if __name__ == "__main__":
+    main()

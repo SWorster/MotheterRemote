@@ -40,7 +40,7 @@ rpi_is_ethernet = False
 rpi_hostname = "rp3"
 
 rpi_is_wifi = True  # if the RPi uses a wifi connection
-rpi_ip = "131.229.147.51"
+rpi_ip = "131.229.142.192"
 rpi_ddns = "macleishmoths.ddns.net"  # ddns recommended if available
 ddns_over_ip = True  # whether to use the ddns address or the ip
 if ddns_over_ip:
