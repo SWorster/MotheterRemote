@@ -41,9 +41,6 @@ global_ui: bool = False
 
 class Connection:
     def __init__(self):
-        self.ui = False
-        self.direct = False
-        self.data: list[str] = []
         if ethernet:
             self = Wifi()  # same implementation
         elif wifi:
@@ -53,8 +50,12 @@ class Connection:
         else:
             self = Wifi()
 
+    def setup(self) -> None:
+        self.ui = False
+        self.direct = False
         self.listening = True
         self.taking_input = True
+        self.data: list[str] = []
         self.t_in = threading.Thread(self.output())
         self.t_out = threading.Thread(self.loop())
         self.t_in.start()
@@ -132,6 +133,9 @@ class Connection:
 
 
 class Wifi(Connection):
+    def __init__(self):
+        self.start_connection()
+        self.setup()
 
     def start_connection(self) -> None:
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -175,6 +179,9 @@ class Wifi(Connection):
 
 
 class Ethernet(Connection):
+    def __init__(self):
+        self.start_connection()
+        self.setup()
 
     def start_connection(self) -> None:
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
