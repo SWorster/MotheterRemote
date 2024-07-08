@@ -132,9 +132,6 @@ class Connection:
 
 
 class Wifi(Connection):
-    def __init__(self):
-        Connection.__init__(self)
-        self.data: list[str]
 
     def start_connection(self) -> None:
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -178,9 +175,6 @@ class Wifi(Connection):
 
 
 class Ethernet(Connection):
-    def __init__(self):
-        Connection.__init__(self)
-        self.data: list[str]
 
     def start_connection(self) -> None:
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
