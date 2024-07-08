@@ -144,7 +144,8 @@ class Wifi(Connection):
     def start_connection(self) -> None:
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # bind the socket to a specific address and port
-        self.s.bind((host_addr, so_port))
+        # self.s.bind((host_addr, so_port))
+        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         print(f"Connecting to {rpi_addr}:{so_port}")
         self.s.connect((rpi_addr, so_port))
         # self.s.listen(5)

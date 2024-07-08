@@ -27,6 +27,7 @@ class sock:
     def __init__(self):
         self.data: list[str]
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # bind the socket to a specific address and port
         self.s.bind((rpi_addr, so_port))
         self.s.listen(5)
