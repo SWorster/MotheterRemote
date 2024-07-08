@@ -34,9 +34,9 @@ Using DDNS is strongly recommended, as the RPi's IP may change unpredictably. Th
 rpi_repo = "MotheterRemote/comms"  # path to this repo directory
 rpi_data_path = "/var/tmp/sqm_macleish/"  # where sensor stores its data (NOT in repo)
 rpi_image_path = "/var/tmp/images/"  # where sensor stores its images (NOT in repo)
+rpi_name = "rp3"
 
 rpi_is_ethernet = False
-rpi_name = "rp3"
 rpi_hostname = "rp3"
 
 rpi_is_wifi = True  # if the RPi uses a wifi connection

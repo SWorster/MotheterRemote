@@ -30,6 +30,8 @@ host_data_path = configs.host_data_path
 rpi_data_path = configs.rpi_data_path
 rpi_repo = configs.rpi_repo
 
+rpi_hostname = configs.rpi_hostname
+
 utf8 = configs.utf8
 
 # global
@@ -173,9 +175,53 @@ class Wifi(Connection):
         os.system(s)
 
 
-class Cellular(Connection):
+class Ethernet(Connection):
     def __init__(self):
-        pass
+        self.data: list[str]
+
+    def start_connection(self) -> None:
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # bind the socket to a specific address and port
+        self.s.bind((host_addr, so_port))
+        self.s.listen(5)
+        print(f"Listening on {rpi_hostname}:{so_port}")
+        c, c_address = self.s.accept()  # accept incoming connections
+        self.c = c
+        print(f"Accepted connection from {c_address[0]}:{c_address[1]}")
+        self.t1 = threading.Thread(self.listen())
+
+    def listen(self) -> None:
+        self.live = True
+        while self.live:
+            m = self.recv()
+            self.data.append(m)
+
+    def return_collected(self) -> list[str]:
+        d = self.data
+        self.data.clear()
+        return d
+
+    def send(self, m: str) -> None:
+        msg = m.encode(utf8)
+        self.c.send(msg)
+
+    def recv(self) -> str:
+        msg_bytes = self.c.recv(so_msg_size)
+        msg = msg_bytes.decode(utf8)
+        return msg
+
+    def close(self) -> None:
+        self.s.close()
+        self.c.close()
+
+    def rsync(self) -> None:
+        s = f"rsync -avz -e ssh {rpi_name}@{rpi_hostname}:{rpi_data_path} {host_data_path}"
+        print(s)
+        os.system(s)
+
+
+class Cellular(Connection):
+    pass
 
 
 def main() -> None:
