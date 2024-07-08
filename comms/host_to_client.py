@@ -30,7 +30,7 @@ host_data_path = configs.host_data_path
 rpi_data_path = configs.rpi_data_path
 rpi_repo = configs.rpi_repo
 
-rpi_hostname = configs.rpi_hostname
+rpi_hostname = configs.rpi_hostname + ".local"
 
 utf8 = configs.utf8
 
@@ -43,6 +43,7 @@ class Connection:
     def __init__(self):
         self.ui = False
         self.direct = False
+        self.data: list[str] = []
         if ethernet:
             self = Wifi()  # same implementation
         elif wifi:
@@ -132,6 +133,7 @@ class Connection:
 
 class Wifi(Connection):
     def __init__(self):
+        Connection.__init__(self)
         self.data: list[str]
 
     def start_connection(self) -> None:
@@ -177,6 +179,7 @@ class Wifi(Connection):
 
 class Ethernet(Connection):
     def __init__(self):
+        Connection.__init__(self)
         self.data: list[str]
 
     def start_connection(self) -> None:
