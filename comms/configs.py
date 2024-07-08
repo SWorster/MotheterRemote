@@ -72,7 +72,7 @@ LE_PORT = 10001  # port number, for SQM-LE
 SOCK_BUF = 256  # socket buffer size
 
 """Socket info"""
-so_port = 44444  # this gets overwritten in most of the code, so it's just a backup
+so_port = 42069  # this gets overwritten in most of the code, so it's just a backup
 so_msg_size = 1024  # should be power of 2
 utf8 = "utf-8"  # encoding method. don't change this unless you REALLY know what you're doing.
 
