@@ -110,11 +110,13 @@ class Handler(Input, Output):
         self.t2.start()
 
     def listen_host(self) -> None:
+        print("listening for messages from host")
         while True:
             m = self.host_to_rpi()
             self.rpi_to_client(m)
 
     def listen_client(self) -> None:
+        print("listening for messages from client")
         while True:
             m = self.client_to_rpi()
             self.rpi_to_host(m)
@@ -126,8 +128,8 @@ class Handler(Input, Output):
 
 
 def main():
+    print("here")
     h = Handler()
-    print(f"started handler {h}")
 
 
 if __name__ == "__main__":
