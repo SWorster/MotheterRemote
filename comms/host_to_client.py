@@ -2,7 +2,6 @@
 Runs on host computer, sends a command and gets responses.
 """
 
-import argparse
 import os
 import time
 import threading
@@ -56,73 +55,77 @@ class Connection:
         self.listening = True
         self.taking_input = True
         self.data: list[str] = []
-        self.t_in = threading.Thread(self.output())
+        self.t_in = threading.Thread(self.responses())
         self.t_out = threading.Thread(self.loop())
+
+    def start_listening_in(self):
         self.t_in.start()
+
+    def start_listening_out(self):
         self.t_out.start()
 
-    def output(self) -> None:
+    def responses(self) -> None:
         while self.listening:
             time.sleep(1)
             arr = self.return_collected()
             for m in arr:
                 print(parse_response.sort_response(m))
 
-    def get_ui(self) -> str | None:
-        u = ui_commands.command_menu()
-        if u == "exit":
-            self.ui = False
-            print("exiting user interface command generator")
-            return
-        if u == "":
-            return
-        return u
-
-    def direct_entry(self) -> str | None:
-        print("Type cancel to stop sending direct commands,")
-        c = input("or enter command to send: ")
-        if c == "cancel":
-            print("exiting direct entry")
-            self.direct = False
-            return
-        return c
-
-    def no_ui(self) -> str | None:
-        modes = [
-            "MODES:",
-            "direct: enter commands directly",
-            "ui: user interface command generator",
-            "sync: retrieve data",
-            "quit: exit program",
-        ]
-        print("\n".join(modes))
-        command = input("Type mode: ")
-        match command:
-            case "direct":
-                print("activating direct command entry")
-                self.direct = True
-            case "sync":
-                self.rsync()
-            case "ui":
-                print("activating user interface command generator")
-                self.ui = True
-                return
-            case "quit":
-                print("exiting loop")
-                self.taking_input = False
-                return
-            case _:
-                print("input not recognized")
-                return
-
     def loop(self) -> None:
+        def get_ui() -> str | None:
+            u = ui_commands.command_menu()
+            if u == "exit":
+                self.ui = False
+                print("exiting user interface command generator")
+                return
+            if u == "":
+                return
+            return u
+
+        def direct_entry() -> str | None:
+            print("Type cancel to stop sending direct commands,")
+            c = input("or enter command to send: ")
+            if c == "cancel":
+                print("exiting direct entry")
+                self.direct = False
+                return
+            return c
+
+        def no_ui() -> str | None:
+            modes = [
+                "MODES:",
+                "direct: enter commands directly",
+                "ui: user interface command generator",
+                "sync: retrieve data",
+                "quit: exit program",
+            ]
+            print("\n".join(modes))
+            command = input("Type mode: ")
+            match command:
+                case "direct":
+                    print("activating direct command entry")
+                    self.direct = True
+                case "sync":
+                    self.rsync()
+                case "ui":
+                    print("activating user interface command generator")
+                    self.ui = True
+                    return
+                case "quit":
+                    print("exiting loop")
+                    self.taking_input = False
+                    return
+                case _:
+                    print("input not recognized")
+                    return
+
         while self.taking_input:
             if self.ui:
-                s = self.get_ui()
+                s = get_ui()
             elif self.direct:
-                s = self.direct_entry()
+                s = direct_entry()
             else:
-                s = self.no_ui()
+                s = no_ui()
 
             if s != None:
                 self.send(s)
@@ -233,41 +236,11 @@ class Cellular(Connection):
 
 def main() -> None:
     """parses arguments"""
-    parser = argparse.ArgumentParser(
-        prog="get_command.py",
-        description="Sends a command to the raspberry pi",
-        epilog=f"If no argument given, syncs collected data",
-    )
-    parser.add_argument(
-        "command",
-        nargs="?",
-        type=str,
-        help="To send a command you've already made, just give it as an argument",
-    )
-    parser.add_argument("-ui", "-u", action="store_true", help="enables user interface")
-    parser.add_argument(
-        "-sync", "-s", action="store_true", help="sync data, no interface"
-    )
 
-    args = vars(parser.parse_args())  # get arguments from command line
-    ui = args.get("ui")
-    command = args.get("command")
-    sync = args.get("sync")
-
-    if isinstance(ui, bool) and ui:  # if user wants interface
-        command = ui_commands.command_menu()  # get command from user
-        global global_ui
-        global_ui = True
-        conn = Connection()
-    if command != None:  # if there's a command to send, send it
-        conn = Connection()
-        conn.send(command)
-    elif sync:
-        s = f"rsync -avz -e ssh {rpi_name}@{rpi_addr}:{rpi_data_path} {host_data_path}"
-        print(s)
-        os.system(s)
-    else:
-        conn = Connection()
+    conn = Connection()
+    conn.start_listening_in()
+    conn.start_listening_out()
+    conn.loop()
 
 
 if __name__ == "__main__":
