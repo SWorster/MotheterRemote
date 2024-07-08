@@ -40,7 +40,9 @@ class Ethernet(Input):
     """handles ethernet connection"""
 
     def __init__(self):
+        print("HERE")
         self.conn = rpi_wifi.sock()
+        print("MADE SOCK")
 
     def host_to_rpi(self) -> str:
         return self.conn.recv()
@@ -54,6 +56,7 @@ class Wifi(Input):
 
     def __init__(self):
         self.conn = rpi_wifi.sock()
+        print("initializing wifi connection")
 
     def host_to_rpi(self) -> str:
         return self.conn.recv()

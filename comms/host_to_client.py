@@ -145,11 +145,15 @@ class Wifi(Connection):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # bind the socket to a specific address and port
         self.s.bind((host_addr, so_port))
-        self.s.listen(5)
-        print(f"Listening on {rpi_addr}:{so_port}")
-        c, c_address = self.s.accept()  # accept incoming connections
-        self.c = c
-        print(f"Accepted connection from {c_address[0]}:{c_address[1]}")
+        print(f"Connecting to {rpi_addr}:{so_port}")
+        self.s.connect((rpi_addr, so_port))
+        # self.s.listen(5)
+        # print(f"Listening on {rpi_addr}:{so_port}")
+        # c, c_address = self.s.accept()  # accept incoming connections
+        # self.c = c
+        # print(f"Accepted connection from {c_address[0]}:{c_address[1]}")
+        print(f"Connected to {rpi_addr}:{so_port}")
+        self.c = self.s
         self.t1 = threading.Thread(self.listen())
 
     def listen(self) -> None:
