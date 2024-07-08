@@ -104,8 +104,8 @@ class Handler(Input, Output):
 
     def __init__(self):
         """start input/output listeners"""
-        self.t1 = threading.Thread(self.listen_host())
-        self.t2 = threading.Thread(self.listen_client())
+        self.t1 = threading.Thread(target=self.listen_host)
+        self.t2 = threading.Thread(target=self.listen_client)
         self.t1.start()
         self.t2.start()
 
@@ -130,6 +130,7 @@ class Handler(Input, Output):
 def main():
     print("here")
     h = Handler()
+    print(f"started handler {h}")
 
 
 if __name__ == "__main__":
