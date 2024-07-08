@@ -57,6 +57,16 @@ class sock:
         self.c.close()
 
 
+def main():
+    s = sock()
+    s.send("test")
+    lst = s.return_collected()
+    print(lst)
+
+
+if __name__ == "__main__":
+    main()
+
 # def listen() -> None:
 #     print("LISTENER:")
 #     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

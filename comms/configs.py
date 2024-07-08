@@ -16,7 +16,7 @@ Relevant files:
 
 All code relating to SQM sensor communication was unceremoniously copied from the Py3SQM project and has been extensively modified (bastardized). If you find yourself needing to debug or rework anything in that area, I recommend checking that project for assistance. I attempted to improve upon Py3SQM, but was unsuccessful because of the ephem module (it's coded in python 2, there's no type checking, and there is NO documentation). However, my experimentation did result in a moderately cleaner, semi-type-checked, and better-documented version of the project.
 
-This code suite was only tested on an SQM-LU device. The framework for an SQM-LE exists, but you may have to debug it yourself (sorry, not much I could do on that front without the actual device). 
+This code suite was only tested on an SQM-LU device. The framework for an SQM-LE exists, but you may have to debug it yourself (sorry, not much I could do on that front without the actual device).
 
 To prevent your host/RPi IP address from changing, you can either request a static IP through your institution or get a DDNS address (NoIP is a good option, although you have to update and renew it monthly).
 """
@@ -34,7 +34,12 @@ Using DDNS is strongly recommended, as the RPi's IP may change unpredictably. Th
 rpi_repo = "MotheterRemote/comms"  # path to this repo directory
 rpi_data_path = "/var/tmp/sqm_macleish/"  # where sensor stores its data (NOT in repo)
 rpi_image_path = "/var/tmp/images/"  # where sensor stores its images (NOT in repo)
+
+rpi_is_ethernet = False
 rpi_name = "rp3"
+rpi_hostname = "rp3"
+
+rpi_is_wifi = True  # if the RPi uses a wifi connection
 rpi_ip = "131.229.147.51"
 rpi_ddns = "macleishmoths.ddns.net"  # ddns recommended if available
 ddns_over_ip = True  # whether to use the ddns address or the ip
@@ -42,16 +47,17 @@ if ddns_over_ip:
     rpi_addr = rpi_ddns
 else:
     rpi_addr = rpi_ip
-rpi_is_wifi = True  # if the RPi uses a wifi connection
+
 rpi_is_cellular = False  # if the RPi uses a cellular connection
+
 rpi_is_radio = True  # if the RPi uses LoRa to talk to an accessory RPi
-rpi_lora_port = "/dev/ttyUSB0"  # main RPi's port to the LoRa device
+rpi_lora_port = "/dev/tty.usbmodem578E0230291"  # main RPi's port to the LoRa device
 
 """Info about accessory RPi, if it exists"""
 acc_repo = "MotheterRemote/comms"  # path to this repo directory
 acc_data_path = "/var/tmp/sqm_macleish/"  # where sensor stores its data (NOT in repo)
 acc_image_path = "/var/tmp/images/"  # where sensor stores its images (NOT in repo)
-acc_lora_port = "/dev/ttyUSB0"  # accessory RPI's LoRa port
+acc_lora_port = "/dev/ttyUSB_LORA"  # accessory RPI's LoRa port
 BAUD = 115200  # baud rate
 EOL = "\n"  # end of line character
 EOF = "\r"  # end of file character (marks end of a message)

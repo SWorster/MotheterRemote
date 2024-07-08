@@ -657,7 +657,8 @@ def command_menu() -> str:
         5 = simulation commands\n\
         6 = data logging commands\n\
         7 = data logging utilities\n\
-        8 = bootloader commands (not yet implemented)"
+        8 = bootloader commands (not yet implemented)\n\
+        9 = exit user interface"
     )
     resp = parse(f"Select a category: ")
     print("")
@@ -678,6 +679,8 @@ def command_menu() -> str:
             return logging_settings()
         case "8":
             print("BOOTLOADER COMMANDS ARE NOT YET IMPLEMENTED")
+        case "9":
+            return "exit"
         case "0":
             return debugging()
         case _:
