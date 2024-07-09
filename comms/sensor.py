@@ -54,8 +54,8 @@ class SQM:
         buffer_data = self.read_buffer()
         s = "Clearing buffer ... | " + str(buffer_data) + " | ... DONE"
         print(s)
-        if s != "Clearing buffer ... | b'' | ... DONE":
-            print(s)
+        # if s != "Clearing buffer ... | b'' | ... DONE":
+        #     print(s)
 
     def send_and_receive(self, command: str, tries: int = 3) -> str:
         print(f"sending message {command}, tries={tries}")
@@ -223,13 +223,9 @@ class SQMLU(SQM):
         try:
             print(f"Trying fixed device address {device_addr}")
             self.addr = device_addr
-            print(1)
             self.s = serial.Serial(self.addr, self.bauds, timeout=2)
-            print(2)
             self.start_connection()
-            print(3)
             super().clear_buffer()
-            print(4)
         except:  # device not at that address
             print(
                 f"Device not found on {device_addr}, searching for device address ..."
@@ -325,6 +321,6 @@ if __name__ == "__main__":
         exit()
 
     d = SQM()  # create device
-    # time.sleep(5)
-    # resp = d.send_and_receive(command)
-    # print(f"Sensor response: {resp}")
+    time.sleep(5)
+    resp = d.send_and_receive(command)
+    print(f"Sensor response: {resp}")
