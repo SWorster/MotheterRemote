@@ -325,5 +325,6 @@ if __name__ == "__main__":
         exit()
 
     d = SQM()  # create device
+    time.sleep(5)
     resp = d.send_and_receive(command)
     print(f"Sensor response: {resp}")
