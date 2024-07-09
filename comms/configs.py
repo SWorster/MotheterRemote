@@ -24,7 +24,7 @@ To prevent your host/RPi IP address from changing, you can either request a stat
 """Info about the host computer. This should be a computer with a static IP."""
 host_data_path = "data"  # path within repo
 host_name = "skyeworster"
-host_addr = "131.229.152.158"  # ip or ddns, either should work #TODO should test this
+host_addr = "10.10.20.110"  # ip or ddns, either should work #TODO should test this
 
 
 """Info about RPi. Careful: this is the RPi that the server will talk to, which may or may not be the one attached to the sensor device.
@@ -40,9 +40,9 @@ rpi_is_ethernet = False
 rpi_hostname = "rp3"
 
 rpi_is_wifi = True  # if the RPi uses a wifi connection
-rpi_ip = "131.229.142.192"
+rpi_ip = "10.10.9.11"
 rpi_ddns = "macleishmoths.ddns.net"  # ddns recommended if available
-ddns_over_ip = True  # whether to use the ddns address or the ip
+ddns_over_ip = False  # whether to use the ddns address or the ip
 if ddns_over_ip:
     rpi_addr = rpi_ddns
 else:
