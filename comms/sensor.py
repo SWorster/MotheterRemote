@@ -42,6 +42,7 @@ class SQM:
             self = SQMLU()
         if device_type == "SQM-LE":
             self = SQMLE()
+        self.data: list[str]
 
     def start_connection(self) -> None:
         """Start photometer connection"""
