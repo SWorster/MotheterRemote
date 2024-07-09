@@ -204,6 +204,7 @@ class SQMLE(SQM):
             if msg.decode() == "":
                 return None
             print("buffer: ", msg.decode())
+            self.data.append(msg.decode())
         except:
             pass
         return msg
@@ -292,6 +293,7 @@ class SQMLU(SQM):
             if msg.decode() == "":
                 return None
             print("buffer: ", msg.decode())
+            self.data.append(msg.decode())
         except:
             pass
         return msg
