@@ -36,13 +36,13 @@ elif device_type == "SQM-LU":
 class SQM:
     """Shared methods for SQM devices"""
 
-    def __init__(self):
-        self.data: list[str] = []
-        if device_type == "SQM-LU":
-            self = SQMLU()
-        if device_type == "SQM-LE":
-            self = SQMLE()
-        # self.data: list[str] = []
+    # def __init__(self):
+    #     self.data: list[str] = []
+    #     if device_type == "SQM-LU":
+    #         self = SQMLU()
+    #     if device_type == "SQM-LE":
+    #         self = SQMLE()
+    # self.data: list[str] = []
 
     def reset_device(self) -> None:
         """Connection reset"""
@@ -218,13 +218,13 @@ class SQMLU(SQM):
     def __init__(self) -> None:
         """Search for the photometer and read its metadata"""
         self.data: list[str] = []
-        self.bauds = LU_BAUD
         try:
             print(f"Trying fixed device address {device_addr}")
             self.addr = device_addr
-            # self.s = serial.Serial(self.addr, self.bauds, timeout=2)
+            # self.s = serial.Serial(self.addr, LU_BAUD, timeout=2)
             self.start_connection()
-            self.clear_buffer()
+            print(f"Device found at address {device_addr}")
+
         except:  # device not at that address
             print(
                 f"Device not found on {device_addr}, searching for device address ..."
@@ -232,8 +232,9 @@ class SQMLU(SQM):
             self.addr = self.search()
             print(("Found address %s ... " % str(self.addr)))
             self.start_connection()
-            self.clear_buffer()
-            self.send_and_receive("rx")
+
+        self.clear_buffer()
+        self.send_and_receive("rx")
 
     def search(self) -> str:
         """
@@ -287,7 +288,8 @@ class SQMLU(SQM):
         msg = None
         try:
             msg = self.s.readline()
-            print("buffer: ", msg)
+            self.data.append(msg.decode())
+            print("buffer: ", msg.decode())
         except:
             pass
         return msg
@@ -298,20 +300,7 @@ class SQMLU(SQM):
         Args:
             command (str): the command to send
         """
-        self.s.write(command.encode())
-
-    def reset_device(self) -> None:
-        """Connection reset"""
-        self.close_connection()
-        time.sleep(0.1)
-        self.start_connection()
-
-    def clear_buffer(self):
-        buffer_data = self.read_buffer()
-        s = "Clearing buffer ... | " + str(buffer_data) + " | ... DONE"
-        print(s)
-        # if s != "Clearing buffer ... | b'' | ... DONE":
-        #     print(s)
+        print("sending: ", self.s.write(command.encode()))
 
     def send_and_receive(self, command: str, tries: int = 3) -> str:
         print(f"sending message {command}, tries={tries}")
@@ -335,40 +324,6 @@ class SQMLU(SQM):
             print(("Sensor info: " + str(msg)), end=" ")
         return msg
 
-    def start_continuous_read(self) -> None:
-        self.data: list[str]
-        self.live = True
-        self.t1 = threading.Thread(self.listen())  # listener in background
-        self.t1.start()
-
-    def stop_continuous_read(self) -> None:
-        self.live = False
-        self.t1.join()
-
-    def listen(self):
-        self.live
-        while self.live:
-            time.sleep(0.1)
-            byte_msg = self.read_buffer()
-            try:
-                assert byte_msg != None
-                msg = byte_msg.decode()
-                self.data.append(msg)
-            except:
-                pass
-
-    def return_collected(self) -> list[str]:
-        d = self.data
-        self.data.clear()
-        return d
-
-    def rpi_to_client(self, m: str) -> None:
-        self.send_command(m)
-
-    def client_to_rpi(self) -> str:
-        msg_arr = self.return_collected()
-        return EOL.join(msg_arr)
-
 
 if __name__ == "__main__":
     """This file is designed to run only on the RPi that is directly hooked up to the sensor. If it is run as main, it will just parse your arguments and print the sensor response. To get multiple sensor responses, create an SQM() instance from another program."""
@@ -390,7 +345,13 @@ if __name__ == "__main__":
         print(f"command is not a string. command: {command}, type: {type(command)}")
         exit()
 
-    d = SQM()  # create device
+    if device_type == "SQM-LU":
+        d = SQMLU()
+    elif device_type == "SQM-LE":
+        d = SQMLE()
+    else:
+        d = SQMLU()  # default
+    # d = SQM()  # create device
     time.sleep(5)
     resp = d.send_and_receive(command)
     print(f"Sensor response: {resp}")
