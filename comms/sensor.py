@@ -44,14 +44,6 @@ class SQM:
             self = SQMLE()
         # self.data: list[str] = []
 
-    def start_connection(self) -> None:
-        """Start photometer connection"""
-        pass
-
-    def close_connection(self) -> None:
-        """End photometer connection"""
-        pass
-
     def reset_device(self) -> None:
         """Connection reset"""
         self.close_connection()
@@ -63,12 +55,6 @@ class SQM:
         s = "Clearing buffer ... | " + str(buffer_data) + " | ... DONE"
         if s != "Clearing buffer ... | b'' | ... DONE":
             print(s)
-
-    def read_buffer(self) -> bytes | None:
-        pass
-
-    def send_command(self, command: str) -> None:
-        pass
 
     def send_and_receive(self, command: str, tries: int = 3) -> str:
         print(f"sending message {command}, tries={tries}")
@@ -125,6 +111,14 @@ class SQM:
     def client_to_rpi(self) -> str:
         msg_arr = self.return_collected()
         return EOL.join(msg_arr)
+
+    def start_connection(self) -> None: ...
+
+    def close_connection(self) -> None: ...
+
+    def read_buffer(self) -> bytes | None: ...
+
+    def send_command(self, command: str) -> None: ...
 
 
 class SQMLE(SQM):
