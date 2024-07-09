@@ -109,8 +109,8 @@ def loop():
     while True:
         time.sleep(1)
         d = output.client_to_rpi()  # get messages from child
-        print("rpi wifi loop: ", d)
         if d != "":
+            print("rpi wifi loop: ", d)
             conn.send_to_host(d)  # if message exists, send it
 
 
