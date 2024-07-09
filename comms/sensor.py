@@ -69,8 +69,8 @@ class SQM:
         except:
             if tries <= 0:
                 print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
-                if DEBUG:
-                    raise
+                # if DEBUG:
+                #     raise
                 return ""
             time.sleep(1)
             self.reset_device()
