@@ -138,7 +138,7 @@ class SQMLE(SQM):
         self.port = LE_PORT
         self.start_connection()
 
-        self.clear_buffer()
+        super().clear_buffer()
 
     def search(self) -> list[None] | str:
         """Search SQM LE in the LAN. Return its address"""
@@ -227,7 +227,7 @@ class SQMLU(SQM):
             print(2)
             self.start_connection()
             print(3)
-            self.clear_buffer()
+            super().clear_buffer()
             print(4)
         except:  # device not at that address
             print(
