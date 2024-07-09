@@ -20,6 +20,7 @@ host_port = configs.host_server
 host_client = configs.host_client
 rpi_port = configs.rpi_server
 rpi_client = configs.rpi_client
+device_type = configs.device_type
 
 so_msg_size = configs.so_msg_size
 utf8 = configs.utf8
@@ -116,7 +117,13 @@ def main():
     if lora:
         output = lora_parent.Radio()
     else:
-        output = sensor.SQM()
+        if device_type == "SQM-LU":
+            output = sensor.SQMLU()
+        elif device_type == "SQM-LE":
+            output = sensor.SQMLE()
+        else:
+            output = sensor.SQMLU()  # default
+        # output = sensor.SQM()
 
     l = threading.Thread(target=loop)
     l.start()
