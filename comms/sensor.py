@@ -203,7 +203,7 @@ class SQMLE(SQM):
             msg = self.s.recv(SOCK_BUF)
             if msg.decode() == "":
                 return None
-            print("buffer: ", msg.decode())
+            print("buffer: ", msg.decode().strip())
             self.data.append(msg.decode())
             print("data: ", self.data)
         except:
@@ -293,7 +293,7 @@ class SQMLU(SQM):
             msg = self.s.readline()
             if msg.decode() == "":
                 return None
-            print("buffer: ", msg.decode())
+            print("buffer: ", msg.decode().strip())
             self.data.append(msg.decode())
             print(self.data)
         except:
