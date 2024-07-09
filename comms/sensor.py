@@ -205,6 +205,7 @@ class SQMLE(SQM):
                 return None
             print("buffer: ", msg.decode())
             self.data.append(msg.decode())
+            print("data: ", self.data)
         except:
             pass
         return msg
