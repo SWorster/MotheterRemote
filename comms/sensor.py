@@ -287,6 +287,7 @@ class SQMLU(SQM):
         msg = None
         try:
             msg = self.s.readline()
+            print("buffer: ", msg)
         except:
             pass
         return msg
@@ -298,6 +299,28 @@ class SQMLU(SQM):
             command (str): the command to send
         """
         self.s.write(command.encode())
+
+    def send_and_receive(self, command: str, tries: int = 3) -> str:
+        print(f"sending message {command}, tries={tries}")
+        msg: str = ""
+        self.send_command(command)
+        time.sleep(5)
+        byte_msg = self.read_buffer()
+        try:  # Sanity check
+            assert byte_msg != None
+            msg = byte_msg.decode()
+        except:
+            if tries <= 0:
+                print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
+                if DEBUG:
+                    raise
+                return ""
+            time.sleep(1)
+            self.reset_device()
+            time.sleep(1)
+            msg = self.send_and_receive(command, tries - 1)
+            print(("Sensor info: " + str(msg)), end=" ")
+        return msg
 
 
 if __name__ == "__main__":
