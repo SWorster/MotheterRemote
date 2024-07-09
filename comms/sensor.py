@@ -69,8 +69,8 @@ class SQM:
         except:
             if tries <= 0:
                 print(("ERR. Reading the photometer!: %s" % str(byte_msg)))
-                # if DEBUG:
-                #     raise
+                if DEBUG:
+                    raise
                 return ""
             time.sleep(1)
             self.reset_device()
@@ -138,8 +138,7 @@ class SQMLE(SQM):
             print(("Found address %s ... " % str(self.addr)))
         self.port = LE_PORT
         self.start_connection()
-
-        super().clear_buffer()
+        self.clear_buffer()
 
     def search(self) -> list[None] | str:
         """Search SQM LE in the LAN. Return its address"""
@@ -223,9 +222,9 @@ class SQMLU(SQM):
         try:
             print(f"Trying fixed device address {device_addr}")
             self.addr = device_addr
-            self.s = serial.Serial(self.addr, self.bauds, timeout=2)
+            # self.s = serial.Serial(self.addr, self.bauds, timeout=2)
             self.start_connection()
-            super().clear_buffer()
+            self.clear_buffer()
         except:  # device not at that address
             print(
                 f"Device not found on {device_addr}, searching for device address ..."
@@ -234,6 +233,7 @@ class SQMLU(SQM):
             print(("Found address %s ... " % str(self.addr)))
             self.start_connection()
             self.clear_buffer()
+            self.send_and_receive("rx")
 
     def search(self) -> str:
         """
