@@ -57,7 +57,7 @@ class Server:
 
         try:
             sock.connect((host_addr, rpi_client))  # Connect to server and send data
-            sock.sendall(f"{m}{EOF}".encode())  # send everything
+            sock.sendall(f"{m}".encode())  # send everything
         finally:
             sock.close()  # die
         print(f"Sent: {m}")  # for debugging
@@ -72,7 +72,9 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
         self.data = self.request.recv(1024)
         cur_thread = threading.current_thread()
-        print(f"{self.client_address[0]} {cur_thread}: {self.data}")  # for debugging
+        print(
+            f"{self.client_address[0]} {cur_thread.name}: {self.data.decode(utf8)}"
+        )  # for debugging
         global output
         output.rpi_to_client(self.data)  # forward message to radio/sensor
 

@@ -70,7 +70,7 @@ class Server:
 
         try:
             sock.connect((rpi_addr, rpi_port))  # Connect to server and send data
-            sock.sendall(f"{m}{EOF}".encode())  # send everything
+            sock.sendall(f"{m}".encode())  # send everything
         finally:
             sock.close()  # die
         print(f"Sent: {m}")  # for debugging
@@ -85,7 +85,9 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
         self.data = self.request.recv(1024)
         cur_thread = threading.current_thread()
-        print(f"{self.client_address[0]} {cur_thread}: {self.data}")  # for debugging
+        print(
+            f"{self.client_address[0]} {cur_thread.name}: {self.data.decode(utf8)}"
+        )  # for debugging
 
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
@@ -100,7 +102,9 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(1024).strip()
-        print(f"{self.client_address[0]} wrote: {self.data}")  # print result to console
+        print(
+            f"{self.client_address[0]} wrote: {self.data.decode(utf8)}"
+        )  # print result to console
 
 
 # class Connection:
