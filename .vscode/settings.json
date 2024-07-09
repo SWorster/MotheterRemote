@@ -113,6 +113,7 @@
     "rawdata",
     "RDWR",
     "replug",
+    "REUSEADDR",
     "RXREADOUT",
     "scandir",
     "sentfromhost",

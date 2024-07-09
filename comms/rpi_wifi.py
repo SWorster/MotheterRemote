@@ -110,8 +110,9 @@ def loop():
     while True:
         time.sleep(1)
         d = output.client_to_rpi()  # get messages from child
+        print("d", d)
         if len(d) > 0:
-            print("ď", d)
+            # print("ď", d)
             conn.send_to_host(str(d))  # if message exists, send it
 
 
