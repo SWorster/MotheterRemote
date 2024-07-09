@@ -103,15 +103,16 @@ class SQM:
 
     def return_collected(self) -> list[str]:
         d = self.data
+        print(f"deleting data {self.data}")
         self.data.clear()
         return d
 
     def rpi_to_client(self, m: str) -> None:
         self.send_command(m)
 
-    def client_to_rpi(self) -> str:
+    def client_to_rpi(self) -> list[str]:
         msg_arr = self.return_collected()
-        return EOL.join(msg_arr)
+        return msg_arr
 
     def start_connection(self) -> None: ...
 
