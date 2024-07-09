@@ -294,6 +294,7 @@ class SQMLU(SQM):
                 return None
             print("buffer: ", msg.decode())
             self.data.append(msg.decode())
+            print(self.data)
         except:
             pass
         return msg
