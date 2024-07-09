@@ -47,8 +47,18 @@ global_ui: bool = False
 class Server:
     def __init__(self):
         # Create the server, binding to localhost on specified port
-        self.server = socketserver.TCPServer((host_addr, host_port), MyTCPHandler)
-        self.server.serve_forever()  # run server forever (until program interrupted)
+        print(f"creating host server {host_addr}:{host_port}")
+        self.server = socketserver.TCPServer(
+            (host_addr, host_port), ThreadedTCPRequestHandler
+        )
+        server_thread = threading.Thread(target=self.server.serve_forever)
+        # Exit the server thread when the main thread terminates
+        server_thread.daemon = True
+        server_thread.start()
+        print("Server loop running in thread:", server_thread.name)
+
+        # self.server = socketserver.TCPServer((host_addr, host_port), MyTCPHandler)
+        # self.server.serve_forever()  # run server forever (until program interrupted)
 
     def send_to_rpi(self, m: str) -> None:
         """simple socket connection that forwards a single message to the host, then dies
@@ -64,6 +74,18 @@ class Server:
         finally:
             sock.close()  # die
         print(f"Sent: {m}")  # for debugging
+
+
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    pass
+
+
+class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
+
+    def handle(self):
+        self.data = self.request.recv(1024)
+        cur_thread = threading.current_thread()
+        print(f"{self.client_address[0]} {cur_thread}: {self.data}")  # for debugging
 
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
