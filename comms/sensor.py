@@ -42,7 +42,7 @@ class SQM:
             self = SQMLU()
         if device_type == "SQM-LE":
             self = SQMLE()
-        self.data: list[str] = []
+        # self.data: list[str] = []
 
     def start_connection(self) -> None:
         """Start photometer connection"""
@@ -228,9 +228,13 @@ class SQMLU(SQM):
         try:
             print(f"Trying fixed device address {device_addr}")
             self.addr = device_addr
+            print(1)
             self.s = serial.Serial(self.addr, self.bauds, timeout=2)
+            print(2)
             self.start_connection()
+            print(3)
             self.clear_buffer()
+            print(4)
         except:  # device not at that address
             print(
                 f"Device not found on {device_addr}, searching for device address ..."
@@ -326,6 +330,6 @@ if __name__ == "__main__":
         exit()
 
     d = SQM()  # create device
-    time.sleep(5)
-    resp = d.send_and_receive(command)
-    print(f"Sensor response: {resp}")
+    # time.sleep(5)
+    # resp = d.send_and_receive(command)
+    # print(f"Sensor response: {resp}")
