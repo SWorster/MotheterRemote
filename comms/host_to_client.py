@@ -111,6 +111,26 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         )  # print result to console
 
 
+def loop():
+    global conn
+    while True:
+        d = input("Type message to send: ")
+        conn.send_to_rpi(d)  # if message exists, send it
+
+
+def main() -> None:
+    """parses arguments"""
+    global conn
+    conn = Server()  # start TCP server
+
+    l = threading.Thread(target=loop)
+    l.start()
+
+
+if __name__ == "__main__":
+    main()
+
+
 # class Connection:
 #     def __init__(self):
 #         if ethernet:
@@ -312,26 +332,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 #     pass
 
 
-def loop():
-    global conn
-    while True:
-        d = input("Type message to send: ")
-        conn.send_to_rpi(d)  # if message exists, send it
-
-
-def main() -> None:
-    """parses arguments"""
-    global conn
-    conn = Server()  # start TCP server
-
-    l = threading.Thread(target=loop)
-    l.start()
-
-    # conn = Connection()
-    # conn.start_listening_in()
-    # conn.start_listening_out()
-    # conn.loop()
-
-
-if __name__ == "__main__":
-    main()
+# conn = Connection()
+# conn.start_listening_in()
+# conn.start_listening_out()
+# conn.loop()
