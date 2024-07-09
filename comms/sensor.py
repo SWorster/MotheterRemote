@@ -300,6 +300,19 @@ class SQMLU(SQM):
         """
         self.s.write(command.encode())
 
+    def reset_device(self) -> None:
+        """Connection reset"""
+        self.close_connection()
+        time.sleep(0.1)
+        self.start_connection()
+
+    def clear_buffer(self):
+        buffer_data = self.read_buffer()
+        s = "Clearing buffer ... | " + str(buffer_data) + " | ... DONE"
+        print(s)
+        # if s != "Clearing buffer ... | b'' | ... DONE":
+        #     print(s)
+
     def send_and_receive(self, command: str, tries: int = 3) -> str:
         print(f"sending message {command}, tries={tries}")
         msg: str = ""
@@ -321,6 +334,40 @@ class SQMLU(SQM):
             msg = self.send_and_receive(command, tries - 1)
             print(("Sensor info: " + str(msg)), end=" ")
         return msg
+
+    def start_continuous_read(self) -> None:
+        self.data: list[str]
+        self.live = True
+        self.t1 = threading.Thread(self.listen())  # listener in background
+        self.t1.start()
+
+    def stop_continuous_read(self) -> None:
+        self.live = False
+        self.t1.join()
+
+    def listen(self):
+        self.live
+        while self.live:
+            time.sleep(0.1)
+            byte_msg = self.read_buffer()
+            try:
+                assert byte_msg != None
+                msg = byte_msg.decode()
+                self.data.append(msg)
+            except:
+                pass
+
+    def return_collected(self) -> list[str]:
+        d = self.data
+        self.data.clear()
+        return d
+
+    def rpi_to_client(self, m: str) -> None:
+        self.send_command(m)
+
+    def client_to_rpi(self) -> str:
+        msg_arr = self.return_collected()
+        return EOL.join(msg_arr)
 
 
 if __name__ == "__main__":
