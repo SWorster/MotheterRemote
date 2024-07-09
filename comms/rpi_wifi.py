@@ -72,6 +72,7 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
+        print("rpi handler")
         if not isinstance(self.request, socket.socket):
             print("BaseRequestHandler: self.request not socket")
             return
@@ -109,8 +110,8 @@ def loop():
     while True:
         time.sleep(1)
         d = output.client_to_rpi()  # get messages from child
+        print("rpi wifi loop: ", d)
         if len(d) > 0:
-            print("rpi wifi loop: ", d)
             conn.send_to_host(str(d))  # if message exists, send it
 
 

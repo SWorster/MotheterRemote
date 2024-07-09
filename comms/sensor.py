@@ -103,7 +103,6 @@ class SQM:
 
     def return_collected(self) -> list[str]:
         d = self.data
-        print(f"deleting data {self.data}")
         self.data.clear()
         return d
 
