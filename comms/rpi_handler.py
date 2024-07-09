@@ -18,6 +18,8 @@ ADDR = configs.rpi_lora_port
 BAUD = configs.BAUD
 EOL = configs.EOL
 EOF = configs.EOF
+host_port = configs.host_server
+rpi_port = configs.rpi_server
 
 
 class Input:

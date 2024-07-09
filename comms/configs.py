@@ -59,8 +59,7 @@ acc_data_path = "/var/tmp/sqm_macleish/"  # where sensor stores its data (NOT in
 acc_image_path = "/var/tmp/images/"  # where sensor stores its images (NOT in repo)
 acc_lora_port = "/dev/ttyUSB_LORA"  # accessory RPI's LoRa port
 BAUD = 115200  # baud rate
-EOL = "\n"  # end of line character
-EOF = "\r"  # end of file character (marks end of a message)
+
 
 """Sensor device information"""
 observatory_name = "macleish"
@@ -72,7 +71,13 @@ LE_PORT = 10001  # port number, for SQM-LE
 SOCK_BUF = 256  # socket buffer size
 
 """Socket info"""
-so_port = 42069  # this gets overwritten in most of the code, so it's just a backup
+host_server = 42069  # host server port (to receive)
+host_client = 33333  # host client port (to send from)
+rpi_server = 12345  # rpi server port (to receive)
+rpi_client = 22222  # rpi client port (to send from)
+
+EOL = "\n"  # end of line character
+EOF = "\r"  # end of file character (marks end of a message)
 so_msg_size = 1024  # should be power of 2
 utf8 = "utf-8"  # encoding method. don't change this unless you REALLY know what you're doing.
 

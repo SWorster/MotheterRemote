@@ -15,7 +15,12 @@ import lora_parent
 # config settings
 host_addr = configs.host_addr
 rpi_addr = configs.rpi_addr
-so_port = configs.so_port
+
+host_port = configs.host_server
+host_client = configs.host_client
+rpi_port = configs.rpi_server
+rpi_client = configs.rpi_client
+
 so_msg_size = configs.so_msg_size
 utf8 = configs.utf8
 TTL = configs.TTL  # minutes to wait before quitting
@@ -32,7 +37,7 @@ EOF = configs.EOF
 class Server:
     def __init__(self):
         # Create the server, binding to localhost on specified port
-        self.server = socketserver.TCPServer((rpi_addr, so_port), MyTCPHandler)
+        self.server = socketserver.TCPServer((rpi_addr, rpi_port), MyTCPHandler)
         self.server.serve_forever()  # run server forever (until program interrupted)
 
     def send_to_host(self, m: str) -> None:
@@ -41,11 +46,10 @@ class Server:
         Args:
             m (str): message to send
         """
-        HOST, PORT = host_addr, 9999
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
-            sock.connect((HOST, PORT))  # Connect to server and send data
+            sock.connect((host_addr, rpi_client))  # Connect to server and send data
             sock.sendall(f"{m}{EOF}".encode())  # send everything
         finally:
             sock.close()  # die
