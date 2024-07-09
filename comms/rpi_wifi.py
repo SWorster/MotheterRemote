@@ -54,6 +54,7 @@ class Server:
         Args:
             m (str): message to send
         """
+        print("send_to_host")
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
@@ -108,7 +109,7 @@ def loop():
     while True:
         time.sleep(1)
         d = output.client_to_rpi()  # get messages from child
-        print(d)
+        print("rpi wifi loop: ", d)
         if d != "":
             conn.send_to_host(d)  # if message exists, send it
 

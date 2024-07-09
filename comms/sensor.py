@@ -235,9 +235,7 @@ class SQMLU(SQM):
             self.addr = self.search()
             print(("Found address %s ... " % str(self.addr)))
             self.start_connection()
-
         self.clear_buffer()
-        self.send_and_receive("rx")
 
     def search(self) -> str:
         """
