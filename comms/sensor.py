@@ -224,15 +224,16 @@ class SQMLU(SQM):
     def __init__(self) -> None:
         """Search for the photometer and read its metadata"""
         self.data: list[str] = []
+        self.bauds = LU_BAUD
         try:
             self.addr = device_addr
+            self.s = serial.Serial(self.addr, self.bauds, timeout=2)
         except:  # device not at that address
             print(
                 f"Device not found on {device_addr}, searching for device address ..."
             )
             self.addr = self.search()
             print(("Found address %s ... " % str(self.addr)))
-        self.bauds = LU_BAUD
         self.start_connection()
         self.clear_buffer()
 
