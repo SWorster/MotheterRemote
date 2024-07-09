@@ -226,6 +226,7 @@ class SQMLU(SQM):
         self.data: list[str] = []
         self.bauds = LU_BAUD
         try:
+            print(f"Trying fixed device address {device_addr}")
             self.addr = device_addr
             self.s = serial.Serial(self.addr, self.bauds, timeout=2)
             self.start_connection()
