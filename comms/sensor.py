@@ -53,6 +53,7 @@ class SQM:
     def clear_buffer(self):
         buffer_data = self.read_buffer()
         s = "Clearing buffer ... | " + str(buffer_data) + " | ... DONE"
+        print(s)
         if s != "Clearing buffer ... | b'' | ... DONE":
             print(s)
 
