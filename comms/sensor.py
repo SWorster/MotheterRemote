@@ -103,7 +103,7 @@ class SQM:
 
     def return_collected(self) -> list[str]:
         d = self.data
-        self.data.clear()
+        # self.data.clear()
         return d
 
     def rpi_to_client(self, m: str) -> None:
