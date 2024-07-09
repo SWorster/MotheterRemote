@@ -71,9 +71,10 @@ class SQM:
         pass
 
     def send_and_receive(self, command: str, tries: int = 3) -> str:
+        print(f"sending message {command}, tries={tries}")
         msg: str = ""
         self.send_command(command)
-        time.sleep(1)
+        time.sleep(5)
         byte_msg = self.read_buffer()
         try:  # Sanity check
             assert byte_msg != None
