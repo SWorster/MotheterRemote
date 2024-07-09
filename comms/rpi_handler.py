@@ -93,7 +93,7 @@ class Radio(Output):  # client = rpi over lora
     """handles radio connection"""
 
     def __init__(self):
-        self.device = lora_parent.Ser()
+        self.device = lora_parent.Radio()
 
     def rpi_to_client(self, m: str) -> None:
         self.device.send(m)

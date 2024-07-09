@@ -23,6 +23,7 @@ host_name = configs.host_name
 LU_BAUD = configs.LU_BAUD
 LE_PORT = configs.LE_PORT
 SOCK_BUF = configs.SOCK_BUF
+EOL = configs.EOL
 # _meta_len_ = None  # Default, to ignore the length of the read string.
 
 
@@ -114,6 +115,13 @@ class SQM:
         d = self.data
         self.data.clear()
         return d
+
+    def rpi_to_client(self, m: str) -> None:
+        self.send_command(m)
+
+    def client_to_rpi(self) -> str:
+        msg_arr = self.return_collected()
+        return EOL.join(msg_arr)
 
 
 class SQMLE(SQM):

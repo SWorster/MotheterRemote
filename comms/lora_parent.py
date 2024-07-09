@@ -14,7 +14,7 @@ EOL = configs.EOL
 EOF = configs.EOF
 
 
-class Ser:
+class Radio:
     def __init__(self):
         self.data: list[str]
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
@@ -52,9 +52,16 @@ class Ser:
             i = input("Send: ")
             self.send(i)
 
+    def rpi_to_client(self, m: str) -> None:
+        self.send(m)
+
+    def client_to_rpi(self) -> str:
+        msg_arr = self.return_collected()
+        return EOL.join(msg_arr)
+
 
 if __name__ == "__main__":
-    s = Ser()
+    s = Radio()
     s.t1.start()
     s.send_loop()
 
