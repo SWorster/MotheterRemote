@@ -83,10 +83,13 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
-        self.data = self.request.recv(1024)
+        if not isinstance(self.request, socket.socket):
+            print("BaseRequestHandler: self.request not socket")
+            return
+        self.data = self.request.recv(1024).decode(utf8)
         cur_thread = threading.current_thread()
         print(
-            f"{self.client_address[0]} {cur_thread.name}: {self.data.decode(utf8)}"
+            f"{self.client_address[0]} {cur_thread.name}: {self.data}"
         )  # for debugging
 
 
