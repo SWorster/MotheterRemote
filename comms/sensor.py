@@ -228,13 +228,14 @@ class SQMLU(SQM):
         try:
             self.addr = device_addr
             self.s = serial.Serial(self.addr, self.bauds, timeout=2)
+            self.start_connection()
         except:  # device not at that address
             print(
                 f"Device not found on {device_addr}, searching for device address ..."
             )
             self.addr = self.search()
             print(("Found address %s ... " % str(self.addr)))
-        self.start_connection()
+            self.start_connection()
         self.clear_buffer()
 
     def search(self) -> str:
