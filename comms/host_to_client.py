@@ -83,6 +83,7 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
+        print("in request handler")
         if not isinstance(self.request, socket.socket):
             print("BaseRequestHandler: self.request not socket")
             return
@@ -127,8 +128,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 #         self.listening = True
 #         self.taking_input = True
 #         self.data: list[str] = []
-#         self.t_in = threading.Thread(self.responses())
-#         self.t_out = threading.Thread(self.loop())
+#         self.t_in = threading.Thread(target=self.responses)
+#         self.t_out = threading.Thread(target=self.loop)
 
 #     def start_listening_in(self):
 #         self.t_in.start()
@@ -227,7 +228,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 #         # print(f"Accepted connection from {c_address[0]}:{c_address[1]}")
 #         print(f"Connected to {rpi_addr}:{rpi_port}")
 #         self.c = self.s
-#         self.t1 = threading.Thread(self.listen())
+#         self.t1 = threading.Thread(target=self.listen)
 
 #     def listen(self) -> None:
 #         self.live = True
@@ -274,7 +275,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 #         c, c_address = self.s.accept()  # accept incoming connections
 #         self.c = c
 #         print(f"Accepted connection from {c_address[0]}:{c_address[1]}")
-#         self.t1 = threading.Thread(self.listen())
+#         self.t1 = threading.Thread(target=self.listen)
 
 #     def listen(self) -> None:
 #         self.live = True

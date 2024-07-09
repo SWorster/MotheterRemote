@@ -124,9 +124,11 @@ def main():
         else:
             output = sensor.SQMLU()  # default
         # output = sensor.SQM()
+        output.start_continuous_read()
 
     l = threading.Thread(target=loop)
     l.start()
+    print("Listener loop running in thread:", l.name)
 
 
 if __name__ == "__main__":
@@ -137,7 +139,7 @@ if __name__ == "__main__":
 #     def __init__(self):
 #         self.data: list[str]
 #         self.s = serial.Serial(ADDR, BAUD, timeout=None)
-#         self.l = threading.Thread(self.listen())  # listener in background
+#         self.l = threading.Thread(target=self.listen)  # listener in background
 #         self.l.start()
 
 #     def start_listen(self) -> None:
@@ -203,7 +205,7 @@ if __name__ == "__main__":
 #         c, c_address = self.s.accept()  # accept incoming connections
 #         self.c = c
 #         print(f"Accepted connection from {c_address[0]}:{c_address[1]}")
-#         self.t1 = threading.Thread(self.listen())
+#         self.t1 = threading.Thread(target=self.listen)
 
 #     def return_collected(self) -> list[str]:
 #         d = self.data

@@ -82,7 +82,7 @@ class SQM:
     def start_continuous_read(self) -> None:
         self.data: list[str]
         self.live = True
-        self.t1 = threading.Thread(self.listen())  # listener in background
+        self.t1 = threading.Thread(target=self.listen)  # listener in background
         self.t1.start()
 
     def stop_continuous_read(self) -> None:
@@ -203,7 +203,6 @@ class SQMLE(SQM):
             msg = self.s.recv(SOCK_BUF)
             if msg.decode() == "":
                 return None
-            self.data.append(msg.decode())
             print("buffer: ", str(msg))
         except:
             pass
@@ -294,7 +293,6 @@ class SQMLU(SQM):
             msg = self.s.readline()
             if msg.decode() == "":
                 return None
-            self.data.append(msg.decode())
             print("buffer: ", str(msg))
         except:
             pass
