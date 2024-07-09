@@ -58,7 +58,7 @@ class SQM:
         #     print(s)
 
     def send_and_receive(self, command: str, tries: int = 3) -> str:
-        print(f"sending message {command}, tries={tries}")
+        # print(f"sending message {command}, tries={tries}")
         msg: str = ""
         self.send_command(command)
         time.sleep(5)
@@ -201,6 +201,10 @@ class SQMLE(SQM):
         msg = None
         try:
             msg = self.s.recv(SOCK_BUF)
+            if msg.decode() == "":
+                return None
+            self.data.append(msg.decode())
+            print("buffer: ", str(msg))
         except:
             pass
         return msg
@@ -288,8 +292,10 @@ class SQMLU(SQM):
         msg = None
         try:
             msg = self.s.readline()
+            if msg.decode() == "":
+                return None
             self.data.append(msg.decode())
-            print("buffer: ", msg.decode())
+            print("buffer: ", str(msg))
         except:
             pass
         return msg
@@ -300,10 +306,10 @@ class SQMLU(SQM):
         Args:
             command (str): the command to send
         """
-        print("sending: ", self.s.write(command.encode()))
+        self.s.write(command.encode())
 
     def send_and_receive(self, command: str, tries: int = 3) -> str:
-        print(f"sending message {command}, tries={tries}")
+        # print(f"sending message {command}, tries={tries}")
         msg: str = ""
         self.send_command(command)
         time.sleep(5)
