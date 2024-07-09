@@ -103,9 +103,12 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 def loop():
     """loops in a dedicated thread. every second, pulls messages from the child connection's buffer and sends them."""
     global output, conn
+    cur_thread = threading.current_thread()
+    print("Listener loop running in thread:", cur_thread.name)
     while True:
         time.sleep(1)
         d = output.client_to_rpi()  # get messages from child
+        print(d)
         if d != "":
             conn.send_to_host(d)  # if message exists, send it
 
@@ -128,7 +131,6 @@ def main():
 
     l = threading.Thread(target=loop)
     l.start()
-    print("Listener loop running in thread:", l.name)
 
 
 if __name__ == "__main__":
