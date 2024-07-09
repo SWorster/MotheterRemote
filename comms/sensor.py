@@ -37,6 +37,7 @@ class SQM:
     """Shared methods for SQM devices"""
 
     def __init__(self):
+        self.data: list[str]
         if device_type == "SQM-LU":
             self = SQMLU()
         if device_type == "SQM-LE":
@@ -129,6 +130,7 @@ class SQMLE(SQM):
 
     def __init__(self) -> None:
         """Search the photometer in the network and read its metadata"""
+        self.data: list[str]
         try:
             self.addr = device_addr
         except:
@@ -219,6 +221,7 @@ class SQMLE(SQM):
 class SQMLU(SQM):
     def __init__(self) -> None:
         """Search for the photometer and read its metadata"""
+        self.data: list[str]
         try:
             self.addr = device_addr
         except:  # device not at that address
