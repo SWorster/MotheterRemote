@@ -89,7 +89,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         self.data = self.request.recv(1024).decode(utf8).strip()
         cur_thread = threading.current_thread()
         print(
-            f"{self.client_address[0]} {cur_thread.name}: {self.data}"
+            f"Received from {self.client_address[0]} in {cur_thread.name}: {self.data}"
         )  # for debugging
         prettify(self.data)
 

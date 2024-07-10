@@ -77,7 +77,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         self.data = self.request.recv(1024).decode(utf8).strip()
         cur_thread = threading.current_thread()
         print(
-            f"{self.client_address[0]} {cur_thread.name}: {self.data}"
+            f"Received from {self.client_address[0]} in {cur_thread.name}: {self.data}"
         )  # for debugging
         global output
         output.rpi_to_client(self.data)  # forward message to radio/sensor
@@ -92,7 +92,6 @@ def loop():
         time.sleep(1)
         d = output.client_to_rpi()  # get messages from child
         if len(d) > 0:
-            print("data:      ", d)
             conn.send_to_host(EOL.join(d))  # if message exists, send it
 
 

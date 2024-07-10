@@ -24,7 +24,6 @@ LU_BAUD = configs.LU_BAUD
 LE_PORT = configs.LE_PORT
 SOCK_BUF = configs.SOCK_BUF
 EOL = configs.EOL
-# _meta_len_ = None  # Default, to ignore the length of the read string.
 
 
 if device_type == "SQM-LE":
@@ -43,14 +42,12 @@ class SQM:
         self.start_connection()
 
     def clear_buffer(self):
-        buffer_data = self.read_buffer()
-        s = "Clearing buffer ... | " + str(buffer_data) + " | ... DONE"
-        print(s)
-        # if s != "Clearing buffer ... | b'' | ... DONE":
-        #     print(s)
+        print("Clearing buffer ... | ", end="")
+        print(self.read_buffer(), "| ... DONE")
+        # s = "Clearing buffer ... | " + str(buffer_data) + " | ... DONE"
+        # print(s)
 
     def send_and_receive(self, command: str, tries: int = 3) -> str:
-        # print(f"sending message {command}, tries={tries}")
         msg: str = ""
         self.send_command(command)
         time.sleep(5)
@@ -89,7 +86,6 @@ class SQM:
 
     def return_collected(self) -> list[str]:
         d = self.data[:]  # pass by value, not reference
-        print("return collected", d)
         self.data.clear()
         return d
 
@@ -187,10 +183,8 @@ class SQMLE(SQM):
         try:
             msg = self.s.recv(SOCK_BUF)
             if msg.decode() == "":
-                return None
-            print("buffer: ", msg.decode().strip())
-            self.data.append(msg.decode())
-            print("data: ", self.data)
+                return
+            self.data.append(msg.decode().strip())
         except:
             pass
         return msg
@@ -277,10 +271,8 @@ class SQMLU(SQM):
         try:
             msg = self.s.readline()
             if msg.decode() == "":
-                return None
-            print("buffer: ", msg.decode().strip())
+                return
             self.data.append(msg.decode().strip())
-            print("data: ", self.data)
         except:
             pass
         return msg
@@ -294,7 +286,6 @@ class SQMLU(SQM):
         self.s.write(command.encode())
 
     def send_and_receive(self, command: str, tries: int = 3) -> str:
-        # print(f"sending message {command}, tries={tries}")
         msg: str = ""
         self.send_command(command)
         time.sleep(5)
