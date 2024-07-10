@@ -2,7 +2,7 @@
 Runs on host computer, sends a command and gets responses.
 """
 
-# import os
+import os
 import threading
 import socketserver
 import socket
@@ -47,12 +47,15 @@ trigger_prompt: bool = False
 
 class Server:
     def __init__(self):
-        # Create the server, binding to localhost on specified port
         print(f"Creating host server {host_addr}:{host_port}")
-        socketserver.TCPServer.allow_reuse_address = True
+        socketserver.TCPServer.allow_reuse_address = True  # allows reconnecting
+
+        # start TCP server
         self.server = socketserver.TCPServer(
             (host_addr, host_port), ThreadedTCPRequestHandler
         )
+
+        # run server in designated thread
         server_thread = threading.Thread(target=self.server.serve_forever)
         server_thread.daemon = True  # Exit server thread when main thread terminates
         server_thread.start()
@@ -67,43 +70,75 @@ class Server:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
-            sock.connect((rpi_addr, rpi_port))  # Connect to server and send data
+            sock.connect((rpi_addr, rpi_port))  # connect to server
             sock.sendall(f"{m}".encode())  # send everything
+            print(f"Sent: {m}")
         except Exception as e:
-            print(e)
+            print(e)  # print error without halting
             print("Client RPi might not be running rpi_wifi.py")
+            start_listener()  # force RPi to run rpi_wifi.py
+            time.sleep(5)  # give time for program to start before continuing
         finally:
             sock.close()  # die
-        print(f"Sent: {m}")  # for debugging
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    """overwrites TCPServer with custom handler"""
+
     pass
 
 
 class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
+    """overwrites BaseRequestHandler with custom handler"""
 
     def handle(self):
+        """custom request handler for TCP threaded server"""
+        # ensure request is socket
         if not isinstance(self.request, socket.socket):
             print("ThreadedTCPRequestHandler: self.request not socket")
             return
+
+        # when request comes in, decode and format it
         self.data = self.request.recv(1024).decode(utf8).strip()
         cur_thread = threading.current_thread()
         print(
             f"Received from {self.client_address[0]} in {cur_thread.name}: {self.data}"
-        )  # for debugging
-        prettify(self.data)
+        )
+        prettify(self.data)  # print formatted data to terminal
+
+
+def start_listener():
+    """sends command to prompt RPi to start listening"""
+    # nohup allows rpi_wifi.py to run even after terminal ends
+    # & lets process run the the background
+    s = [f"ssh {rpi_name}@{rpi_addr} 'cd {rpi_repo}; nohup python3 rpi_wifi.py' &"]
+    print("Sending command to RPi:", s)
+    to_kill = threading.Thread(target=os.system, args=s)  # run in dedicated thread
+    to_kill.start()
+
+
+def kill_listener():
+    """kills RPi program"""
+    s = f"ssh {rpi_name}@{rpi_addr} 'pkill -f rpi_wifi.py'"
+    print("Sending command to RPi:", s)
+    os.system(s)
 
 
 def prettify(m: str) -> None:
+    """prints formatted response from RPi
+
+    Args:
+        m (str): message to format
+    """
     arr = m.split(EOL)
     for s in arr:
         print(parse_response.sort_response(s))
     global trigger_prompt
-    trigger_prompt = True
+    trigger_prompt = True  # allow next user input
 
 
 def loop():
+    """user input loop"""
     global conn
     while True:
         d = input("Type message to send: ")
@@ -111,8 +146,8 @@ def loop():
         global trigger_prompt
         start = time.time()
         while (time.time() - start < 1.5) and trigger_prompt == False:
-            pass
-        trigger_prompt = False
+            pass  # do nothing until current prompt dealt with, or timeout
+        trigger_prompt = False  # disallow user input
 
 
 def main() -> None:

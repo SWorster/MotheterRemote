@@ -42,12 +42,20 @@ class SQM:
         self.start_connection()
 
     def clear_buffer(self):
+        """clears buffer and prints to console"""
         print("Clearing buffer ... | ", end="")
         print(self.read_buffer(), "| ... DONE")
-        # s = "Clearing buffer ... | " + str(buffer_data) + " | ... DONE"
-        # print(s)
 
     def send_and_receive(self, command: str, tries: int = 3) -> str:
+        """sends and receives a single command. called from main
+
+        Args:
+            command (str): command to send
+            tries (int, optional): how many attempts to make. Defaults to 3.
+
+        Returns:
+            str: sensor response
+        """
         msg: str = ""
         self.send_command(command)
         time.sleep(5)
@@ -69,30 +77,48 @@ class SQM:
         return msg
 
     def start_continuous_read(self) -> None:
+        """starts listener"""
         self.data: list[str]
         self.live = True
         self.t1 = threading.Thread(target=self.listen)  # listener in background
         self.t1.start()
 
     def stop_continuous_read(self) -> None:
+        """stops listener"""
         self.live = False
         self.t1.join()
 
     def listen(self):
+        """listener. runs in dedicated thread"""
         self.live
         while self.live:
             time.sleep(0.1)
             self.read_buffer()  # this stores the data
 
     def return_collected(self) -> list[str]:
+        """clears data array, returns contents
+
+        Returns:
+            list[str]: data to return
+        """
         d = self.data[:]  # pass by value, not reference
         self.data.clear()
         return d
 
     def rpi_to_client(self, m: str) -> None:
+        """sends a command to the sensor
+
+        Args:
+            m (str): command to send
+        """
         self.send_command(m)
 
     def client_to_rpi(self) -> list[str]:
+        """returns responses from sensor
+
+        Returns:
+            list[str]: responses
+        """
         msg_arr = self.return_collected()
         return msg_arr
 

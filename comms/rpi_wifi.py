@@ -37,15 +37,17 @@ EOF = configs.EOF
 
 class Server:
     def __init__(self):
-        # Create the server, binding to localhost on specified port
         print(f"Creating RPi server {rpi_addr}:{rpi_port}")
-        socketserver.TCPServer.allow_reuse_address = True
+        socketserver.TCPServer.allow_reuse_address = True  # allows reconnecting
+
+        # start TCP server
         self.server = socketserver.TCPServer(
             (rpi_addr, rpi_port), ThreadedTCPRequestHandler
         )
+
+        # run server in designated thread
         server_thread = threading.Thread(target=self.server.serve_forever)
-        # Exit the server thread when the main thread terminates
-        server_thread.daemon = True
+        server_thread.daemon = True  # Exit server thread when main thread terminates
         server_thread.start()
         print("Server loop running in", server_thread.name)
 
@@ -58,34 +60,41 @@ class Server:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
-            sock.connect((host_addr, host_port))  # Connect to server and send data
+            sock.connect((host_addr, host_port))  # connect to server
             sock.sendall(f"{m}".encode())  # send everything
+            print(f"Sent: {m}")  # for debugging
         finally:
             sock.close()  # die
-        print(f"Sent: {m}")  # for debugging
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    """overwrites TCPServer with custom handler"""
+
     pass
 
 
 class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
+    """overwrites BaseRequestHandler with custom handler"""
 
     def handle(self):
+        """custom request handler for TCP threaded server"""
+        # ensure request is socket
         if not isinstance(self.request, socket.socket):
             print("ThreadedTCPRequestHandler: self.request not socket")
             return
+
+        # when request comes in, decode and format it
         self.data = self.request.recv(1024).decode(utf8).strip()
         cur_thread = threading.current_thread()
         print(
             f"Received from {self.client_address[0]} in {cur_thread.name}: {self.data}"
-        )  # for debugging
+        )
         global output
         output.rpi_to_client(self.data)  # forward message to radio/sensor
 
 
 def loop():
-    """loops in a dedicated thread. every second, pulls messages from the child connection's buffer and sends them."""
+    """loops in a dedicated thread. pulls messages from the child connection's buffer and sends them."""
     global output, conn
     cur_thread = threading.current_thread()
     print("Listener loop running in thread:", cur_thread.name)
