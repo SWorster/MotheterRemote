@@ -142,16 +142,21 @@ def loop():
     global conn
     while True:
         d = input("Type message to send: ")
-        if d == "ui":
-            d = ui_commands.command_menu()
-        elif d == "rsync" or "sync":
-            rsync()
-            continue
-        elif d == "kill":
-            kill_listener()
-        elif d == "exit":
-            print("ending program")
-            exit()
+        match d:
+            case "ui":
+                d = ui_commands.command_menu()
+            case "rsync" | "sync":
+                rsync()
+                continue
+            case "kill":
+                kill_listener()
+                continue
+            case "exit" | "quit" | "q":
+                print("Ending program")
+                exit()
+            case _:
+                pass
+
         conn.send_to_rpi(d)  # if message exists, send it
         global trigger_prompt
         start = time.time()
