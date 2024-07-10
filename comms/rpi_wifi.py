@@ -119,7 +119,6 @@ def main():
         output.start_continuous_read()
 
     l = threading.Thread(target=loop)
-    l.daemon = True
     l.start()
 
     conn = Server()  # start TCP server

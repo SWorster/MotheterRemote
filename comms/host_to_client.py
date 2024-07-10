@@ -114,7 +114,6 @@ def start_listener():
     s = [f"ssh {rpi_name}@{rpi_addr} 'cd {rpi_repo}; nohup python3 rpi_wifi.py' &"]
     print("Sending command to RPi:", s)
     to_kill = threading.Thread(target=os.system, args=s)  # run in dedicated thread
-    to_kill.daemon = True
     to_kill.start()
 
 
@@ -172,7 +171,6 @@ def main() -> None:
     conn = Server()  # start TCP server
 
     l = threading.Thread(target=loop)
-    l.daemon = True
     l.start()
 
 
