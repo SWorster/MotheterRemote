@@ -144,7 +144,7 @@ def loop():
         d = input("Type message to send: ")
         if d == "ui":
             d = ui_commands.command_menu()
-        elif d == "rsync" or "" or "sync":
+        elif d == "rsync" or "sync":
             rsync()
             continue
         elif d == "kill":
