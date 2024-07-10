@@ -136,7 +136,6 @@ class SQMLE(SQM):
             )
             self.addr = self.search()
             print(("Found address %s ... " % str(self.addr)))
-        self.port = LE_PORT
         self.start_connection()
         self.clear_buffer()
 
@@ -182,13 +181,12 @@ class SQMLE(SQM):
         """Start photometer connection"""
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.settimeout(20)
-        self.s.connect((self.addr, int(self.port)))
-        # self.s.settimeout(1) # idk why this is commented
+        self.s.connect((self.addr, int(LE_PORT)))
+        # self.s.settimeout(1) # idk why this is commented, I didn't comment it out
 
     def close_connection(self) -> None:
         """End photometer connection"""
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0))
-
         request = ""
         r = True
         while r:  # wait until device stops responding
@@ -295,7 +293,7 @@ class SQMLU(SQM):
                 return None
             print("buffer: ", msg.decode().strip())
             self.data.append(msg.decode().strip())
-            print(self.data)
+            print("data: ", self.data)
         except:
             pass
         return msg

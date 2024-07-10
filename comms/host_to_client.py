@@ -97,7 +97,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 def prettify(m: str) -> None:
     arr = m.split(EOL)
     for s in arr:
-        parse_response.sort_response(s)
+        print(parse_response.sort_response(s))
 
 
 def loop():
