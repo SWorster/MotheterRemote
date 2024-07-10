@@ -54,13 +54,9 @@ class Server:
             (host_addr, host_port), ThreadedTCPRequestHandler
         )
         server_thread = threading.Thread(target=self.server.serve_forever)
-        # Exit the server thread when the main thread terminates
-        server_thread.daemon = True
+        server_thread.daemon = True  # Exit server thread when main thread terminates
         server_thread.start()
         print("Server loop running in", server_thread.name)
-
-        # self.server = socketserver.TCPServer((host_addr, host_port), MyTCPHandler)
-        # self.server.serve_forever()  # run server forever (until program interrupted)
 
     def send_to_rpi(self, m: str) -> None:
         """simple socket connection that forwards a single message to the host, then dies
@@ -73,6 +69,9 @@ class Server:
         try:
             sock.connect((rpi_addr, rpi_port))  # Connect to server and send data
             sock.sendall(f"{m}".encode())  # send everything
+        except Exception as e:
+            print(e)
+            print("Client RPi might not be running rpi_wifi.py")
         finally:
             sock.close()  # die
         print(f"Sent: {m}")  # for debugging
@@ -111,7 +110,7 @@ def loop():
         conn.send_to_rpi(d)  # if message exists, send it
         global trigger_prompt
         start = time.time()
-        while (time.time() - start < 1.5) or trigger_prompt == False:
+        while (time.time() - start < 1.5) and trigger_prompt == False:
             pass
         trigger_prompt = False
 
