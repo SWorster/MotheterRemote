@@ -113,7 +113,7 @@ def loop():
         start = time.time()
         while (time.time() - start < 1.5) or trigger_prompt == False:
             pass
-        trigger_prompt = True
+        trigger_prompt = False
 
 
 def main() -> None:
