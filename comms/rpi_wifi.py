@@ -58,7 +58,7 @@ class Server:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
-            sock.connect((host_addr, rpi_client))  # Connect to server and send data
+            sock.connect((host_addr, host_port))  # Connect to server and send data
             sock.sendall(f"{m}".encode())  # send everything
         finally:
             sock.close()  # die
