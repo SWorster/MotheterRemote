@@ -72,32 +72,15 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
-        print("rpi handler")
+        print("rpi request handler")  # for debugging
         if not isinstance(self.request, socket.socket):
-            print("BaseRequestHandler: self.request not socket")
+            print("ThreadedTCPRequestHandler: self.request not socket")
             return
-        self.data = self.request.recv(1024).decode(utf8)
+        self.data = self.request.recv(1024).decode(utf8).strip()
         cur_thread = threading.current_thread()
         print(
             f"{self.client_address[0]} {cur_thread.name}: {self.data}"
         )  # for debugging
-        global output
-        output.rpi_to_client(self.data)  # forward message to radio/sensor
-
-
-class MyTCPHandler(socketserver.BaseRequestHandler):
-    """
-    The request handler class for our server.
-
-    It is instantiated once per connection to the server, and must
-    override the handle() method to implement communication to the
-    client.
-    """
-
-    def handle(self):
-        # self.request is the TCP socket connected to the client
-        self.data = self.request.recv(1024).strip()
-        print(f"{self.client_address[0]} wrote: {self.data}")  # for debugging
         global output
         output.rpi_to_client(self.data)  # forward message to radio/sensor
 
