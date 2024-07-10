@@ -19,6 +19,7 @@ class Radio:
         self.data: list[str]
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
         self.t1 = threading.Thread(self.listen())  # listener in background
+        self.t1.daemon = True
         self.t1.start()
 
     def start_listen(self) -> None:

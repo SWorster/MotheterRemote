@@ -34,10 +34,11 @@ Using DDNS is strongly recommended, as the RPi's IP may change unpredictably. Th
 rpi_repo = "MotheterRemote/comms"  # path to this repo directory
 rpi_data_path = "/var/tmp/sqm_macleish/"  # where sensor stores its data (NOT in repo)
 rpi_image_path = "/var/tmp/images/"  # where sensor stores its images (NOT in repo)
+
 rpi_name = "rp3"
 
 rpi_is_ethernet = False
-rpi_hostname = "rp3"
+rpi_hostname = "rp3.local"
 
 rpi_is_wifi = True  # if the RPi uses a wifi connection
 rpi_ip = "10.10.9.11"
@@ -52,13 +53,13 @@ rpi_is_cellular = False  # if the RPi uses a cellular connection
 
 rpi_is_radio = False  # if the RPi uses LoRa to talk to an accessory RPi
 rpi_lora_port = "/dev/tty.usbmodem578E0230291"  # main RPi's port to the LoRa device
+BAUD = 115200  # baud rate
 
 """Info about accessory RPi, if it exists"""
 acc_repo = "MotheterRemote/comms"  # path to this repo directory
 acc_data_path = "/var/tmp/sqm_macleish/"  # where sensor stores its data (NOT in repo)
 acc_image_path = "/var/tmp/images/"  # where sensor stores its images (NOT in repo)
 acc_lora_port = "/dev/ttyUSB_LORA"  # accessory RPI's LoRa port
-BAUD = 115200  # baud rate
 
 
 """Sensor device information"""
@@ -78,7 +79,6 @@ rpi_client = 22222  # rpi client port (to send from)
 
 EOL = "\n"  # end of line character
 EOF = "\r"  # end of file character (marks end of a message)
-so_msg_size = 1024  # should be power of 2
 utf8 = "utf-8"  # encoding method. don't change this unless you REALLY know what you're doing.
 
 """settings for rpi_listener.py"""

@@ -22,7 +22,6 @@ rpi_port = configs.rpi_server
 rpi_client = configs.rpi_client
 device_type = configs.device_type
 
-so_msg_size = configs.so_msg_size
 utf8 = configs.utf8
 TTL = configs.TTL  # minutes to wait before quitting
 TRIES = configs.TRIES  # number of attempts to make
@@ -120,6 +119,7 @@ def main():
         output.start_continuous_read()
 
     l = threading.Thread(target=loop)
+    l.daemon = True
     l.start()
 
     conn = Server()  # start TCP server

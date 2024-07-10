@@ -9,7 +9,7 @@ import socket
 import time
 
 # python module imports
-# import ui_commands
+import ui_commands
 import configs
 import parse_response
 
@@ -22,7 +22,6 @@ host_addr = configs.host_addr
 rpi_addr = configs.rpi_addr
 rpi_name = configs.rpi_name
 
-so_msg_size = configs.so_msg_size
 so_encoding = configs.utf8
 host_port = configs.host_server
 host_client = configs.host_client
@@ -33,7 +32,8 @@ host_data_path = configs.host_data_path
 rpi_data_path = configs.rpi_data_path
 rpi_repo = configs.rpi_repo
 
-rpi_hostname = configs.rpi_hostname + ".local"
+if ethernet:
+    rpi_addr = configs.rpi_hostname
 
 utf8 = configs.utf8
 EOF = configs.EOF
@@ -114,6 +114,7 @@ def start_listener():
     s = [f"ssh {rpi_name}@{rpi_addr} 'cd {rpi_repo}; nohup python3 rpi_wifi.py' &"]
     print("Sending command to RPi:", s)
     to_kill = threading.Thread(target=os.system, args=s)  # run in dedicated thread
+    to_kill.daemon = True
     to_kill.start()
 
 
@@ -142,6 +143,16 @@ def loop():
     global conn
     while True:
         d = input("Type message to send: ")
+        if d == "ui":
+            d = ui_commands.command_menu()
+        elif d == "rsync" or "" or "sync":
+            rsync()
+            continue
+        elif d == "kill":
+            kill_listener()
+        elif d == "exit":
+            print("ending program")
+            exit()
         conn.send_to_rpi(d)  # if message exists, send it
         global trigger_prompt
         start = time.time()
@@ -150,12 +161,18 @@ def loop():
         trigger_prompt = False  # disallow user input
 
 
+def rsync() -> None:
+    s = f"rsync -avz -e ssh {rpi_name}@{rpi_addr}:{rpi_data_path} {host_data_path}"
+    os.system(s)
+
+
 def main() -> None:
     """parses arguments"""
     global conn
     conn = Server()  # start TCP server
 
     l = threading.Thread(target=loop)
+    l.daemon = True
     l.start()
 
 

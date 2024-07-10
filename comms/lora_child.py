@@ -20,6 +20,7 @@ class Ser:
         """initialize serial connection to device"""
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
         self.t1 = threading.Thread(self.listen())  # run listener in background
+        self.t1.daemon = True
         self.t1.start()
         self.device = sensor.SQM()  # initialize device
 
