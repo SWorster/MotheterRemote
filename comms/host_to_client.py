@@ -3,10 +3,10 @@ Runs on host computer, sends a command and gets responses.
 """
 
 # import os
-# import time
 import threading
 import socketserver
 import socket
+import time
 
 # python module imports
 # import ui_commands
@@ -42,6 +42,7 @@ EOL = configs.EOL
 # global
 t1: threading.Thread | None = None
 global_ui: bool = False
+trigger_prompt: bool = False
 
 
 class Server:
@@ -99,6 +100,8 @@ def prettify(m: str) -> None:
     arr = m.split(EOL)
     for s in arr:
         print(parse_response.sort_response(s))
+    global trigger_prompt
+    trigger_prompt = True
 
 
 def loop():
@@ -106,6 +109,11 @@ def loop():
     while True:
         d = input("Type message to send: ")
         conn.send_to_rpi(d)  # if message exists, send it
+        global trigger_prompt
+        start = time.time()
+        while (time.time() - start < 1.5) or trigger_prompt == False:
+            pass
+        trigger_prompt = True
 
 
 def main() -> None:
