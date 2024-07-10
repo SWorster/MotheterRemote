@@ -102,6 +102,7 @@ class SQM:
                 pass
 
     def return_collected(self) -> list[str]:
+        print("self.data",self.data)
         d = self.data[:]  # pass by value, not reference
         print("return collected", d)
         self.data.clear()
