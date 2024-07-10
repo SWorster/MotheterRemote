@@ -11,8 +11,7 @@ import socket
 # python module imports
 # import ui_commands
 import configs
-
-# import parse_response
+import parse_response
 
 # values from config file
 ethernet = configs.rpi_is_ethernet
@@ -38,6 +37,7 @@ rpi_hostname = configs.rpi_hostname + ".local"
 
 utf8 = configs.utf8
 EOF = configs.EOF
+EOL = configs.EOL
 
 # global
 t1: threading.Thread | None = None
@@ -47,7 +47,7 @@ global_ui: bool = False
 class Server:
     def __init__(self):
         # Create the server, binding to localhost on specified port
-        print(f"creating host server {host_addr}:{host_port}")
+        print(f"Creating host server {host_addr}:{host_port}")
         self.server = socketserver.TCPServer(
             (host_addr, host_port), ThreadedTCPRequestHandler
         )
@@ -55,7 +55,7 @@ class Server:
         # Exit the server thread when the main thread terminates
         server_thread.daemon = True
         server_thread.start()
-        print("Server loop running in thread:", server_thread.name)
+        print("Server loop running in", server_thread.name)
 
         # self.server = socketserver.TCPServer((host_addr, host_port), MyTCPHandler)
         # self.server.serve_forever()  # run server forever (until program interrupted)
@@ -91,6 +91,13 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         print(
             f"{self.client_address[0]} {cur_thread.name}: {self.data}"
         )  # for debugging
+        prettify(self.data)
+
+
+def prettify(m: str) -> None:
+    arr = m.split(EOL)
+    for s in arr:
+        parse_response.sort_response(s)
 
 
 def loop():

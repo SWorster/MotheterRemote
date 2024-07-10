@@ -38,7 +38,7 @@ EOF = configs.EOF
 class Server:
     def __init__(self):
         # Create the server, binding to localhost on specified port
-        print(f"creating rpi server {rpi_addr}:{rpi_port}")
+        print(f"Creating RPi server {rpi_addr}:{rpi_port}")
         self.server = socketserver.TCPServer(
             (rpi_addr, rpi_port), ThreadedTCPRequestHandler
         )
@@ -46,7 +46,7 @@ class Server:
         # Exit the server thread when the main thread terminates
         server_thread.daemon = True
         server_thread.start()
-        print("Server loop running in thread:", server_thread.name)
+        print("Server loop running in", server_thread.name)
 
     def send_to_host(self, m: str) -> None:
         """simple socket connection that forwards a single message to the host, then dies
@@ -54,7 +54,6 @@ class Server:
         Args:
             m (str): message to send
         """
-        print("send_to_host")
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
@@ -94,7 +93,7 @@ def loop():
         d = output.client_to_rpi()  # get messages from child
         if len(d) > 0:
             print("data:      ", d)
-            conn.send_to_host(str(d))  # if message exists, send it
+            conn.send_to_host(EOL.join(d))  # if message exists, send it
 
 
 def main():
