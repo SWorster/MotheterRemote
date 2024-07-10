@@ -83,7 +83,6 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
-        print("host request handler")  # for debugging
         if not isinstance(self.request, socket.socket):
             print("ThreadedTCPRequestHandler: self.request not socket")
             return
