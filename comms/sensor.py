@@ -102,8 +102,8 @@ class SQM:
                 pass
 
     def return_collected(self) -> list[str]:
-        d = self.data
-        # self.data.clear()
+        d = self.data[:]  # pass by value, not reference
+        self.data.clear()
         return d
 
     def rpi_to_client(self, m: str) -> None:
