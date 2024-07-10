@@ -39,6 +39,7 @@ class Server:
     def __init__(self):
         # Create the server, binding to localhost on specified port
         print(f"Creating RPi server {rpi_addr}:{rpi_port}")
+        socketserver.TCPServer.allow_reuse_address = True
         self.server = socketserver.TCPServer(
             (rpi_addr, rpi_port), ThreadedTCPRequestHandler
         )

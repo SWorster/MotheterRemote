@@ -48,6 +48,7 @@ class Server:
     def __init__(self):
         # Create the server, binding to localhost on specified port
         print(f"Creating host server {host_addr}:{host_port}")
+        socketserver.TCPServer.allow_reuse_address = True
         self.server = socketserver.TCPServer(
             (host_addr, host_port), ThreadedTCPRequestHandler
         )
