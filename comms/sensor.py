@@ -36,14 +36,6 @@ elif device_type == "SQM-LU":
 class SQM:
     """Shared methods for SQM devices"""
 
-    # def __init__(self):
-    #     self.data: list[str] = []
-    #     if device_type == "SQM-LU":
-    #         self = SQMLU()
-    #     if device_type == "SQM-LE":
-    #         self = SQMLE()
-    # self.data: list[str] = []
-
     def reset_device(self) -> None:
         """Connection reset"""
         self.close_connection()
@@ -93,16 +85,9 @@ class SQM:
         self.live
         while self.live:
             time.sleep(0.1)
-            byte_msg = self.read_buffer()
-            try:
-                assert byte_msg != None
-                msg = byte_msg.decode()
-                self.data.append(msg)
-            except:
-                pass
+            self.read_buffer()  # this stores the data
 
     def return_collected(self) -> list[str]:
-        print("self.data",self.data)
         d = self.data[:]  # pass by value, not reference
         print("return collected", d)
         self.data.clear()
