@@ -99,7 +99,6 @@ def loop():
 def main():
     """when program is run, creates server for Wifi connection from host, creates socket to send to host, sets up connection to lora radio or sensor."""
     global output, conn
-    conn = Server()  # start TCP server
     if lora:
         output = lora_parent.Radio()
     else:
@@ -113,6 +112,8 @@ def main():
 
     l = threading.Thread(target=loop)
     l.start()
+
+    conn = Server()  # start TCP server
 
 
 if __name__ == "__main__":
