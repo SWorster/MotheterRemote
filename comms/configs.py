@@ -66,9 +66,9 @@ LE_PORT = 10001  # port number, for SQM-LE
 SOCK_BUF = 256  # socket buffer size
 
 """Socket info"""
-host_server = 42069  # host server port (to receive)
-host_client = 33333  # host client port (to send from)
-rpi_server = 12345  # rpi server port (to receive)
+host_server = 55555  # host server port (to receive)
+host_client = 44444  # host client port (to send from)
+rpi_server = 33333  # rpi server port (to receive)
 rpi_client = 22222  # rpi client port (to send from)
 
 EOL = "\n"  # end of line character
