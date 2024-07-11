@@ -20,10 +20,11 @@ class Ser:
     def __init__(self):
         """initialize serial connection to device"""
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
-        self.t1 = threading.Thread(target=self.listen)  # run listener in background
+        self.t1 = threading.Thread(target=self.listen)  # run radio listener
         # self.t1.daemon = True
         self.t1.start()
         self.device = sensor.SQM()  # initialize device
+        self.device.start_continuous_read()  # start device listener
 
     def listen(self) -> None:
         """get incoming radio messages, send them to device"""
