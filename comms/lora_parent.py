@@ -73,7 +73,6 @@ class Radio:
 
 if __name__ == "__main__":
     s = Radio()
-    s.t1.start()
     s.send_loop()
 
 
