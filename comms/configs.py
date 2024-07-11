@@ -24,7 +24,7 @@ To prevent your host/RPi IP address from changing, you can either request a stat
 """Info about the host computer. This should be a computer with a static IP."""
 host_data_path = "data"  # path within repo
 host_name = "skyeworster"
-host_addr = "10.10.17.201"  # ip or ddns, either should work #TODO should test this
+host_addr = "10.10.0.186"  # ip or ddns, either should work #TODO should test this
 
 
 """Info about RPi. Careful: this is the RPi that the server will talk to, which may or may not be the one attached to the sensor device.
@@ -51,8 +51,8 @@ else:
 
 rpi_is_cellular = False  # if the RPi uses a cellular connection
 
-rpi_is_radio = False  # if the RPi uses LoRa to talk to an accessory RPi
-rpi_lora_port = "/dev/tty.usbmodem578E0230291"  # main RPi's port to the LoRa device
+rpi_is_radio = True  # if the RPi uses LoRa to talk to an accessory RPi
+rpi_lora_port = "/dev/ttyUSB_LORA"  # main RPi's port to the LoRa device
 BAUD = 115200  # baud rate
 
 """Info about accessory RPi, if it exists"""
