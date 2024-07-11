@@ -2,6 +2,7 @@
 Handles LoRa communications from main RPi.
 """
 
+import time
 import serial
 import threading
 
@@ -23,20 +24,28 @@ class Radio:
         self.t1.start()
 
     def start_listen(self) -> None:
+        """tries to start listener, if not already running"""
         try:
             self.t1.start()
         except RuntimeError:
             print("already running listen()")
 
     def listen(self) -> None:
+        """radio listener that runs continuously"""
         self.live = True
         while self.live:
+            time.sleep(0.1)
             full_msg = self.s.read_until(EOF.encode())
             msg_arr = full_msg.decode().split(EOL)
             for msg in msg_arr:
                 self.data.append(msg)
 
-    def send(self, msg: str | list[str] = "test") -> None:
+    def send(self, msg: str | list[str] = "rx") -> None:
+        """sends message to child rpi over radio
+
+        Args:
+            msg (str | list[str], optional): message to send. Defaults to "rx".
+        """
         if isinstance(msg, list):
             m = EOL.join(msg)
         else:
@@ -48,7 +57,8 @@ class Radio:
         self.data.clear()
         return d
 
-    def send_loop(self) -> None:  # ui for debugging only
+    def send_loop(self) -> None:
+        """ui for debugging only"""
         while True:
             i = input("Send: ")
             self.send(i)
@@ -63,7 +73,7 @@ class Radio:
 
 if __name__ == "__main__":
     s = Radio()
-    # s.t1.start()
+    s.t1.start()
     s.send_loop()
 
 

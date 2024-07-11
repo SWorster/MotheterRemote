@@ -2,6 +2,7 @@
 Runs on an accessory RPi that communicates to the main RPi using LoRa radio. This is not part of a relay: this RPi must be directly connected to the sensor.
 """
 
+import time
 import serial
 import threading
 
@@ -28,11 +29,15 @@ class Ser:
         """get incoming radio messages, send them to device"""
         self.live = True
         while self.live:
+            time.sleep(0.1)
             full_msg = self.s.read_until(EOF.encode())
             msg_arr = full_msg.decode().split(EOL)
             for msg in msg_arr:
-                resp = self.device.send_and_receive(msg)  # get response from device
-                self.send(resp)  # forward response over radio
+                self.device.rpi_to_client(msg)  # send command
+                time.sleep(0.1)
+                resp = self.device.client_to_rpi()  # get response from device
+                if len(resp) != 0:
+                    self.send(resp)  # forward response over radio
 
     def send(self, msg: str | list[str] = "test") -> None:
         """send sensor responses to parent over radio
@@ -46,7 +51,8 @@ class Ser:
             m = msg
         self.s.write((m + EOF).encode())
 
-    def send_loop(self) -> None:  # ui for debugging only
+    def send_loop(self) -> None:
+        """ui for debugging only"""
         while True:
             i = input("Send: ")
             self.send(i)
@@ -54,7 +60,7 @@ class Ser:
 
 if __name__ == "__main__":
     s = Ser()
-    # s.send_loop()
+    s.send_loop()
 
 
 """
