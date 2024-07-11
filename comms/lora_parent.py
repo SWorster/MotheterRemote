@@ -68,6 +68,7 @@ class Radio:
 
     def client_to_rpi(self) -> str:
         msg_arr = self.return_collected()
+        print(msg_arr)
         return EOL.join(msg_arr)
 
 
