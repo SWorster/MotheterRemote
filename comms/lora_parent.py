@@ -16,7 +16,7 @@ EOF = configs.EOF
 
 class Radio:
     def __init__(self):
-        self.data: list[str]
+        self.data: list[str] = []
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
         self.t1 = threading.Thread(target=self.start_listen)  # listener in background
         self.t1.daemon = True
@@ -44,7 +44,7 @@ class Radio:
         self.s.write((m + EOF).encode())
 
     def return_collected(self) -> list[str]:
-        d = self.data
+        d = self.data[:]  # pass by value, not reference
         self.data.clear()
         return d
 
