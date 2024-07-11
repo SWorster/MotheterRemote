@@ -49,17 +49,28 @@ class Server:
     def __init__(self):
         print(f"Creating host server {host_addr}:{host_port}")
         socketserver.TCPServer.allow_reuse_address = True  # allows reconnecting
-
-        # start TCP server
-        self.server = socketserver.TCPServer(
-            (host_addr, host_port), ThreadedTCPRequestHandler
-        )
-
-        # run server in designated thread
-        server_thread = threading.Thread(target=self.server.serve_forever)
-        server_thread.daemon = True  # Exit server thread when main thread terminates
-        server_thread.start()
-        print("Server loop running in", server_thread.name)
+        try:
+            # start TCP server
+            self.server = socketserver.TCPServer(
+                (host_addr, host_port), ThreadedTCPRequestHandler
+            )
+        except Exception as e:
+            print(e)
+            print("Could not create server. Killing RPi processes...")
+            kill_listener()
+            time.sleep(5)
+            print(f"Creating host server {host_addr}:{host_port}")
+            self.server = socketserver.TCPServer(
+                (host_addr, host_port), ThreadedTCPRequestHandler
+            )
+        finally:
+            # run server in designated thread
+            server_thread = threading.Thread(target=self.server.serve_forever)
+            server_thread.daemon = (
+                True  # Exit server thread when main thread terminates
+            )
+            server_thread.start()
+            print("Server loop running in", server_thread.name)
 
     def send_to_rpi(self, m: str) -> None:
         """simple socket connection that forwards a single message to the host, then dies
