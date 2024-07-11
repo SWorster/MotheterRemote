@@ -18,7 +18,7 @@ class Radio:
     def __init__(self):
         self.data: list[str]
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
-        self.t1 = threading.Thread(self.listen())  # listener in background
+        self.t1 = threading.Thread(target=self.start_listen)  # listener in background
         self.t1.daemon = True
         self.t1.start()
 
@@ -63,7 +63,7 @@ class Radio:
 
 if __name__ == "__main__":
     s = Radio()
-    s.t1.start()
+    # s.t1.start()
     s.send_loop()
 
 

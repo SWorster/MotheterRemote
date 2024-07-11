@@ -8,8 +8,7 @@ Relevant files:
 -ui_commands: runs on host computer. Terminal-based user interface to generate and send commands.
 -parse_response: runs on host computer. Formats responses from sensor and prints to terminal.
 -host_to_client: runs on the host computer (a server at your institution). Handles user input, outgoing communication, and basic data storage.
--rpi_handler: runs on the main RPi and manages inbound and outbound communications. Relies on four files for each of the communication options.
--rpi_wifi: called by rpi_handler. Uses socket to maintain a connection to the host computer.
+-rpi_wifi: runs on main rpi. Uses socket to maintain a connection to the host computer.
 -lora_parent: called by rpi_handler. Uses serial to communicate with accessory RPi via LoRa radio.
 -lora_client: runs on accessory RPi, if it exists. Uses serial to communicate with main RPi via LoRa radio.
 -sensor: runs on main RPI, or accessory RPi if using a LoRa setup. Uses serial to communicate with the SQM sensor.
@@ -31,11 +30,10 @@ host_addr = "10.10.0.186"  # ip or ddns, either should work #TODO should test th
 Using DDNS is strongly recommended, as the RPi's IP may change unpredictably. This code will use whichever address you prioritize, but you should store both of them here anyways as a backup.
 #? find a way to auto-update the most recent IP for the RPi and store it here?
 """
+rpi_name = "rp3"
 rpi_repo = "MotheterRemote/comms"  # path to this repo directory
 rpi_data_path = "/var/tmp/sqm_macleish/"  # where sensor stores its data (NOT in repo)
 rpi_image_path = "/var/tmp/images/"  # where sensor stores its images (NOT in repo)
-
-rpi_name = "rp3"
 
 rpi_is_ethernet = False
 rpi_hostname = "rp3.local"
@@ -43,11 +41,7 @@ rpi_hostname = "rp3.local"
 rpi_is_wifi = True  # if the RPi uses a wifi connection
 rpi_ip = "10.10.9.11"
 rpi_ddns = "macleishmoths.ddns.net"  # ddns recommended if available
-ddns_over_ip = False  # whether to use the ddns address or the ip
-if ddns_over_ip:
-    rpi_addr = rpi_ddns
-else:
-    rpi_addr = rpi_ip
+rpi_addr = rpi_ip  # choose which address to use: ip or ddns
 
 rpi_is_cellular = False  # if the RPi uses a cellular connection
 
@@ -65,7 +59,7 @@ acc_lora_port = "/dev/ttyUSB_LORA"  # accessory RPI's LoRa port
 """Sensor device information"""
 observatory_name = "macleish"
 device_type = "SQM-LU"  # must be SQM-LU or SQM-LE
-device_addr = "/dev/ttyUSB0"  # port on RPi that connects to the sensor
+device_addr = "/dev/ttyUSB_SQMsensor"  # port on RPi that connects to the sensor
 debug = True  # whether to raise exceptions if something goes a little sideways
 LU_BAUD = 115200  # baud rate, for SQM-LU
 LE_PORT = 10001  # port number, for SQM-LE

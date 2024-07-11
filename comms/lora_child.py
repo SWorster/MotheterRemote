@@ -19,7 +19,7 @@ class Ser:
     def __init__(self):
         """initialize serial connection to device"""
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
-        self.t1 = threading.Thread(self.listen())  # run listener in background
+        self.t1 = threading.Thread(target=self.listen)  # run listener in background
         self.t1.daemon = True
         self.t1.start()
         self.device = sensor.SQM()  # initialize device
@@ -54,7 +54,7 @@ class Ser:
 
 if __name__ == "__main__":
     s = Ser()
-    s.send_loop()
+    # s.send_loop()
 
 
 """
