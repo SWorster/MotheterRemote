@@ -34,9 +34,10 @@ class Ser:
         print("Radio listener running in thread:", cur_thread.name)
         self.live = True
         while self.live:
-            time.sleep(0.1)
+            time.sleep(1)
             full_msg = self.s.read_until(EOF.encode())
             msg_arr = full_msg.decode().split(EOL)
+            print(f"msg_arr: {msg_arr}")
             for msg in msg_arr:
                 time.sleep(0.1)
                 print(f"received {msg} over radio")
