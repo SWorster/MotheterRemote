@@ -54,8 +54,9 @@ class Ser:
         print("Listener loop running in thread:", cur_thread.name)
         self.live = True
         while self.live:
-            time.sleep(0.1)
+            time.sleep(1)
             resp = self.device.client_to_rpi()  # get response from device
+            print("resp", resp)
             if len(resp) != 0:
                 print(f"received {resp} from sensor")
                 self.send(resp)
