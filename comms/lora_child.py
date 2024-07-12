@@ -72,6 +72,7 @@ class Ser:
             m = EOL.join(msg)  # if list, collate into string
         else:
             m = msg
+        print(f"Sending over radio: {m}")
         self.s.write((m + EOF).encode())
 
     def send_loop(self) -> None:
