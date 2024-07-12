@@ -110,8 +110,9 @@ def loop() -> None:
             print(f"Sending to host: {m}")
             conn.send_to_host(EOL.join(m))  # if message exists, send it
             return
-        print(f"Sending to host: {s}")
-        conn.send_to_host(s)  # if message exists, send it
+        if len(s) > 0:
+            print(f"Sending to host: {s}")
+            conn.send_to_host(s)  # if message exists, send it
 
 
 def main():
