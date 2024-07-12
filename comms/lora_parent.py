@@ -43,9 +43,7 @@ class Radio:
         self.live = True
         while self.live:
             time.sleep(short_s)
-            print()
             full_msg = self.s.read_until(EOF.encode(utf8))
-            print(full_msg)
             msg_arr = full_msg.decode(utf8).split(EOL)
             for msg in msg_arr:
                 print(f"Received over radio: {msg}")
