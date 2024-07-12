@@ -46,6 +46,7 @@ class Radio:
             full_msg = self.s.read_until(EOF.encode(utf8))
             msg_arr = full_msg.decode(utf8).split(EOL)
             for msg in msg_arr:
+                print(f"Received over radio: {msg}")
                 self.data.append(msg)
 
     def send(self, msg: str | list[str] = "rx") -> None:
