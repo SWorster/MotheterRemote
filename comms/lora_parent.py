@@ -64,12 +64,13 @@ class Radio:
             self.send(i)
 
     def rpi_to_client(self, m: str) -> None:
+        print(f"sending {m} to radio")
         self.send(m)
 
     def client_to_rpi(self) -> str:
         msg_arr = self.return_collected()
         if len(msg_arr) != 0:
-            print(msg_arr)
+            print(f"received {msg_arr} from radio")
         return EOL.join(msg_arr)
 
 
