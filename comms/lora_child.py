@@ -14,13 +14,20 @@ ADDR = configs.acc_lora_port
 BAUD = configs.BAUD
 EOL = configs.EOL
 EOF = configs.EOF
+device_type = configs.device_type
 
 
 class Ser:
     def __init__(self):
         """initialize serial connection to device"""
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
-        self.device = sensor.SQM()  # initialize device
+        # self.device = sensor.SQM()  # initialize device
+        if device_type == "SQM-LU":
+            self.device = sensor.SQMLU()
+        elif device_type == "SQM-LE":
+            self.device = sensor.SQMLE()
+        else:
+            self.device = sensor.SQMLU()  # default
         self.device.start_continuous_read()  # start device listener
         time.sleep(1)
         self.radio = threading.Thread(target=self.listen_radio)  # run radio listener
