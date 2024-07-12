@@ -101,6 +101,7 @@ def loop():
         time.sleep(1)
         d = output.client_to_rpi()  # get messages from child
         if len(d) > 0:
+            print(f"Sending to host: {d}")
             conn.send_to_host(EOL.join(d))  # if message exists, send it
 
 
