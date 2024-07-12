@@ -20,25 +20,41 @@ class Ser:
     def __init__(self):
         """initialize serial connection to device"""
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
-        self.t1 = threading.Thread(target=self.listen)  # run radio listener
-        # self.t1.daemon = True
-        self.t1.start()
+        self.radio = threading.Thread(target=self.listen_radio)  # run radio listener
+        self.sensor = threading.Thread(target=self.listen_sensor)  # run sensor listener
+        self.radio.start()
+        self.sensor.start()
         self.device = sensor.SQM()  # initialize device
         self.device.start_continuous_read()  # start device listener
 
-    def listen(self) -> None:
+    def listen_radio(self) -> None:
         """get incoming radio messages, send them to device"""
+        cur_thread = threading.current_thread()
+        print("Radio listener running in thread:", cur_thread.name)
         self.live = True
         while self.live:
             time.sleep(0.1)
             full_msg = self.s.read_until(EOF.encode())
             msg_arr = full_msg.decode().split(EOL)
             for msg in msg_arr:
-                self.device.rpi_to_client(msg)  # send command
                 time.sleep(0.1)
-                resp = self.device.client_to_rpi()  # get response from device
-                if len(resp) != 0:
-                    self.send(resp)  # forward response over radio
+                print(f"received {msg} over radio")
+                self.device.rpi_to_client(msg)  # send command
+                # resp = self.device.client_to_rpi()  # get response from device
+                # if len(resp) != 0:
+                #     self.send(resp)  # forward response over radio
+
+    def listen_sensor(self) -> None:
+        """get incoming sensor messages, send them over radio"""
+        cur_thread = threading.current_thread()
+        print("Listener loop running in thread:", cur_thread.name)
+        self.live = True
+        while self.live:
+            time.sleep(0.1)
+            resp = self.device.client_to_rpi()  # get response from device
+            if len(resp) != 0:
+                print(f"received {resp} from sensor")
+                self.send(resp)
 
     def send(self, msg: str | list[str] = "test") -> None:
         """send sensor responses to parent over radio
@@ -61,7 +77,7 @@ class Ser:
 
 if __name__ == "__main__":
     s = Ser()
-    s.send_loop()
+    # s.send_loop()
 
 
 """
