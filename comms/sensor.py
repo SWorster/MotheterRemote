@@ -78,7 +78,7 @@ class SQM:
 
     def start_continuous_read(self) -> None:
         """starts listener"""
-        self.data: list[str]
+        self.data: list[str] = []
         self.live = True
         self.t1 = threading.Thread(target=self.listen)  # listener in background
         self.t1.start()
