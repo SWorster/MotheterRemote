@@ -13,55 +13,59 @@ import ui_commands
 import configs
 import parse_response
 
-# values from config file
+# connection type
 ethernet = configs.rpi_is_ethernet
 wifi = configs.rpi_is_wifi
-cellular = configs.rpi_is_cellular
+cellular = configs.rpi_is_cellular  # TODO
 
+# WiFi/Ethernet connection info
 host_addr = configs.host_addr
 rpi_addr = configs.rpi_addr
+if ethernet:
+    rpi_addr = configs.rpi_hostname
 rpi_name = configs.rpi_name
 
-so_encoding = configs.utf8
-host_port = configs.host_server
-host_client = configs.host_client
-rpi_port = configs.rpi_server
-rpi_client = configs.rpi_client
+# socket port numbers
+host_server = configs.host_server
+rpi_server = configs.rpi_server
 
+# data storage and repository directories
 host_data_path = configs.host_data_path
 rpi_data_path = configs.rpi_data_path
 rpi_repo = configs.rpi_repo
 
-if ethernet:
-    rpi_addr = configs.rpi_hostname
-
+# text encoding
 utf8 = configs.utf8
-EOF = configs.EOF
-EOL = configs.EOL
+EOF = configs.EOF  # end of file character
+EOL = configs.EOL  # end of line character
+msg_len = configs.msg_len  # length of message to send/receive
+
+# timing
+long_s = configs.long_s
+mid_s = configs.mid_s
+short_s = configs.short_s
 
 # global
-t1: threading.Thread | None = None
-global_ui: bool = False
-trigger_prompt: bool = False
+trigger_prompt: bool = False  # whether ready to ask for user input
 
 
 class Server:
     def __init__(self):
-        print(f"Creating host server {host_addr}:{host_port}")
+        print(f"Creating host server {host_addr}:{host_server}")
         socketserver.TCPServer.allow_reuse_address = True  # allows reconnecting
         try:
             # start TCP server
             self.server = socketserver.TCPServer(
-                (host_addr, host_port), ThreadedTCPRequestHandler
+                (host_addr, host_server), ThreadedTCPRequestHandler
             )
         except Exception as e:
             print(e)
-            # print("Could not create server. Killing RPi processes...")
+            # print("Could not create server. Killing RPi processes...") #TODO
             # kill_listener()
-            # time.sleep(5)
-            print(f"Creating host server {host_addr}:{host_port}")
+            # time.sleep(long_s)
+            print(f"Creating host server {host_addr}:{host_server}")
             self.server = socketserver.TCPServer(
-                (host_addr, host_port), ThreadedTCPRequestHandler
+                (host_addr, host_server), ThreadedTCPRequestHandler
             )
 
         # run server in designated thread
@@ -70,23 +74,23 @@ class Server:
         server_thread.start()
         print("Server loop running in", server_thread.name)
 
-    def send_to_rpi(self, m: str) -> None:
+    def send_to_rpi(self, s: str) -> None:
         """simple socket connection that forwards a single message to the host, then dies
 
         Args:
-            m (str): message to send
+            s (str): message to send
         """
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
-            sock.connect((rpi_addr, rpi_port))  # connect to server
-            sock.sendall(f"{m}".encode())  # send everything
-            print(f"Sent: {m}")
+            sock.connect((rpi_addr, rpi_server))  # connect to server
+            sock.sendall(f"{s}".encode(utf8))  # send everything
+            print(f"Sent: {s}")
         except Exception as e:
             print(e)  # print error without halting
             print("Client RPi might not be running rpi_wifi.py")
             start_listener()  # force RPi to run rpi_wifi.py
-            time.sleep(5)  # give time for program to start before continuing
+            time.sleep(long_s)  # give time for program to start before continuing
         finally:
             sock.close()  # die
 
@@ -108,7 +112,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             return
 
         # when request comes in, decode and format it
-        self.data = self.request.recv(1024).decode(utf8).strip()
+        self.data = self.request.recv(msg_len).decode(utf8).strip()
         cur_thread = threading.current_thread()
         print(
             f"Received from {self.client_address[0]} in {cur_thread.name}: {self.data}"
@@ -133,15 +137,15 @@ def kill_listener():
     os.system(s)
 
 
-def prettify(m: str) -> None:
+def prettify(s: str) -> None:
     """prints formatted response from RPi
 
     Args:
-        m (str): message to format
+        s (str): message to format
     """
-    arr = m.split(EOL)
-    for s in arr:
-        print(parse_response.sort_response(s))
+    arr = s.split(EOL)
+    for m in arr:
+        print(parse_response.sort_response(m))
     global trigger_prompt
     trigger_prompt = True  # allow next user input
 
@@ -150,10 +154,10 @@ def loop():
     """user input loop"""
     global conn
     while True:
-        d = input("Type message to send: ")
-        match d:
+        s = input("Type message to send: ")
+        match s:
             case "ui":
-                d = ui_commands.command_menu()
+                s = ui_commands.command_menu()
             case "rsync" | "sync":
                 rsync()
                 continue
@@ -166,7 +170,7 @@ def loop():
             case _:
                 pass
 
-        conn.send_to_rpi(d)  # if message exists, send it
+        conn.send_to_rpi(s)  # if message exists, send it
         global trigger_prompt
         start = time.time()
         while (time.time() - start < 1.5) and trigger_prompt == False:

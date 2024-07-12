@@ -10,11 +10,22 @@ import threading
 import configs
 import sensor
 
-ADDR = configs.acc_lora_port
-BAUD = configs.BAUD
+# radio connection
+ADDR = configs.R_ADDR
+BAUD = configs.R_BAUD
+
+# text encoding
 EOL = configs.EOL
 EOF = configs.EOF
+utf8 = configs.utf8
+
+# device info
 device_type = configs.device_type
+
+# timing
+long_s = configs.long_s
+mid_s = configs.mid_s
+short_s = configs.short_s
 
 
 class Ser:
@@ -29,7 +40,7 @@ class Ser:
         else:
             self.device = sensor.SQMLU()  # default
         self.device.start_continuous_read()  # start device listener
-        time.sleep(1)
+        time.sleep(mid_s)
         self.radio = threading.Thread(target=self.listen_radio)  # run radio listener
         self.sensor = threading.Thread(target=self.listen_sensor)  # run sensor listener
         self.radio.start()
@@ -41,11 +52,11 @@ class Ser:
         print("Radio listener running in thread:", cur_thread.name)
         self.live = True
         while self.live:
-            time.sleep(1)
-            full_msg = self.s.read_until(EOF.encode())
-            msg_arr = full_msg.decode().split(EOL)
+            time.sleep(mid_s)
+            full_msg = self.s.read_until(EOF.encode(utf8))
+            msg_arr = full_msg.decode(utf8).split(EOL)
             for msg in msg_arr:
-                time.sleep(0.1)
+                time.sleep(short_s)
                 m = msg.strip()
                 print(f"Received over radio: {m}")
                 self.device.rpi_to_client(m)  # send command
@@ -56,7 +67,7 @@ class Ser:
         print("Listener loop running in thread:", cur_thread.name)
         self.live = True
         while self.live:
-            time.sleep(1)
+            time.sleep(mid_s)
             resp = self.device.client_to_rpi()  # get response from device
             if len(resp) != 0:
                 print(f"Received from sensor: {resp}")
@@ -73,7 +84,7 @@ class Ser:
         else:
             m = msg
         print(f"Sending over radio: {m}")
-        self.s.write((m + EOF).encode())
+        self.s.write((m + EOF).encode(utf8))
 
     def send_loop(self) -> None:
         """ui for debugging only"""

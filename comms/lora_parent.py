@@ -6,13 +6,21 @@ import time
 import serial
 import threading
 
-# module imports
 import configs
 
-ADDR = configs.rpi_lora_port
-BAUD = configs.BAUD
+# radio connection
+ADDR = configs.R_ADDR
+BAUD = configs.R_BAUD
+
+# text encoding
 EOL = configs.EOL
 EOF = configs.EOF
+utf8 = configs.utf8
+
+# timing
+long_s = configs.long_s
+mid_s = configs.mid_s
+short_s = configs.short_s
 
 
 class Radio:
@@ -34,9 +42,9 @@ class Radio:
         """radio listener that runs continuously"""
         self.live = True
         while self.live:
-            time.sleep(0.1)
-            full_msg = self.s.read_until(EOF.encode())
-            msg_arr = full_msg.decode().split(EOL)
+            time.sleep(short_s)
+            full_msg = self.s.read_until(EOF.encode(utf8))
+            msg_arr = full_msg.decode(utf8).split(EOL)
             for msg in msg_arr:
                 self.data.append(msg)
 
@@ -50,7 +58,7 @@ class Radio:
             m = EOL.join(msg)
         else:
             m = msg
-        self.s.write((m + EOF).encode())
+        self.s.write((m + EOF).encode(utf8))
 
     def return_collected(self) -> list[str]:
         d = self.data[:]  # pass by value, not reference
