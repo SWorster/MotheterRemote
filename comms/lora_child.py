@@ -36,11 +36,12 @@ class Ser:
         while self.live:
             time.sleep(1)
             full_msg = self.s.read_until(EOF.encode())
+            print(full_msg)
             msg_arr = full_msg.decode().split(EOL)
             print(f"msg_arr: {msg_arr}")
             for msg in msg_arr:
                 time.sleep(0.1)
-
+                print(msg.strip())
                 print(f"received {msg.strip()} over radio")
                 self.device.rpi_to_client(msg.strip())  # send command
                 # resp = self.device.client_to_rpi()  # get response from device
