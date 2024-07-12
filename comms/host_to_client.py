@@ -56,9 +56,9 @@ class Server:
             )
         except Exception as e:
             print(e)
-            print("Could not create server. Killing RPi processes...")
-            kill_listener()
-            time.sleep(5)
+            # print("Could not create server. Killing RPi processes...")
+            # kill_listener()
+            # time.sleep(5)
             print(f"Creating host server {host_addr}:{host_port}")
             self.server = socketserver.TCPServer(
                 (host_addr, host_port), ThreadedTCPRequestHandler

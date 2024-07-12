@@ -23,7 +23,7 @@ To prevent your host/RPi IP address from changing, you can either request a stat
 """Info about the host computer. This should be a computer with a static IP."""
 host_data_path = "data"  # path within repo
 host_name = "skyeworster"
-host_addr = "10.10.0.186"  # ip or ddns, either should work #TODO should test this
+host_addr = "10.10.15.228"  # ip or ddns, either should work #TODO should test this
 
 
 """Info about RPi. Careful: this is the RPi that the server will talk to, which may or may not be the one attached to the sensor device.
@@ -66,7 +66,7 @@ LE_PORT = 10001  # port number, for SQM-LE
 SOCK_BUF = 256  # socket buffer size
 
 """Socket info"""
-host_server = 55555  # host server port (to receive)
+host_server = 5555  # host server port (to receive)
 host_client = 44444  # host client port (to send from)
 rpi_server = 33333  # rpi server port (to receive)
 rpi_client = 22222  # rpi client port (to send from)
