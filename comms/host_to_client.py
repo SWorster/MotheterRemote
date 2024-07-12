@@ -53,20 +53,21 @@ class Server:
     def __init__(self):
         print(f"Creating host server {host_addr}:{host_server}")
         socketserver.TCPServer.allow_reuse_address = True  # allows reconnecting
+        # start TCP server
         try:
-            # start TCP server
             self.server = socketserver.TCPServer(
                 (host_addr, host_server), ThreadedTCPRequestHandler
             )
         except Exception as e:
             print(e)
-            # print("Could not create server. Killing RPi processes...") #TODO
-            # kill_listener()
-            # time.sleep(long_s)
-            print(f"Creating host server {host_addr}:{host_server}")
-            self.server = socketserver.TCPServer(
-                (host_addr, host_server), ThreadedTCPRequestHandler
-            )
+            self.server.server_close()
+        #     # print("Could not create server. Killing RPi processes...") #TODO
+        #     # kill_listener()
+        #     # time.sleep(long_s)
+        #     print(f"Creating host server {host_addr}:{host_server}")
+        #     self.server = socketserver.TCPServer(
+        #         (host_addr, host_server), ThreadedTCPRequestHandler
+        #     )
 
         # run server in designated thread
         server_thread = threading.Thread(target=self.server.serve_forever)
