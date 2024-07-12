@@ -102,7 +102,10 @@ class SQM:
             list[str]: data to return
         """
         d = self.data[:]  # pass by value, not reference
+        print(self.data)
+        print(d)
         self.data.clear()
+        print(d)
         return d
 
     def rpi_to_client(self, m: str) -> None:
