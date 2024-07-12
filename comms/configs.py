@@ -59,7 +59,7 @@ acc_lora_port = "/dev/ttyUSB_LORA"  # accessory RPI's LoRa port
 """Sensor device information"""
 observatory_name = "macleish"
 device_type = "SQM-LU"  # must be SQM-LU or SQM-LE
-device_addr = "/dev/ttyUSB_SQMsensor"  # port on RPi that connects to the sensor
+device_addr = "/dev/ttyUSB0"  # port on RPi that connects to the sensor
 debug = True  # whether to raise exceptions if something goes a little sideways
 LU_BAUD = 115200  # baud rate, for SQM-LU
 LE_PORT = 10001  # port number, for SQM-LE
