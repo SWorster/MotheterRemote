@@ -40,8 +40,9 @@ class Ser:
             print(f"msg_arr: {msg_arr}")
             for msg in msg_arr:
                 time.sleep(0.1)
-                print(f"received {msg} over radio")
-                self.device.rpi_to_client(msg)  # send command
+
+                print(f"received {msg.strip()} over radio")
+                self.device.rpi_to_client(msg.strip())  # send command
                 # resp = self.device.client_to_rpi()  # get response from device
                 # if len(resp) != 0:
                 #     self.send(resp)  # forward response over radio
