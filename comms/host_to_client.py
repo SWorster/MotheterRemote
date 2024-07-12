@@ -168,6 +168,14 @@ def loop():
             case "exit" | "quit" | "q":
                 print("Ending program")
                 exit()
+            case "help":
+                s = "Commands:\n\
+                    ui: user interface to generate commands\n\
+                    rsync|sync: get all recorded data from sensor\n\
+                    kill: stop the program running on the RPi\n\
+                    exit|quit|q: stop this program\n\
+                    help: print this help menu"
+                print(s)
             case _:
                 pass
 

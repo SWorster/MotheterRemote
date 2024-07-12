@@ -610,7 +610,7 @@ def logging_settings() -> str:
 
 def debugging() -> str:
     print(
-        "Welcome to the secret debugging command menu!\
+        "Welcome to the secret debugging command menu!\n\
         Commands:\n\
         1 = parse\n\
         2 = zero fill\n\
