@@ -111,6 +111,7 @@ class SQM:
         Args:
             m (str): command to send
         """
+        print(f"sending {m} to sensor")
         self.send_command(m)
 
     def client_to_rpi(self) -> list[str]:
