@@ -28,7 +28,7 @@ class Radio:
         try:
             self.t1.start()
         except RuntimeError:
-            print("already running listen()")
+            print("Listener already running")
 
     def listen(self) -> None:
         """radio listener that runs continuously"""
@@ -64,34 +64,16 @@ class Radio:
             self.send(i)
 
     def rpi_to_client(self, m: str) -> None:
-        print(f"sending {m} to radio")
+        print(f"Sending to radio: {m}")
         self.send(m)
 
     def client_to_rpi(self) -> str:
         msg_arr = self.return_collected()
         if len(msg_arr) != 0:
-            print(f"received {msg_arr} from radio")
+            print(f"Received over radio: {msg_arr}")
         return EOL.join(msg_arr)
 
 
 if __name__ == "__main__":
     s = Radio()
     s.send_loop()
-
-
-"""
-# addr = "/dev/tty.usbmodem578E0230291"
-# BAUD = 115200
-# s = serial.Serial(addr, BAUD, timeout=None)
-# full_msg = s.read_until("\n".encode())
-# msg = full_msg.decode().split("\n")[0]
-# print(msg)
-# s.close()
-"""
-"""
-        if "close" in m:
-            print("closing serial")
-            self.live = False  # kills listener
-            self.s.close()  # closes port
-            exit()
-            """

@@ -102,10 +102,7 @@ class SQM:
             list[str]: data to return
         """
         d = self.data[:]  # pass by value, not reference
-        print(self.data)
-        print(d)
         self.data.clear()
-        print(d)
         return d
 
     def rpi_to_client(self, m: str) -> None:
@@ -114,7 +111,7 @@ class SQM:
         Args:
             m (str): command to send
         """
-        print(f"sending {m} to sensor")
+        print(f"Sending to sensor: {m}")
         self.send_command(m)
 
     def client_to_rpi(self) -> list[str]:
@@ -354,7 +351,7 @@ if __name__ == "__main__":
     args = vars(parser.parse_args())
     command = args.get("command")
     if not isinstance(command, str):
-        print(f"command is not a string. command: {command}, type: {type(command)}")
+        print(f"Command is not a string. command: {command}, type: {type(command)}")
         exit()
 
     if device_type == "SQM-LU":

@@ -43,17 +43,12 @@ class Ser:
         while self.live:
             time.sleep(1)
             full_msg = self.s.read_until(EOF.encode())
-            print(full_msg)
             msg_arr = full_msg.decode().split(EOL)
-            print(f"msg_arr: {msg_arr}")
             for msg in msg_arr:
                 time.sleep(0.1)
-                print(msg.strip())
-                print(f"received {msg.strip()} over radio")
-                self.device.rpi_to_client(msg.strip())  # send command
-                # resp = self.device.client_to_rpi()  # get response from device
-                # if len(resp) != 0:
-                #     self.send(resp)  # forward response over radio
+                m = msg.strip()
+                print(f"Received over radio: {m}")
+                self.device.rpi_to_client(m)  # send command
 
     def listen_sensor(self) -> None:
         """get incoming sensor messages, send them over radio"""
@@ -63,9 +58,8 @@ class Ser:
         while self.live:
             time.sleep(1)
             resp = self.device.client_to_rpi()  # get response from device
-            print("resp", resp)
             if len(resp) != 0:
-                print(f"received {resp} from sensor")
+                print(f"Received from sensor: {resp}")
                 self.send(resp)
 
     def send(self, msg: str | list[str] = "test") -> None:
@@ -89,22 +83,3 @@ class Ser:
 
 if __name__ == "__main__":
     s = Ser()
-    # s.send_loop()
-
-
-"""
-# addr = "/dev/tty.usbmodem578E0230291"
-# BAUD = 115200
-# s = serial.Serial(addr, BAUD, timeout=None)
-# full_msg = s.read_until("\n".encode())
-# msg = full_msg.decode().split("\n")[0]
-# print(msg)
-# s.close()
-"""
-"""
-        if "close" in m:
-            print("closing serial")
-            self.live = False  # kills listener
-            self.s.close()  # closes port
-            exit()
-            """
