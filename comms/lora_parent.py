@@ -27,14 +27,14 @@ class Radio:
     def __init__(self):
         self.data: list[str] = []
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
-        self.t1 = threading.Thread(target=self.start_listen)  # listener in background
-        self.t1.daemon = True
-        self.t1.start()
+        self.l = threading.Thread(target=self.listen)  # listener in background
+        self.l.daemon = True
+        self.l.start()
 
     def start_listen(self) -> None:
         """tries to start listener, if not already running"""
         try:
-            self.t1.start()
+            self.l.start()
         except RuntimeError:
             print("Listener already running")
 
