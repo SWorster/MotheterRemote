@@ -5,7 +5,6 @@ Handles WiFi communication for the RPi. Forwards messages from host to radio/sen
 import socket
 import time
 import threading
-import os
 import socketserver
 
 # module imports
