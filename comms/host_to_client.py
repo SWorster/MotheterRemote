@@ -17,6 +17,7 @@ import parse_response
 ethernet = configs.rpi_is_ethernet
 wifi = configs.rpi_is_wifi
 cellular = configs.rpi_is_cellular  # TODO
+lora = configs.rpi_is_radio
 
 # WiFi/Ethernet connection info
 host_addr = configs.host_addr
@@ -190,6 +191,8 @@ def loop():
 def rsync() -> None:
     s = f"rsync -avz -e ssh {rpi_name}@{rpi_addr}:{rpi_data_path} {host_data_path}"
     os.system(s)
+    if lora:
+        conn.send_to_rpi("rsync")
 
 
 def main() -> None:

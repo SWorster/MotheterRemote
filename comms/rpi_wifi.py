@@ -5,6 +5,7 @@ Handles WiFi communication for the RPi. Forwards messages from host to radio/sen
 import socket
 import time
 import threading
+import os
 import socketserver
 
 # module imports
@@ -117,6 +118,12 @@ def loop() -> None:
 
 def main():
     """when program is run, creates server for Wifi connection from host, creates socket to send to host, sets up connection to lora radio or sensor."""
+
+    # if already running, don't run
+    s = os.popen("ps -ef | grep rpi_wifi").read()
+    if len(s) > 1:
+        quit()
+
     global output, conn
     if lora:
         output = lora_parent.Radio()
