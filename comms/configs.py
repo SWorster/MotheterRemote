@@ -45,7 +45,7 @@ rpi_addr = rpi_ip  # choose which address to use: ip or ddns
 
 rpi_is_cellular = False  # if the RPi uses a cellular connection
 
-rpi_is_radio = True  # if the RPi uses LoRa to talk to an accessory RPi
+rpi_is_radio = False  # if the RPi uses LoRa to talk to an accessory RPi
 R_ADDR = "/dev/ttyUSB_LORA"  # main RPi's port to the LoRa device
 R_BAUD = 115200  # baud rate
 
