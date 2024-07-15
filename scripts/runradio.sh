@@ -1,8 +1,4 @@
-# * * * * * ~/MotheterRemote/scripts/runradio.sh
-# if [ $(ps -ef | grep [l]ora_child) = "" ] ; then
-#     /usr/bin/python3 ~/MotheterRemote/comms/lora_child.py > /tmp/lora_child.log 2>&1
-# fi
-
+#!/bin/bash
 processes=$(ps -ef | grep [l]ora_child)
 if [[ $? == 1 ]]; then # grep found nothing
     echo "Not running rpi_wifi! Running..."
