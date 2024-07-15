@@ -450,6 +450,8 @@ def sort_response(r: str) -> str:
     Args:
         r (str): message from sensor unit
     """
+    if r == "":
+        return ""
     match r[0]:
         case "r":
             return parse_reading(r)
@@ -471,4 +473,4 @@ def sort_response(r: str) -> str:
         case "L":
             return sort_L(r)
         case _:
-            return ""
+            return r
