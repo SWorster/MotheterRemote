@@ -46,6 +46,8 @@ long_s = configs.long_s
 mid_s = configs.mid_s
 short_s = configs.short_s
 
+remote_start = False
+
 # global
 trigger_prompt: bool = False  # whether ready to ask for user input
 
@@ -91,8 +93,9 @@ class Server:
         except Exception as e:
             print(e)  # print error without halting
             print("Client RPi might not be running rpi_wifi.py")
-            start_listener()  # force RPi to run rpi_wifi.py
-            time.sleep(long_s)  # give time for program to start before continuing
+            if remote_start:
+                start_listener()  # force RPi to run rpi_wifi.py
+                time.sleep(long_s)  # give time for program to start before continuing
         finally:
             sock.close()  # die
 

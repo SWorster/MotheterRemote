@@ -106,7 +106,7 @@ class Ser:
         """
         if s == "rsync getfiles":
             print("sending file list")
-            self.send(get_file_list())
+            self.send(self.get_file_list())
         else:  # must be asking for specific file
             name = s.replace("rsync ", "")  # rest of request is path
             if not os.path.isfile(name):  # if wrong, ignore
@@ -119,41 +119,42 @@ class Ser:
             self.s.write(b)
             # self.s.write(open(name, "rb").read())  # send as bytes
 
-
-def get_file_list() -> str:
-    """gets string list of all .dat files in the data directory on this rpi, with the corresponding date of modification
-
-    Returns:
-        str: name and modified date for each file, concatenated
-    """
-
-    def all_file_list(path: str = "") -> list[str]:
-        """recursively finds all .dat files in the rpi data directory.
-
-        Args:
-            path (str, optional): current path to search. Defaults to current working directory.
+    def get_file_list(self) -> str:
+        """gets string list of all .dat files in the data directory on this rpi, with the corresponding date of modification
 
         Returns:
-            list[str]: all .dat files in current directory
+            str: name and modified date for each file, concatenated
         """
-        file_list = os.listdir(path)
-        for entry in file_list:
-            fullPath = os.path.join(path, entry)
-            if os.path.isdir(fullPath):
-                file_list.extend(all_file_list(fullPath))
-        return file_list
 
-    l = all_file_list(acc_data_path)
-    a: list[str] = []
-    for file in l:
-        if file.endswith(".dat"):  # filter for dat files
-            ctime = os.path.getmtime(file)  # seconds since 1970
-            s = f"{file},{ctime}"  # entry with name and time
-            a.append(s)
-    a.insert(0, f"rsync files")  # prepend header for parent processing
-    s = EOL.join(a)  # join into a single string
-    return s
+        def all_file_list(path: str = "") -> list[str]:
+            """recursively finds all .dat files in the rpi data directory.
+
+            Args:
+                path (str, optional): current path to search. Defaults to current working directory.
+
+            Returns:
+                list[str]: all .dat files in current directory
+            """
+            file_list = os.listdir(path)
+            for entry in file_list:
+                fullPath = os.path.join(path, entry)
+                if os.path.isdir(fullPath):
+                    file_list.extend(all_file_list(fullPath))
+            return file_list
+
+        l = all_file_list(acc_data_path)
+        a: list[str] = []
+        for file in l:
+            if file.endswith(".dat"):  # filter for dat files
+                ctime = os.path.getmtime(file)  # seconds since 1970
+                s = f"{file},{ctime}"  # entry with name and time
+                a.append(s)
+        a.insert(0, f"rsync files")  # prepend header for parent processing
+        s = EOL.join(a)  # join into a single string
+        return s
 
 
 if __name__ == "__main__":
+    print("started lora", end=" ")
     s = Ser()
+    print("made serial", end=" ")

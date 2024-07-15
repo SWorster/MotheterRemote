@@ -31,7 +31,7 @@ Using DDNS is strongly recommended, as the RPi's IP may change unpredictably. Th
 #? find a way to auto-update the most recent IP for the RPi and store it here?
 """
 rpi_name = "rp3"  # the username, not the hostname
-rpi_repo = "MotheterRemote/comms"  # path to this repo directory
+rpi_repo = "~/MotheterRemote/comms"  # path to this repo directory
 rpi_data_path = "/var/tmp/sqm_macleish/"  # where sensor stores its data (NOT in repo)
 rpi_image_path = "/var/tmp/images/"  # where sensor stores its images (NOT in repo)
 
@@ -51,7 +51,7 @@ R_BAUD = 115200  # baud rate
 
 
 """Info about accessory RPi, if it exists"""
-acc_repo = "MotheterRemote/comms"  # path to this repo directory
+acc_repo = "~/MotheterRemote/comms"  # path to this repo directory
 acc_data_path = "/var/tmp/sqm_macleish/"  # where sensor stores its data (NOT in repo)
 # ? is this needed
 acc_image_path = "/var/tmp/images/"  # where sensor stores its images (NOT in repo)
