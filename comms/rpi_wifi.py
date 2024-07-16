@@ -36,11 +36,12 @@ mid_s = configs.mid_s
 short_s = configs.short_s
 
 output: lora_parent.Radio | sensor.SQMLE | sensor.SQMLU
+echo = True
 
 
 class Server:
     def __init__(self):
-        print(f"Creating RPi server {rpi_addr}:{rpi_server}")
+        p(f"Creating RPi server {rpi_addr}:{rpi_server}")
         socketserver.TCPServer.allow_reuse_address = True  # allows reconnecting
 
         # start TCP server
@@ -52,7 +53,7 @@ class Server:
         server_thread = threading.Thread(target=self.server.serve_forever)
         server_thread.daemon = True  # Exit server thread when main thread terminates
         server_thread.start()
-        print("Server loop running in", server_thread.name)
+        p(f"Server loop running in {server_thread.name}")
 
     def send_to_host(self, s: str) -> None:
         """simple socket connection that forwards a single message to the host, then dies
@@ -65,7 +66,7 @@ class Server:
         try:
             sock.connect((host_addr, host_server))  # connect to server
             sock.sendall(f"{s}".encode(utf8))  # send everything
-            print(f"Sent: {s}")  # for debugging
+            p(f"Sent: {s}")  # for debugging
         finally:
             sock.close()  # die
 
@@ -81,8 +82,6 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         """custom request handler for TCP threaded server"""
-        print("this should print")
-        os.system("echo 'please print istg'")
 
         # ensure request is socket
         if not isinstance(self.request, socket.socket):
@@ -92,9 +91,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         # when request comes in, decode and format it
         self.data = self.request.recv(msg_len).decode(utf8).strip()
         cur_thread = threading.current_thread()
-        print(
-            f"Received from {self.client_address[0]} in {cur_thread.name}: {self.data}"
-        )
+        p(f"Received from {self.client_address[0]} in {cur_thread.name}: {self.data}")
         global output
         if "rsync" in self.data:
             if not isinstance(output, lora_parent.Radio):
@@ -102,8 +99,8 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         try:
             output.rpi_to_client(self.data)  # forward message to radio/sensor
         except Exception as e:
-            print(e)
-            print("Resetting output device")
+            p(str(e))
+            p("Resetting output device")
             _device_search()
             time.sleep(long_s)
 
@@ -112,17 +109,17 @@ def _loop() -> None:
     """loops in a dedicated thread. pulls messages from the child connection's buffer and sends them."""
     global output, conn
     cur_thread = threading.current_thread()
-    print("Listener loop running in thread:", cur_thread.name)
+    p(f"Listener loop running in {cur_thread.name}")
     while True:
         time.sleep(mid_s)
         s = output.client_to_rpi()  # get messages from child
         if isinstance(s, list):  # message is list, convert to string
             m = EOL.join(s)
-            print(f"Sending to host: {m}")
+            p(f"Sending to host: {m}")
             conn.send_to_host(EOL.join(m))
             return
         if len(s) > 0:  # message is non-empty string
-            print(f"Sending to host: {s}")
+            p(f"Sending to host: {s}")
             conn.send_to_host(s)
 
 
@@ -134,9 +131,9 @@ def _device_search() -> None:
         output = lora_parent.Radio()
         return
     except Exception as e:
-        print(e)
-        print(f"No radio found at port {configs.R_ADDR}")
-        print("Trying sensor connection...")
+        p(str(e))
+        p(f"No radio found at port {configs.R_ADDR}")
+        p("Trying sensor connection...")
 
     try:
         if device_type == "SQM-LU":
@@ -148,10 +145,18 @@ def _device_search() -> None:
         output.start_continuous_read()
         return
     except Exception as e:
-        print(e)
-        print(f"SQM-LU or SQM-LE sensor not found.")
+        p(str(e))
+        p(f"SQM-LU or SQM-LE sensor not found.")
 
-    print("No radio or sensor found. Please check connection!")
+    p("No radio or sensor found. Please check connection!")
+
+
+def p(s: str) -> None:
+    global echo
+    if echo:
+        os.system(f"echo {s}")
+    else:
+        print(s)
 
 
 def main():

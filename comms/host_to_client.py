@@ -82,6 +82,8 @@ class Server:
             if remote_start:
                 _start_listener()  # force RPi to run rpi_wifi.py
                 time.sleep(long_s)  # give time for program to start before continuing
+            else:
+                print("Wait approx. 1 minute before trying again.")
         finally:
             sock.close()  # die
 
