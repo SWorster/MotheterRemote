@@ -60,7 +60,7 @@ ssh-keygen -R rp1.local
 
 ## Connecting to the Sensor
 
-In the RPi's start menu, go to Preferences > Raspberry Pi Configuration. In the Interfaces tab enable the serial port and serial console. In the Display tab, turn screen blanking off.
+In the RPi's start menu, go to Preferences > Raspberry Pi Configuration. In the System tab, enable Auto Login. In the Interfaces tab enable the serial port and serial console (you can enable everything else while you're at it; it won't hurt). In the Display tab, turn screen blanking off.
 
 ### Fixed USB port names
 
@@ -168,7 +168,7 @@ If you’re still getting errors about missing packages or python versions, wipe
 
 ## Clone this repository
 
-Clone this repository onto the RPi:
+Clone this repository onto the RPi. I recommend doing this in your home directory so that the repo will be accessible via `~/MotheterRemote`.
 ```bash
 git clone https://github.com/SWorster/MotheterRemote
 ```
@@ -181,23 +181,27 @@ We'll need to set up new cron jobs for the Raspberry Pi (or both, if using a rad
 In a terminal, type `crontab -e` to add a new cron job. At the bottom of the file, insert:
 
 ```bash
-* * * * * sudo chmod +x ~/MotheterRemote/scripts/runrpi.sh >> /tmp/file 2>&1
+* * * * * sudo chmod +x ~/MotheterRemote/scripts/runrpi.sh >> /tmp/perm 2>&1
 
-* * * * * /bin/bash ~/MotheterRemote/scripts/runrpi.sh >> /tmp/file 2>&1
+* * * * * /bin/bash ~/MotheterRemote/scripts/runrpi.sh >> /tmp/debug 2>&1
 
-0 12 * * 0 rm /tmp/file ; rm /tmp/lora_child.log
+0 12 * * 0 rm /tmp/perm ; rm /tmp/debug ; rm /tmp/lora_child
 ```
 
 For the radio RPi, add the following instead:
 
 ```bash
-* * * * * sudo chmod +x ~/MotheterRemote/scripts/runradio.sh >> /tmp/file 2>&1
+* * * * * sudo chmod +x ~/MotheterRemote/scripts/runradio.sh >> /tmp/perm 2>&1
 
-* * * * * /bin/bash ~/MotheterRemote/scripts/runradio.sh >> /tmp/file 2>&1
+* * * * * /bin/bash ~/MotheterRemote/scripts/runradio.sh >> /tmp/debug 2>&1
 
-0 12 * * 0 rm /tmp/file ; rm /tmp/rpi_wifi.log
+0 12 * * 0 rm /tmp/perm ; rm /tmp/debug ; rm /tmp/rpi_wifi
 ```
 
-The first line will ensure we have the authority to run the shell script, and the second actually runs it. We put the output of all of this into a file in the temporary directory, which we can use to debug in the case that something goes wrong. The third line clears out the output files every Sunday at noon so that they don't hog the memory.
+The first line will ensure we have the authority to run the shell script, and the second actually runs it. We put the output of all of this into a file in the temporary directory, which we can use to debug in the case that something goes wrong. The third line clears the output files every Sunday at noon so that they don't hog the memory (this includes the output file for the shell script).
 
-After saving the files, run `sudo service cron reload` to update the changes.
+After saving the files, run `sudo service cron reload` to update the changes. Wait a minute, then type `cat /tmp/filename` to view the logged output.
+
+#### Troubleshooting cron jobs
+
+If you try to perform a git merge (like `git pull`) and your edits include changes to the shell scripts, git may require you to commit or stash your changes before merging. The simplest way to resolve this is `git reset --hard`. **Warning: this will discard any uncommited changes on the RPi.** I recommend making all code changes on a non-RPi computer for this reason, as you'll never need to keep track of what to save.
