@@ -1,4 +1,5 @@
 #!/bin/bash
+
 processes=$(ps -ef | grep [l]ora_child)
 if [[ $? == 1 ]]; then # grep found nothing
     echo "Not running lora_child! Running..."

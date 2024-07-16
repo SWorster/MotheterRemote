@@ -1,4 +1,5 @@
 #!/bin/bash
+
 processes=$(ps -ef | grep [r]pi_wifi)
 if [[ $? == 1 ]]; then # grep found nothing
     echo "Not running rpi_wifi! Running..."

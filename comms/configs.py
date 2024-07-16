@@ -63,8 +63,8 @@ LE_TIMEOUT = 20  # timeout for SQM-LE connections in seconds
 LE_SOCK_BUF = 256  # socket buffer size for SQM-LE connections
 
 """Socket info"""
-host_server = 44444  # host server port
-rpi_server = 33333  # rpi server port
+host_server = 12345  # host server port
+rpi_server = 54321  # rpi server port
 
 EOL = "\n"  # end of line character (where to split array of multiple responses)
 EOF = "\r"  # end of file character (marks end of a message)
