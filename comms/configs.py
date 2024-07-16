@@ -1,7 +1,9 @@
 """
 Please update this file with the correct information for your setup before trying to run anything.
 
-There are two options for the main communication method, WiFi and cellular. Additionally, the sensor can either be connected directly to the main RPi or to an accessory RPi that uses LoRa radio to communicate with the main RPi.
+There are two options for the sensor setup:
+1 - a host computer connects to an RPi over WiFi, which is directly connected to the SQM sensor.
+2 - a host computer connects to an RPi over WiFi, which uses a radio module to communicate with the RPi that's connected to the SQM sensor.
 
 Relevant files:
 -configs: all values that the user might want to change. Accessed by all other files.
@@ -13,7 +15,7 @@ Relevant files:
 -lora_client: runs on accessory RPi, if it exists. Uses serial to communicate with main RPi via LoRa radio.
 -sensor: runs on main RPI, or accessory RPi if using a LoRa setup. Uses serial to communicate with the SQM sensor.
 
-All code relating to SQM sensor communication was unceremoniously copied from the Py3SQM project and has been extensively modified (bastardized). If you find yourself needing to debug or rework anything in that area, I recommend checking that project for assistance. I attempted to improve upon Py3SQM, but was unsuccessful because of the ephem module (it's coded in python 2, there's no type checking, and there is NO documentation). However, my experimentation did result in a moderately cleaner, semi-type-checked, and better-documented version of the project.
+All code relating to SQM sensor communication was unceremoniously copied from the Py3SQM project and has been extensively modified (bastardized). If you find yourself needing to debug or rework anything in that area, I recommend checking that project for assistance.
 
 This code suite was only tested on an SQM-LU device. The framework for an SQM-LE exists, but you will have to debug it yourself (sorry, not much I could do on that front without the actual device). I recommend looking at the original PY3SQM project to see how their version works.
 
