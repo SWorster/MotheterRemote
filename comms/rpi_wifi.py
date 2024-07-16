@@ -34,6 +34,8 @@ long_s = configs.long_s
 mid_s = configs.mid_s
 short_s = configs.short_s
 
+output: lora_parent.Radio | sensor.SQMLE | sensor.SQMLU
+
 
 class Server:
     def __init__(self):
@@ -114,32 +116,32 @@ def _loop() -> None:
             conn.send_to_host(s)
 
 
-def _find_device() -> None:
-    """determines whether a radio or sensor is connected by trying to create each device"""
-    global output
+# def _find_device() -> None:
+#     """determines whether a radio or sensor is connected by trying to create each device"""
+#     global output
 
-    try:
-        output = lora_parent.Radio()
-        return
-    except Exception as e:
-        print(e)
-        print(f"No radio found at port {configs.R_ADDR}")
-        print("Trying sensor connection...")
+#     try:
+#         output = lora_parent.Radio()
+#         return
+#     except Exception as e:
+#         print(e)
+#         print(f"No radio found at port {configs.R_ADDR}")
+#         print("Trying sensor connection...")
 
-    try:
-        if device_type == "SQM-LU":
-            output = sensor.SQMLU()
-        elif device_type == "SQM-LE":
-            output = sensor.SQMLE()
-        else:
-            output = sensor.SQMLU()  # default
-        output.start_continuous_read()
-        return
-    except Exception as e:
-        print(e)
-        print(f"SQM-LU or SQM-LE sensor not found.")
+#     try:
+#         if device_type == "SQM-LU":
+#             output = sensor.SQMLU()
+#         elif device_type == "SQM-LE":
+#             output = sensor.SQMLE()
+#         else:
+#             output = sensor.SQMLU()  # default
+#         output.start_continuous_read()
+#         return
+#     except Exception as e:
+#         print(e)
+#         print(f"SQM-LU or SQM-LE sensor not found.")
 
-    print("No radio or sensor found. Please check connection!")
+#     print("No radio or sensor found. Please check connection!")
 
 
 def main():
