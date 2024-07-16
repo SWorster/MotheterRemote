@@ -50,16 +50,16 @@ elif device_type == "SQM-LU":
 class SQM:
     """Shared methods for SQM devices"""
 
-    def reset_device(self) -> None:
+    def _reset_device(self) -> None:
         """Connection reset"""
-        self.close_connection()
+        self._close_connection()
         time.sleep(short_s)
         self.start_connection()
 
-    def clear_buffer(self):
+    def _clear_buffer(self):
         """clears buffer and prints to console"""
         print("Clearing buffer ... | ", end="")
-        print(self.read_buffer(), "| ... DONE")
+        print(self._read_buffer(), "| ... DONE")
 
     def send_and_receive(self, s: str, tries: int = tries) -> str:
         """sends and receives a single command. called from main
@@ -72,9 +72,9 @@ class SQM:
             str: sensor response
         """
         m: str = ""
-        self.send_command(s)
+        self._send_command(s)
         time.sleep(long_s)
-        byte_m = self.read_buffer()
+        byte_m = self._read_buffer()
         try:  # Sanity check
             assert byte_m != None
             m = byte_m.decode(utf8)
@@ -85,7 +85,7 @@ class SQM:
                     raise
                 return ""
             time.sleep(mid_s)
-            self.reset_device()
+            self._reset_device()
             time.sleep(mid_s)
             m = self.send_and_receive(s, tries - 1)
             print(("Sensor info: " + str(m)), end=" ")
@@ -95,7 +95,7 @@ class SQM:
         """starts listener"""
         self.data: list[str] = []
         self.live = True
-        self.t1 = threading.Thread(target=self.listen)  # listener in background
+        self.t1 = threading.Thread(target=self._listen)  # listener in background
         self.t1.start()
 
     def stop_continuous_read(self) -> None:
@@ -103,14 +103,14 @@ class SQM:
         self.live = False
         self.t1.join()
 
-    def listen(self):
+    def _listen(self):
         """listener. runs in dedicated thread"""
         self.live
         while self.live:
             time.sleep(short_s)
-            self.read_buffer()  # this stores the data
+            self._read_buffer()  # this stores the data
 
-    def return_collected(self) -> list[str]:
+    def _return_collected(self) -> list[str]:
         """clears data array, returns contents
 
         Returns:
@@ -127,7 +127,7 @@ class SQM:
             s (str): command to send
         """
         print(f"Sending to sensor: {s}")
-        self.send_command(s)
+        self._send_command(s)
 
     def client_to_rpi(self) -> list[str]:
         """returns responses from sensor
@@ -135,16 +135,16 @@ class SQM:
         Returns:
             list[str]: responses
         """
-        m_arr = self.return_collected()
+        m_arr = self._return_collected()
         return m_arr
 
     def start_connection(self) -> None: ...
 
-    def close_connection(self) -> None: ...
+    def _close_connection(self) -> None: ...
 
-    def read_buffer(self) -> bytes | None: ...
+    def _read_buffer(self) -> bytes | None: ...
 
-    def send_command(self, s: str) -> None: ...
+    def _send_command(self, s: str) -> None: ...
 
 
 class SQMLE(SQM):
@@ -160,12 +160,12 @@ class SQMLE(SQM):
             print(
                 f"Device not found on {device_addr}, searching for device address ..."
             )
-            self.addr = self.search()
+            self.addr = self._search()
             print(("Found address %s ... " % str(self.addr)))
             self.start_connection()
-        self.clear_buffer()
+        self._clear_buffer()
 
-    def search(self) -> list[None] | str:
+    def _search(self) -> list[None] | str:
         """Search SQM LE in the LAN. Return its address"""
         self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.s.setblocking(False)
@@ -210,17 +210,17 @@ class SQMLE(SQM):
         self.s.connect((self.addr, int(LE_PORT)))
         # self.s.settimeout(1) # idk why this was commented, I didn't comment it out
 
-    def close_connection(self) -> None:
+    def _close_connection(self) -> None:
         """End photometer connection"""
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0))
         request = ""
         r = True
         while r:  # wait until device stops responding
-            r = self.read_buffer()
+            r = self._read_buffer()
             request += str(r)
         self.s.close()
 
-    def read_buffer(self) -> bytes | None:
+    def _read_buffer(self) -> bytes | None:
         """Read the data"""
         m = None
         try:
@@ -232,7 +232,7 @@ class SQMLE(SQM):
             pass
         return m
 
-    def send_command(self, s: str) -> None:
+    def _send_command(self, s: str) -> None:
         """how the SQM_LE sends a command to the sensor
 
         Args:
@@ -256,12 +256,12 @@ class SQMLU(SQM):
             print(
                 f"Device not found on {device_addr}, searching for device address ..."
             )
-            self.addr = self.search()
+            self.addr = self._search()
             print(("Found address %s ... " % str(self.addr)))
             self.start_connection()
-        self.clear_buffer()
+        self._clear_buffer()
 
-    def search(self) -> str:
+    def _search(self) -> str:
         """
         Photometer search.
         Name of the port depends on the platform.
@@ -298,16 +298,16 @@ class SQMLU(SQM):
         """Start photometer connection"""
         self.s = serial.Serial(self.addr, LU_BAUD, timeout=lu_timeout)
 
-    def close_connection(self) -> None:
+    def _close_connection(self) -> None:
         """End photometer connection"""
         request = ""
         r = True
         while r:  # wait until device stops responding
-            r = self.read_buffer()
+            r = self._read_buffer()
             request += str(r)
         self.s.close()
 
-    def read_buffer(self) -> bytes | None:
+    def _read_buffer(self) -> bytes | None:
         """Read the data"""
         m = None
         try:
@@ -319,7 +319,7 @@ class SQMLU(SQM):
             pass
         return m
 
-    def send_command(self, s: str) -> None:
+    def _send_command(self, s: str) -> None:
         """how the SQM_LU sends a command to the sensor
 
         Args:
@@ -329,9 +329,9 @@ class SQMLU(SQM):
 
     def send_and_receive(self, s: str, tries: int = tries) -> str:
         m: str = ""
-        self.send_command(s)
+        self._send_command(s)
         time.sleep(long_s)
-        byte_m = self.read_buffer()
+        byte_m = self._read_buffer()
         try:  # Sanity check
             assert byte_m != None
             m = byte_m.decode(utf8)
@@ -342,7 +342,7 @@ class SQMLU(SQM):
                     raise
                 return ""
             time.sleep(mid_s)
-            self.reset_device()
+            self._reset_device()
             time.sleep(mid_s)
             m = self.send_and_receive(s, tries - 1)
             print(("Sensor info: " + str(m)), end=" ")

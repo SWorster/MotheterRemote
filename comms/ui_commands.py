@@ -10,44 +10,44 @@ import datetime
 to_terminal = False
 
 
-def request_reading() -> str:
+def _request_reading() -> str:
     """requests a reading"""
-    return send("rx", "REQUEST READING")
+    return _send("rx", "REQUEST READING")
 
 
-def request_cal_info() -> str:
+def _request_cal_info() -> str:
     """requests calibration information"""
-    return send("cx", "REQUEST CALIBRATION INFORMATION")
+    return _send("cx", "REQUEST CALIBRATION INFORMATION")
 
 
-def request_unit_info() -> str:
+def _request_unit_info() -> str:
     """requests unit information"""
-    return send("ix", "REQUEST UNIT INFORMATION")
+    return _send("ix", "REQUEST UNIT INFORMATION")
 
 
-def arm_light_cal() -> str:
-    return send("zcalAx", "ARM LIGHT CALIBRATION")
+def _arm_light_cal() -> str:
+    return _send("zcalAx", "ARM LIGHT CALIBRATION")
 
 
-def arm_dark_cal() -> str:
-    return send("zcalBx", "ARM DARK CALIBRATION")
+def _arm_dark_cal() -> str:
+    return _send("zcalBx", "ARM DARK CALIBRATION")
 
 
-def disarm_cal() -> str:
-    return send("zcalDx", "DISARM CALIBRATION")
+def _disarm_cal() -> str:
+    return _send("zcalDx", "DISARM CALIBRATION")
 
 
-def request_interval_settings() -> str:
+def _request_interval_settings() -> str:
     """Sends interval setting request. Prompts two responses: reading w/ serial, and interval setting response"""
-    return send("Ix", "INTERVAL SETTINGS REQUEST")
+    return _send("Ix", "INTERVAL SETTINGS REQUEST")
 
 
-def set_interval_report_period() -> str:
+def _set_interval_report_period() -> str:
     """set interval report period"""
     print(
         "This command sets the interval report period in the RAM by default. This change will not persist through a reboot.\nYou can choose to set this interval in the EEPROM so that the system will boot with this new interval.\nHowever, the EEPROM only has 1 million erase/write cycles, so please test your settings with just RAM before committing to EEPROM."
     )
-    boot = parse(
+    boot = _parse(
         "To write to EEPROM and RAM, type EEPROM. To write to RAM only (recommended), type anything else and press enter.\nMode: "
     )
     if boot == ("EEPROM"):
@@ -55,7 +55,7 @@ def set_interval_report_period() -> str:
     else:
         boot = "p"
 
-    interval = parse("Reporting interval (as integer only): ")
+    interval = _parse("Reporting interval (as integer only): ")
     try:
         time = int(interval)
         print(time)
@@ -63,7 +63,7 @@ def set_interval_report_period() -> str:
         print(f"{interval} is not a valid integer.")
         return ""
 
-    unit = parse("Unit for time value (s=seconds, m=minutes, h=hours): ")
+    unit = _parse("Unit for time value (s=seconds, m=minutes, h=hours): ")
     if "m" in unit:
         print("m")
         time = time * 60
@@ -73,16 +73,16 @@ def set_interval_report_period() -> str:
     elif "s" not in unit:
         print("Assuming default (seconds)")
     print(time)
-    with_zeroes = zero_fill(time, 10)
-    return send(f"{boot}{with_zeroes}x", "SET INTERVAL REPORT PERIOD")
+    with_zeroes = _zero_fill(time, 10)
+    return _send(f"{boot}{with_zeroes}x", "SET INTERVAL REPORT PERIOD")
 
 
-def set_interval_report_threshold() -> str:
+def _set_interval_report_threshold() -> str:
     """set interval report threshold"""
     print(
         "This command sets the interval report threshold in the RAM by default. This change will not persist through a reboot.\nYou can choose to set this interval in the EEPROM so that the system will boot with this new interval.\nHowever, the EEPROM only has 1 million erase/write cycles, so please test your settings with just RAM before committing to EEPROM."
     )
-    boot = parse(
+    boot = _parse(
         "To write to EEPROM and RAM, type EEPROM. To write to RAM only (recommended), type anything else and press enter.\nMode:"
     )
     if boot == ("EEPROM"):
@@ -90,110 +90,110 @@ def set_interval_report_threshold() -> str:
     else:
         boot = "p"
 
-    threshold = parse("Reporting threshold in mag/arcsec^2: ")
+    threshold = _parse("Reporting threshold in mag/arcsec^2: ")
     try:
         float(threshold)
     except:
         print(f"{threshold} is not a valid float.")
         return ""
 
-    with_zeroes = zero_fill_decimal(threshold, 8, 2)
-    return send(f"{boot}{with_zeroes}x", "SET INTERVAL REPORT THRESHOLD")
+    with_zeroes = _zero_fill_decimal(threshold, 8, 2)
+    return _send(f"{boot}{with_zeroes}x", "SET INTERVAL REPORT THRESHOLD")
 
 
-def man_cal_set_light_offset() -> str:
+def _man_cal_set_light_offset() -> str:
     """manually set calibration: light offset"""
-    value = parse("Type offset value in mag/arcsec^2 (float): ")
+    value = _parse("Type offset value in mag/arcsec^2 (float): ")
     try:
         float(value)
     except:
         print(f"{value} is not a valid float.")
         return ""
-    hashes = zero_fill_decimal(value, 8, 2)
-    return send(f"zcal5{hashes}x", "MANUAL CALIBRATION - SET LIGHT OFFSET")
+    hashes = _zero_fill_decimal(value, 8, 2)
+    return _send(f"zcal5{hashes}x", "MANUAL CALIBRATION - SET LIGHT OFFSET")
 
 
-def man_cal_set_light_temperature() -> str:
+def _man_cal_set_light_temperature() -> str:
     """manually set calibration: light temperature"""
-    value = parse("Type temperature value in °C (float): ")
+    value = _parse("Type temperature value in °C (float): ")
     try:
         float(value)
     except:
         print(f"{value} is not a valid float.")
         return ""
-    hashes = zero_fill_decimal(value, 3, 1)
-    return send(f"zcal6{hashes}x", "MANUAL CALIBRATION - SET LIGHT TEMPERATURE")
+    hashes = _zero_fill_decimal(value, 3, 1)
+    return _send(f"zcal6{hashes}x", "MANUAL CALIBRATION - SET LIGHT TEMPERATURE")
 
 
-def man_cal_set_dark_period() -> str:
+def _man_cal_set_dark_period() -> str:
     """manually set calibration: dark period"""
-    value = parse("Type period value in seconds (float): ")
+    value = _parse("Type period value in seconds (float): ")
     try:
         float(value)
     except:
         print(f"{value} is not a valid float.")
         return ""
-    hashes = zero_fill_decimal(value, 7, 3)
-    return send(f"zcal7{hashes}x", "MANUAL CALIBRATION - SET DARK PERIOD")
+    hashes = _zero_fill_decimal(value, 7, 3)
+    return _send(f"zcal7{hashes}x", "MANUAL CALIBRATION - SET DARK PERIOD")
 
 
-def man_cal_set_dark_temperature() -> str:
+def _man_cal_set_dark_temperature() -> str:
     """manually set calibration: dark temperature"""
-    value = parse("Type temperature value in °C (float): ")
+    value = _parse("Type temperature value in °C (float): ")
     try:
         float(value)
     except:
         print(f"{value} is not a valid float.")
         return ""
-    hashes = zero_fill_decimal(value, 3, 1)
-    return send(f"zcal8{hashes}x", "MANUAL CALIBRATION - SET DARK TEMPERATURE")
+    hashes = _zero_fill_decimal(value, 3, 1)
+    return _send(f"zcal8{hashes}x", "MANUAL CALIBRATION - SET DARK TEMPERATURE")
 
 
-def request_simulation_values() -> str:
+def _request_simulation_values() -> str:
     """get simulation values"""
-    return send("sx", "REQUEST INTERNAL SIMULATION VALUES")
+    return _send("sx", "REQUEST INTERNAL SIMULATION VALUES")
 
 
-def request_simulation_calculation() -> str:
+def _request_simulation_calculation() -> str:
     """runs a simulation"""
-    counts = parse("Number of simulated counts: ")
-    frequency = parse("Frequency in Hz: ")
-    temp = parse("Temperature ADC in °C: ")
-    count_zeroes = zero_fill(counts, 10)
-    freq_zeroes = zero_fill(frequency, 10)
-    temp_zeroes = zero_fill(temp, 10)
-    return send(
+    counts = _parse("Number of simulated counts: ")
+    frequency = _parse("Frequency in Hz: ")
+    temp = _parse("Temperature ADC in °C: ")
+    count_zeroes = _zero_fill(counts, 10)
+    freq_zeroes = _zero_fill(frequency, 10)
+    temp_zeroes = _zero_fill(temp, 10)
+    return _send(
         f"S,{count_zeroes},{freq_zeroes},{temp_zeroes}x",
         "SIMULATE INTERNAL CALCULATION",
     )
 
 
-def request_ID() -> str:
-    return send("L0x", "REPORT ID REQUEST")
+def _request_ID() -> str:
+    return _send("L0x", "REPORT ID REQUEST")
 
 
-def request_logging_pointer() -> str:
-    return send("L1x", "LOGGING POINTER REQUEST")
+def _request_logging_pointer() -> str:
+    return _send("L1x", "LOGGING POINTER REQUEST")
 
 
-def erase_flash_chip() -> str:
+def _erase_flash_chip() -> str:
     """erases the flash chip. does not produce a response"""
-    sure = parse(
+    sure = _parse(
         "This action is irreversible. Are you sure you want to erase the entire flash memory? To proceed, type ERASE. To cancel, type anything else."
     )
     if sure == ("ERASE"):
-        return send("L2x", "ERASE FLASH CHIP")
+        return _send("L2x", "ERASE FLASH CHIP")
     else:
         print("Request cancelled, flash NOT erased.")
         return ""
 
 
-def request_log_one_record() -> str:
-    return send("L3x", "LOG ONE RECORD REQUEST")
+def _request_log_one_record() -> str:
+    return _send("L3x", "LOG ONE RECORD REQUEST")
 
 
-def request_return_one_record() -> str:
-    pointer = parse("Type pointer position of record to return: ")
+def _request_return_one_record() -> str:
+    pointer = _parse("Type pointer position of record to return: ")
     try:
         value = int(pointer)
     except:
@@ -205,15 +205,15 @@ def request_return_one_record() -> str:
     if value < 0:
         print(f"{pointer} must be between 0 and 9999999999 (ten digits).")
         return ""
-    pt = zero_fill(pointer, 10)
-    return send(f"L4{pt}x", "RETURN ONE RECORD REQUEST")
+    pt = _zero_fill(pointer, 10)
+    return _send(f"L4{pt}x", "RETURN ONE RECORD REQUEST")
 
 
-def request_battery_voltage() -> str:
-    return send("L5x", "BATTERY VOLTAGE REQUEST")
+def _request_battery_voltage() -> str:
+    return _send("L5x", "BATTERY VOLTAGE REQUEST")
 
 
-def set_logging_trigger_mode() -> str:
+def _set_logging_trigger_mode() -> str:
     """sets logging trigger mode"""
     print("0 = no automatic logging")
     print("1 = logging granularity in seconds and not powering down")
@@ -231,39 +231,39 @@ def set_logging_trigger_mode() -> str:
         "6 = logging every 30 minutes on the 1/2 hour, and powering down between recordings"
     )
     print("7 = logging every hour on the hour, and powering down between recordings")
-    mode = parse(f"Select mode from above options")
+    mode = _parse(f"Select mode from above options")
     if 0 <= int(mode) <= 7:
-        return send(f"LM{mode}x", f"SET LOGGING TRIGGER MODE {mode}")
+        return _send(f"LM{mode}x", f"SET LOGGING TRIGGER MODE {mode}")
     else:
         print("Invalid mode entered")
         return ""
 
 
-def request_logging_trigger_mode() -> str:
-    return send("Lmx", "LOGGING TRIGGER MODE REQUEST")
+def _request_logging_trigger_mode() -> str:
+    return _send("Lmx", "LOGGING TRIGGER MODE REQUEST")
 
 
-def request_logging_interval_settings() -> str:
-    return send("LIx", "LOGGING INTERVAL SETTINGS REQUEST")
+def _request_logging_interval_settings() -> str:
+    return _send("LIx", "LOGGING INTERVAL SETTINGS REQUEST")
 
 
-def set_logging_interval_period() -> str:
+def _set_logging_interval_period() -> str:
     """sets logging interval period"""
-    unit = parse("Type unit for reporting interval (s=seconds m=minutes): ")
-    time = parse("Type time value (integer only): ")
+    unit = _parse("Type unit for reporting interval (s=seconds m=minutes): ")
+    time = _parse("Type time value (integer only): ")
     try:
         value = int(time)
     except:
         print(f"{time} is not a valid integer.")
         return ""
     if value > 0 and value < 9999999999:
-        zeroes_time = zero_fill(time, 5)
+        zeroes_time = _zero_fill(time, 5)
         if "m" in unit:
-            return send(
+            return _send(
                 f"LPM{zeroes_time}x", "SET LOGGING INTERVAL REPORTING PERIOD MINUTES"
             )
         elif "s" in unit:
-            return send(
+            return _send(
                 f"LPS{zeroes_time}x", "SET LOGGING INTERVAL REPORTING PERIOD SECONDS"
             )
         else:
@@ -273,25 +273,25 @@ def set_logging_interval_period() -> str:
     return ""
 
 
-def set_logging_threshold() -> str:
+def _set_logging_threshold() -> str:
     """sets logging light measurement threshold"""
-    thresh = parse("Type mag/arcsec^2 value: ")
+    thresh = _parse("Type mag/arcsec^2 value: ")
     try:
         float(thresh)
     except:
         print(f"{thresh} is not a valid float.")
         return ""
-    zeroes_thresh = zero_fill_decimal(thresh, 8, 2)
-    return send(f"LPT{zeroes_thresh}x", "SET LOGGING THRESHOLD")
+    zeroes_thresh = _zero_fill_decimal(thresh, 8, 2)
+    return _send(f"LPT{zeroes_thresh}x", "SET LOGGING THRESHOLD")
 
 
-def request_clock_data() -> str:
-    return send("Lcx", "CLOCK DATA REQUEST")
+def _request_clock_data() -> str:
+    return _send("Lcx", "CLOCK DATA REQUEST")
 
 
-def set_clock_data() -> str:
-    date_str = parse("Type date in YYYYMMDD format: ")
-    time_str = parse("Type time in HHMMSS format: ")
+def _set_clock_data() -> str:
+    date_str = _parse("Type date in YYYYMMDD format: ")
+    time_str = _parse("Type time in HHMMSS format: ")
 
     date = ""
     try:
@@ -302,18 +302,18 @@ def set_clock_data() -> str:
         date = datetime.datetime.today()
 
     dt = date.strftime("%Y-%m-%d %w %H:%M:%S")
-    return send(f"Lc{dt}x", "SET CLOCK DATA")
+    return _send(f"Lc{dt}x", "SET CLOCK DATA")
 
 
-def put_unit_to_sleep() -> str:
-    return send("Lsx", "PUT UNIT TO SLEEP")
+def _put_unit_to_sleep() -> str:
+    return _send("Lsx", "PUT UNIT TO SLEEP")
 
 
-def request_alarm_data() -> str:
-    return send("Lax", "ALARM DATA REQUEST")
+def _request_alarm_data() -> str:
+    return _send("Lax", "ALARM DATA REQUEST")
 
 
-def parse(text: str) -> str:
+def _parse(text: str) -> str:
     """Allows quick exit from user interface. Checks if user typed a trigger word, halting execution if one is found. Otherwise, simply passes input string.
 
     Args:
@@ -331,7 +331,7 @@ def parse(text: str) -> str:
     return r
 
 
-def zero_fill_decimal(value: str, whole_len: int, dec_len: int) -> str:
+def _zero_fill_decimal(value: str, whole_len: int, dec_len: int) -> str:
     """Pads string representation of float with zeroes to left and right to comply with command formatting
 
     Args:
@@ -360,7 +360,7 @@ def zero_fill_decimal(value: str, whole_len: int, dec_len: int) -> str:
     return f"{hashes}{int_str}.{dec_str}"
 
 
-def zero_fill(value: str | int, length: int) -> str:
+def _zero_fill(value: str | int, length: int) -> str:
     """Pads number with zeroes to the left, to comply with command formatting
 
     Args:
@@ -382,7 +382,7 @@ def zero_fill(value: str | int, length: int) -> str:
     return f"{zeroes}{value}"
 
 
-def ssq(s: str, first: int, last: int) -> str:
+def _ssq(s: str, first: int, last: int) -> str:
     """Get subsequence of string with inclusive endpoints. Most interval values in the manual are listed this way, so this makes things much easier to code. Also strips whitespace for nicer printing.
 
     Args:
@@ -397,7 +397,7 @@ def ssq(s: str, first: int, last: int) -> str:
     return output
 
 
-def ssql(s: str, first: int, last: int) -> str:
+def _ssql(s: str, first: int, last: int) -> str:
     """Get subsequence of string with inclusive endpoints. Strips all leading zeroes on left. Also strips whitespace for nicer printing.
 
     Args:
@@ -412,7 +412,7 @@ def ssql(s: str, first: int, last: int) -> str:
     return output.lstrip("0")
 
 
-def send(command: str, category: str | None = None) -> str:
+def _send(command: str, category: str | None = None) -> str:
     """sends the command
 
     Args:
@@ -430,7 +430,7 @@ def send(command: str, category: str | None = None) -> str:
     else:
         category = f" {category} "
 
-    sure = parse(
+    sure = _parse(
         f"\nDo you wish to send the following{category}command (y/n): {command}   "
     )
     if "y" not in sure:
@@ -441,29 +441,29 @@ def send(command: str, category: str | None = None) -> str:
     return command
 
 
-def select_reading_type() -> str:
+def _select_reading_type() -> str:
     print(
         "Commands:\n\
         1 = request reading\n\
         2 = request calibration information\n\
         3 = request unit information"
     )
-    resp = parse(f"Select a command: ")
+    resp = _parse(f"Select a command: ")
     match resp:
         case "1":
-            return request_reading()
+            return _request_reading()
         case "2":
-            return request_cal_info()
+            return _request_cal_info()
         case "3":
-            return request_unit_info()
+            return _request_unit_info()
         case _:
             print(f"{resp} is not a valid selection.")
             return ""
 
 
-def select_arm_cal_command() -> str:
+def _select_arm_cal_command() -> str:
     """Sends an arm calibration command"""
-    mode = parse(
+    mode = _parse(
         "1 = arm light calibration\n\
         2 = arm dark calibration\n\
         3 = disarm calibration\n\
@@ -471,37 +471,37 @@ def select_arm_cal_command() -> str:
     )
     match mode.lower():
         case "1":
-            return arm_light_cal()
+            return _arm_light_cal()
         case "2":
-            return arm_dark_cal()
+            return _arm_dark_cal()
         case "3":
-            return disarm_cal()
+            return _disarm_cal()
         case _:
             print(f"INVALID MODE {mode}, must be 1/2/3")
             return ""
 
 
-def select_int_thresh() -> str:
+def _select_int_thresh() -> str:
     print(
         "Commands:\n\
         1 = request interval settings\n\
         2 = set interval report period\n\
         3 = set interval report threshold"
     )
-    resp = parse(f"Select a command: ")
+    resp = _parse(f"Select a command: ")
     match resp:
         case "1":
-            return request_interval_settings()
+            return _request_interval_settings()
         case "2":
-            return set_interval_report_period()
+            return _set_interval_report_period()
         case "3":
-            return set_interval_report_threshold()
+            return _set_interval_report_threshold()
         case _:
             print(f"{resp} is not a valid selection.")
             return ""
 
 
-def manual_calibrations() -> str:
+def _manual_calibrations() -> str:
     print(
         "Commands:\n\
         1 = set light offset\n\
@@ -509,39 +509,39 @@ def manual_calibrations() -> str:
         3 = set dark period\n\
         4 = set dark temperature"
     )
-    resp = parse(f"Select a command: ")
+    resp = _parse(f"Select a command: ")
     match resp:
         case "1":
-            return man_cal_set_light_offset()
+            return _man_cal_set_light_offset()
         case "2":
-            return man_cal_set_light_temperature()
+            return _man_cal_set_light_temperature()
         case "3":
-            return man_cal_set_dark_period()
+            return _man_cal_set_dark_period()
         case "4":
-            return man_cal_set_dark_temperature()
+            return _man_cal_set_dark_temperature()
         case _:
             print(f"{resp} is not a valid selection.")
             return ""
 
 
-def simulation_commands() -> str:
+def _simulation_commands() -> str:
     print(
         "Commands:\n\
         1 = request simulation values\n\
         2 = request simulation calculation"
     )
-    resp = parse(f"Select a command: ")
+    resp = _parse(f"Select a command: ")
     match resp:
         case "1":
-            return request_simulation_values()
+            return _request_simulation_values()
         case "2":
-            return request_simulation_calculation()
+            return _request_simulation_calculation()
         case _:
             print(f"{resp} is not a valid selection.")
             return ""
 
 
-def logging_commands() -> str:
+def _logging_commands() -> str:
     print(
         "Commands:\n\
         1 = request logging pointer\n\
@@ -553,30 +553,30 @@ def logging_commands() -> str:
         7 = set logging interval period\n\
         8 = set logging threshold"
     )
-    resp = parse(f"Select a command: ")
+    resp = _parse(f"Select a command: ")
     match resp:
         case "1":
-            return request_logging_pointer()
+            return _request_logging_pointer()
         case "2":
-            return request_log_one_record()
+            return _request_log_one_record()
         case "3":
-            return request_return_one_record()
+            return _request_return_one_record()
         case "4":
-            return set_logging_trigger_mode()
+            return _set_logging_trigger_mode()
         case "5":
-            return request_logging_trigger_mode()
+            return _request_logging_trigger_mode()
         case "6":
-            return request_logging_interval_settings()
+            return _request_logging_interval_settings()
         case "7":
-            return set_logging_interval_period()
+            return _set_logging_interval_period()
         case "8":
-            return set_logging_threshold()
+            return _set_logging_threshold()
         case _:
             print(f"{resp} is not a valid selection.")
             return ""
 
 
-def logging_settings() -> str:
+def _logging_settings() -> str:
     print(
         "Commands:\n\
         1 = request ID\n\
@@ -587,28 +587,28 @@ def logging_settings() -> str:
         6 = put unit to sleep\n\
         7 = request alarm data"
     )
-    resp = parse(f"Select a command: ")
+    resp = _parse(f"Select a command: ")
     match resp:
         case "1":
-            return request_ID()
+            return _request_ID()
         case "2":
-            return erase_flash_chip()
+            return _erase_flash_chip()
         case "3":
-            return request_battery_voltage()
+            return _request_battery_voltage()
         case "4":
-            return request_clock_data()
+            return _request_clock_data()
         case "5":
-            return set_clock_data()
+            return _set_clock_data()
         case "6":
-            return put_unit_to_sleep()
+            return _put_unit_to_sleep()
         case "7":
-            return request_alarm_data()
+            return _request_alarm_data()
         case _:
             print(f"{resp} is not a valid selection.")
             return ""
 
 
-def debugging() -> str:
+def _debugging() -> str:
     print(
         "Welcome to the secret debugging command menu!\n\
         Commands:\n\
@@ -618,29 +618,29 @@ def debugging() -> str:
         4 = subsequence\n\
         5 = subsequence left strip"
     )
-    resp = parse(f"Select a command: ")
+    resp = _parse(f"Select a command: ")
     match resp:
         case "1":
-            parse("Write something to get parsed: ")
+            _parse("Write something to get parsed: ")
         case "2":
-            string = parse("Write something to get converted: ")
-            length = int(parse("Length of end string: "))
-            print(zero_fill(string, length))
+            string = _parse("Write something to get converted: ")
+            length = int(_parse("Length of end string: "))
+            print(_zero_fill(string, length))
         case "3":
-            string = parse("Write something to get converted: ")
-            before = int(parse("Numbers before decimal: "))
-            after = int(parse("Numbers after decimal: "))
-            print(zero_fill_decimal(string, before, after))
+            string = _parse("Write something to get converted: ")
+            before = int(_parse("Numbers before decimal: "))
+            after = int(_parse("Numbers after decimal: "))
+            print(_zero_fill_decimal(string, before, after))
         case "4":
-            string = parse("Write something to take a subsequence of: ")
-            start = int(parse("start (inclusive): "))
-            end = int(parse("end (inclusive): "))
-            print(ssq(string, start, end))
+            string = _parse("Write something to take a subsequence of: ")
+            start = int(_parse("start (inclusive): "))
+            end = int(_parse("end (inclusive): "))
+            print(_ssq(string, start, end))
         case "5":
-            string = parse("Write something with lots of zeroes to the left: ")
-            start = int(parse("start (inclusive): "))
-            end = int(parse("end (inclusive): "))
-            print(ssql(string, start, end))
+            string = _parse("Write something with lots of zeroes to the left: ")
+            start = int(_parse("start (inclusive): "))
+            end = int(_parse("end (inclusive): "))
+            print(_ssql(string, start, end))
         case _:
             print(f"{resp} is not a valid choice.")
     return ""
@@ -660,29 +660,29 @@ def command_menu() -> str:
         8 = bootloader commands (not yet implemented)\n\
         9 = exit user interface"
     )
-    resp = parse(f"Select a category: ")
+    resp = _parse(f"Select a category: ")
     print("")
     match resp:
         case "1":
-            return select_reading_type()
+            return _select_reading_type()
         case "2":
-            return select_arm_cal_command()
+            return _select_arm_cal_command()
         case "3":
-            return select_int_thresh()
+            return _select_int_thresh()
         case "4":
-            return manual_calibrations()
+            return _manual_calibrations()
         case "5":
-            return simulation_commands()
+            return _simulation_commands()
         case "6":
-            return logging_commands()
+            return _logging_commands()
         case "7":
-            return logging_settings()
+            return _logging_settings()
         case "8":
             print("BOOTLOADER COMMANDS ARE NOT YET IMPLEMENTED")
         case "9":
             return "exit"
         case "0":
-            return debugging()
+            return _debugging()
         case _:
             print(f"{resp} is not a valid choice.")
     return ""

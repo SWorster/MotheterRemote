@@ -44,12 +44,14 @@ class Ser:
             self.device = sensor.SQMLU()  # default
         self.device.start_continuous_read()  # start device listener
         time.sleep(mid_s)
-        self.radio = threading.Thread(target=self.listen_radio)  # run radio listener
-        self.sensor = threading.Thread(target=self.listen_sensor)  # run sensor listener
+        self.radio = threading.Thread(target=self._listen_radio)  # run radio listener
+        self.sensor = threading.Thread(
+            target=self._listen_sensor
+        )  # run sensor listener
         self.radio.start()
         self.sensor.start()
 
-    def listen_radio(self) -> None:
+    def _listen_radio(self) -> None:
         """get incoming radio messages, send them to device"""
         cur_thread = threading.current_thread()
         print("Radio listener running in thread:", cur_thread.name)
@@ -63,11 +65,11 @@ class Ser:
                 m = msg.strip()
                 print(f"Received over radio: {m}")
                 if "rsync" in m[0]:
-                    self.rsync(m)
+                    self._rsync(m)
                 else:
                     self.device.rpi_to_client(m)  # send command
 
-    def listen_sensor(self) -> None:
+    def _listen_sensor(self) -> None:
         """get incoming sensor messages, send them over radio"""
         cur_thread = threading.current_thread()
         print("Listener loop running in thread:", cur_thread.name)
@@ -77,9 +79,9 @@ class Ser:
             resp = self.device.client_to_rpi()  # get response from device
             if len(resp) != 0:
                 print(f"Received from sensor: {resp}")
-                self.send(resp)
+                self._send(resp)
 
-    def send(self, msg: str | list[str] = "test") -> None:
+    def _send(self, msg: str | list[str] = "test") -> None:
         """send sensor responses to parent over radio
 
         Args:
@@ -92,13 +94,13 @@ class Ser:
         print(f"Sending over radio: {m}")
         self.s.write((m + EOF).encode(utf8))
 
-    def send_loop(self) -> None:
+    def _send_loop(self) -> None:
         """ui for debugging only"""
         while True:
             i = input("Send: ")
-            self.send(i)
+            self._send(i)
 
-    def rsync(self, s: str) -> None:
+    def _rsync(self, s: str) -> None:
         """handles rsync requests
 
         Args:
@@ -106,7 +108,7 @@ class Ser:
         """
         if s == "rsync getfiles":
             print("sending file list")
-            self.send(self.get_file_list())
+            self._send(self._get_file_list())
         else:  # must be asking for specific file
             name = s.replace("rsync ", "")  # rest of request is path
             if not os.path.isfile(name):  # if wrong, ignore
@@ -119,14 +121,14 @@ class Ser:
             self.s.write(b)
             # self.s.write(open(name, "rb").read())  # send as bytes
 
-    def get_file_list(self) -> str:
+    def _get_file_list(self) -> str:
         """gets string list of all .dat files in the data directory on this rpi, with the corresponding date of modification
 
         Returns:
             str: name and modified date for each file, concatenated
         """
 
-        def all_file_list(path: str = "") -> list[str]:
+        def _all_file_list(path: str = "") -> list[str]:
             """recursively finds all .dat files in the rpi data directory.
 
             Args:
@@ -139,10 +141,10 @@ class Ser:
             for entry in file_list:
                 fullPath = os.path.join(path, entry)
                 if os.path.isdir(fullPath):
-                    file_list.extend(all_file_list(fullPath))
+                    file_list.extend(_all_file_list(fullPath))
             return file_list
 
-        l = all_file_list(acc_data_path)
+        l = _all_file_list(acc_data_path)
         a: list[str] = []
         for file in l:
             if file.endswith(".dat"):  # filter for dat files

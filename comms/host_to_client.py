@@ -94,7 +94,7 @@ class Server:
             print(e)  # print error without halting
             print("Client RPi might not be running rpi_wifi.py")
             if remote_start:
-                start_listener()  # force RPi to run rpi_wifi.py
+                _start_listener()  # force RPi to run rpi_wifi.py
                 time.sleep(long_s)  # give time for program to start before continuing
         finally:
             sock.close()  # die
@@ -122,10 +122,10 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         print(
             f"Received from {self.client_address[0]} in {cur_thread.name}: {self.data}"
         )
-        prettify(self.data)  # print formatted data to terminal
+        _prettify(self.data)  # print formatted data to terminal
 
 
-def start_listener():
+def _start_listener():
     """sends command to prompt RPi to start listening"""
     # nohup allows rpi_wifi.py to run even after terminal ends
     # & lets process run the the background
@@ -135,14 +135,14 @@ def start_listener():
     to_kill.start()
 
 
-def kill_listener():
+def _kill_listener():
     """kills RPi program"""
     s = f"ssh {rpi_name}@{rpi_addr} 'pkill -f rpi_wifi.py'"
     print("Sending command to RPi:", s)
     os.system(s)
 
 
-def prettify(s: str) -> None:
+def _prettify(s: str) -> None:
     """prints formatted response from RPi
 
     Args:
@@ -155,7 +155,7 @@ def prettify(s: str) -> None:
     trigger_prompt = True  # allow next user input
 
 
-def loop():
+def _loop():
     """user input loop"""
     global conn
     while True:
@@ -164,10 +164,10 @@ def loop():
             case "ui":
                 s = ui_commands.command_menu()
             case "rsync" | "sync":
-                rsync()
+                _rsync()
                 continue
             case "kill":
-                kill_listener()
+                _kill_listener()
                 continue
             case "exit" | "quit" | "q":
                 print("Ending program")
@@ -191,7 +191,7 @@ def loop():
         trigger_prompt = False  # disallow user input
 
 
-def rsync() -> None:
+def _rsync() -> None:
     s = f"rsync -avz -e ssh {rpi_name}@{rpi_addr}:{rpi_data_path} {host_data_path}"
     os.system(s)
     conn.send_to_rpi("rsync")
@@ -202,7 +202,7 @@ def main() -> None:
     global conn
     conn = Server()  # start TCP server
 
-    l = threading.Thread(target=loop)
+    l = threading.Thread(target=_loop)
     l.start()
 
 

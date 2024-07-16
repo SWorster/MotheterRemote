@@ -12,10 +12,6 @@ import configs
 import sensor
 import lora_parent
 
-# connection type
-# ethernet = configs.rpi_is_ethernet  # TODO
-# lora = configs.rpi_is_radio
-
 # WiFi/Ethernet connection info
 host_addr = configs.host_addr
 rpi_addr = configs.rpi_addr
@@ -100,7 +96,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         output.rpi_to_client(self.data)  # forward message to radio/sensor
 
 
-def loop() -> None:
+def _loop() -> None:
     """loops in a dedicated thread. pulls messages from the child connection's buffer and sends them."""
     global output, conn
     cur_thread = threading.current_thread()
@@ -118,7 +114,7 @@ def loop() -> None:
             conn.send_to_host(s)
 
 
-def find_device() -> None:
+def _find_device() -> None:
     global output
 
     try:
@@ -160,9 +156,9 @@ def main():
     #         output = sensor.SQMLU()  # default
     #     output.start_continuous_read()
 
-    find_device()
+    _find_device()
 
-    l = threading.Thread(target=loop)
+    l = threading.Thread(target=_loop)
     l.start()
 
     conn = Server()  # start TCP server

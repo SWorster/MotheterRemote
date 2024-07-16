@@ -30,18 +30,18 @@ class Radio:
     def __init__(self):
         self.data: list[str] = []
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
-        self.l = threading.Thread(target=self.listen)  # listener in background
+        self.l = threading.Thread(target=self._listen)  # listener in background
         self.l.daemon = True
         self.l.start()
 
-    def start_listen(self) -> None:
+    def _start_listen(self) -> None:
         """tries to start listener, if not already running"""
         try:
             self.l.start()
         except RuntimeError:
             print("Listener already running")
 
-    def listen(self) -> None:
+    def _listen(self) -> None:
         """radio listener that runs continuously"""
         self.live = True
         while self.live:
@@ -51,10 +51,10 @@ class Radio:
             for msg in msg_arr:
                 print(f"Received over radio: {msg}")
                 if "rsync" in msg:
-                    self.rsync_from_radio(msg)
+                    self._rsync_from_radio(msg)
                 self.data.append(msg)
 
-    def send(self, msg: str | list[str] = "rx") -> None:
+    def _send(self, msg: str | list[str] = "rx") -> None:
         """sends message to child rpi over radio
 
         Args:
@@ -75,15 +75,20 @@ class Radio:
         """ui for debugging only"""
         while True:
             i = input("Send: ")
-            self.send(i)
+            self._send(i)
 
     def rpi_to_client(self, m: str) -> None:
-        if m == "rsync":
-            print("got rsync request")
-            self.send("rsync list")  # ask child for list of dat files
+        """sends a message over radio
+
+        Args:
+            m (str): message to send
+        """
+        if m == "rsync":  # filter out rsync requests
+            print("Got rsync request!")
+            self._send("rsync list")  # ask child for list of dat files
             return
         print(f"Sending to radio: {m}")
-        self.send(m)
+        self._send(m)
 
     def client_to_rpi(self) -> str:
         """returns messages waiting in buffer
@@ -96,28 +101,30 @@ class Radio:
             print(f"Received over radio: {msg_arr}")
         return EOL.join(msg_arr)
 
-    def rsync_from_radio(self, m: str) -> None:
+    def _rsync_from_radio(self, m: str) -> None:
         """called when child rpi returns rsync data"""
         if m.startswith("rsync files"):
-            self.compare_files(m)
+            self._compare_files(m)
 
-    def ask_child_for_file(self, filename: str) -> None:
+    def _ask_child_for_file(self, filename: str) -> None:
         """get file from child for rsync
 
         Args:
             s (str): file name
         """
-        print(f"asking for file {filename}")
+        print(f"Rsync: asking for file {filename}")
         s = f"rsync {filename}"
-        self.send(s)
+        self._send(s)
 
-    def compare_files(self, m: str) -> None:
+    def _compare_files(self, m: str) -> None:
         """List which files to get from child. If parent (this rpi) doesn't have a file, or has an outdated version, send a request to the child to return the file.
 
         Args:
             m (str): list of all .dat files from child with last modified date
         """
-        parent = self.get_file_list()  # dict of all .dat files from this rpi with dates
+        parent = (
+            self._get_file_list()
+        )  # dict of all .dat files from this rpi with dates
         c_list = m.split(EOL)  # list of all child .dat files with dates
         c_list.remove("rsync files")  # remove header
 
@@ -132,18 +139,18 @@ class Radio:
             if c_date == None:  # something must have broken somewhere
                 continue
             elif p_date == None:  # no match in parent dict
-                self.ask_child_for_file(c)  # send request
+                self._ask_child_for_file(c)  # send request
             elif p_date <= c_date:  # if child file more recent
-                self.ask_child_for_file(c)  # send request
+                self._ask_child_for_file(c)  # send request
 
-    def get_file_list(self) -> dict[str, int]:
+    def _get_file_list(self) -> dict[str, int]:
         """gets dict of all .dat files in the data directory on this rpi, with the corresponding date of modification
 
         Returns:
             dict[str, int]: file name and modified date
         """
 
-        def all_file_list(path: str = os.getcwd()) -> list[str]:
+        def _all_file_list(path: str = os.getcwd()) -> list[str]:
             """recursively finds all .dat files in the rpi data directory.
 
             Args:
@@ -156,10 +163,10 @@ class Radio:
             for entry in file_list:
                 fullPath = os.path.join(path, entry)
                 if os.path.isdir(fullPath):  # recurse on directory
-                    file_list.extend(all_file_list(fullPath))
+                    file_list.extend(_all_file_list(fullPath))
             return file_list
 
-        l = all_file_list(rpi_data_path)
+        l = _all_file_list(rpi_data_path)
         d: dict[str, int] = {}
         for file in l:
             if file.endswith(".dat"):  # filter for dat files
