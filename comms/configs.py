@@ -79,3 +79,4 @@ short_s = 0.1  # time to wait for short tasks (eg. between sending messages in a
 msg_len = 1024
 
 tries = 3
+remote_start = True  # whether to start rpi_wifi remotely

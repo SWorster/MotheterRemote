@@ -46,7 +46,7 @@ long_s = configs.long_s
 mid_s = configs.mid_s
 short_s = configs.short_s
 
-remote_start = True
+remote_start = configs.remote_start
 
 # global
 trigger_prompt: bool = False  # whether ready to ask for user input
