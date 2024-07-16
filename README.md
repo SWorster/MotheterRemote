@@ -200,7 +200,7 @@ For the radio RPi, add the following instead:
 
 The first line will ensure we have the authority to run the shell script, and the second actually runs it. We put the output of all of this into a file in the temporary directory, which we can use to debug in the case that something goes wrong. The third line clears the output files every Sunday at noon so that they don't hog the memory (this includes the output file for the shell script).
 
-After saving the files, run `sudo service cron reload` to update the changes. Wait a minute, then type `cat /tmp/filename` to view the logged output.
+After saving the files, run `sudo service cron reload` to update the changes. Wait a minute, then type `cat /tmp/filename` to view the logged output. `perm` will have output from the `chmod` command, which should be nothing if it works; `debug` will have info about whether the python file is running; the `rpi_wifi` or `lora_child` file will have the output of the corresponding program (the stuff that would normally print to the console).
 
 #### Troubleshooting cron jobs
 
