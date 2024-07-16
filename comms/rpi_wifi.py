@@ -2,6 +2,7 @@
 Handles WiFi communication for the RPi. Forwards messages from host to radio/sensor, and from radio/sensor back to host.
 """
 
+import os
 import socket
 import time
 import threading
@@ -80,6 +81,9 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         """custom request handler for TCP threaded server"""
+        print("this should print")
+        os.system("echo 'please print istg'")
+
         # ensure request is socket
         if not isinstance(self.request, socket.socket):
             print("ThreadedTCPRequestHandler: self.request not socket")

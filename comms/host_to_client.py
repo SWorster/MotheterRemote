@@ -13,17 +13,9 @@ import ui_commands
 import configs
 import parse_response
 
-# connection type
-# ethernet = configs.rpi_is_ethernet
-# wifi = configs.rpi_is_wifi
-# cellular = configs.rpi_is_cellular  # TODO
-# lora = configs.rpi_is_radio
-
 # WiFi/Ethernet connection info
 host_addr = configs.host_addr
 rpi_addr = configs.rpi_addr
-# if ethernet:
-#     rpi_addr = configs.rpi_hostname
 rpi_name = configs.rpi_name
 
 # socket port numbers
@@ -65,13 +57,6 @@ class Server:
         except Exception as e:
             print(e)
             self.server.server_close()
-        #     # print("Could not create server. Killing RPi processes...") #TODO
-        #     # kill_listener()
-        #     # time.sleep(long_s)
-        #     print(f"Creating host server {host_addr}:{host_server}")
-        #     self.server = socketserver.TCPServer(
-        #         (host_addr, host_server), ThreadedTCPRequestHandler
-        #     )
 
         # run server in designated thread
         server_thread = threading.Thread(target=self.server.serve_forever)
