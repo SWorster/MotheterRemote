@@ -50,6 +50,7 @@ remote_start = True
 
 # global
 trigger_prompt: bool = False  # whether ready to ask for user input
+output: object
 
 
 class Server:
@@ -200,7 +201,7 @@ def _rsync() -> None:
 
 def main() -> None:
     """starts server and listens for incoming communications"""
-    global conn
+    global conn, output
     conn = Server()  # start TCP server
 
     l = threading.Thread(target=_ui_loop)
