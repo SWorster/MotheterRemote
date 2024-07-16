@@ -95,7 +95,13 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         if "rsync" in self.data:
             if not isinstance(output, lora_parent.Radio):
                 return  # don't send rsync message to sensor
-        output.rpi_to_client(self.data)  # forward message to radio/sensor
+        try:
+            output.rpi_to_client(self.data)  # forward message to radio/sensor
+        except Exception as e:
+            print(e)
+            print("Resetting output device")
+            _device_search()
+            time.sleep(long_s)
 
 
 def _loop() -> None:
@@ -116,71 +122,40 @@ def _loop() -> None:
             conn.send_to_host(s)
 
 
-# def _find_device() -> None:
-#     """determines whether a radio or sensor is connected by trying to create each device"""
-#     global output
+def _device_search() -> None:
+    """determines whether a radio or sensor is connected by trying to create each device"""
+    global output
 
-#     try:
-#         output = lora_parent.Radio()
-#         return
-#     except Exception as e:
-#         print(e)
-#         print(f"No radio found at port {configs.R_ADDR}")
-#         print("Trying sensor connection...")
+    try:
+        output = lora_parent.Radio()
+        return
+    except Exception as e:
+        print(e)
+        print(f"No radio found at port {configs.R_ADDR}")
+        print("Trying sensor connection...")
 
-#     try:
-#         if device_type == "SQM-LU":
-#             output = sensor.SQMLU()
-#         elif device_type == "SQM-LE":
-#             output = sensor.SQMLE()
-#         else:
-#             output = sensor.SQMLU()  # default
-#         output.start_continuous_read()
-#         return
-#     except Exception as e:
-#         print(e)
-#         print(f"SQM-LU or SQM-LE sensor not found.")
+    try:
+        if device_type == "SQM-LU":
+            output = sensor.SQMLU()
+        elif device_type == "SQM-LE":
+            output = sensor.SQMLE()
+        else:
+            output = sensor.SQMLU()  # default
+        output.start_continuous_read()
+        return
+    except Exception as e:
+        print(e)
+        print(f"SQM-LU or SQM-LE sensor not found.")
 
-#     print("No radio or sensor found. Please check connection!")
+    print("No radio or sensor found. Please check connection!")
 
 
 def main():
     """when program is run, creates server for Wifi connection from host, creates socket to send to host, sets up connection to lora radio or sensor."""
 
     global output, conn
-    # if True:
-    #     output = lora_parent.Radio()
-    # else:
-    #     if device_type == "SQM-LU":
-    #         output = sensor.SQMLU()
-    #     elif device_type == "SQM-LE":
-    #         output = sensor.SQMLE()
-    #     else:
-    #         output = sensor.SQMLU()  # default
-    #     output.start_continuous_read()
 
-    try:
-        output = lora_parent.Radio()
-    except Exception as e:
-        print(e)
-        print(f"No radio found at port {configs.R_ADDR}")
-        print("Trying sensor connection...")
-
-        try:
-            if device_type == "SQM-LU":
-                output = sensor.SQMLU()
-            elif device_type == "SQM-LE":
-                output = sensor.SQMLE()
-            else:
-                output = sensor.SQMLU()  # default
-            output.start_continuous_read()
-        except Exception as e:
-            print(e)
-            print(f"SQM-LU or SQM-LE sensor not found.")
-            print("No radio or sensor found. Please check connection!")
-            return
-
-    # _find_device()
+    _device_search()
 
     l = threading.Thread(target=_loop)
     l.start()
