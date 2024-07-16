@@ -157,7 +157,28 @@ def main():
     #         output = sensor.SQMLU()  # default
     #     output.start_continuous_read()
 
-    _find_device()
+    try:
+        output = lora_parent.Radio()
+    except Exception as e:
+        print(e)
+        print(f"No radio found at port {configs.R_ADDR}")
+        print("Trying sensor connection...")
+
+        try:
+            if device_type == "SQM-LU":
+                output = sensor.SQMLU()
+            elif device_type == "SQM-LE":
+                output = sensor.SQMLE()
+            else:
+                output = sensor.SQMLU()  # default
+            output.start_continuous_read()
+        except Exception as e:
+            print(e)
+            print(f"SQM-LU or SQM-LE sensor not found.")
+            print("No radio or sensor found. Please check connection!")
+            return
+
+    # _find_device()
 
     l = threading.Thread(target=_loop)
     l.start()
