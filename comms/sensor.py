@@ -155,13 +155,14 @@ class SQMLE(SQM):
         self.data: list[str] = []
         try:
             self.addr = device_addr
+            self.start_connection()
         except:
             print(
                 f"Device not found on {device_addr}, searching for device address ..."
             )
             self.addr = self.search()
             print(("Found address %s ... " % str(self.addr)))
-        self.start_connection()
+            self.start_connection()
         self.clear_buffer()
 
     def search(self) -> list[None] | str:

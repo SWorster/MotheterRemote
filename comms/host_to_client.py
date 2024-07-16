@@ -14,16 +14,16 @@ import configs
 import parse_response
 
 # connection type
-ethernet = configs.rpi_is_ethernet
-wifi = configs.rpi_is_wifi
-cellular = configs.rpi_is_cellular  # TODO
-lora = configs.rpi_is_radio
+# ethernet = configs.rpi_is_ethernet
+# wifi = configs.rpi_is_wifi
+# cellular = configs.rpi_is_cellular  # TODO
+# lora = configs.rpi_is_radio
 
 # WiFi/Ethernet connection info
 host_addr = configs.host_addr
 rpi_addr = configs.rpi_addr
-if ethernet:
-    rpi_addr = configs.rpi_hostname
+# if ethernet:
+#     rpi_addr = configs.rpi_hostname
 rpi_name = configs.rpi_name
 
 # socket port numbers
@@ -46,7 +46,7 @@ long_s = configs.long_s
 mid_s = configs.mid_s
 short_s = configs.short_s
 
-remote_start = False
+remote_start = True
 
 # global
 trigger_prompt: bool = False  # whether ready to ask for user input
@@ -194,8 +194,7 @@ def loop():
 def rsync() -> None:
     s = f"rsync -avz -e ssh {rpi_name}@{rpi_addr}:{rpi_data_path} {host_data_path}"
     os.system(s)
-    if lora:
-        conn.send_to_rpi("rsync")
+    conn.send_to_rpi("rsync")
 
 
 def main() -> None:

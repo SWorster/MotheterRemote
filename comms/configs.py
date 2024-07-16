@@ -33,19 +33,13 @@ Using DDNS is strongly recommended, as the RPi's IP may change unpredictably. Th
 rpi_name = "rp3"  # the username, not the hostname
 rpi_repo = "~/MotheterRemote/comms"  # path to this repo directory
 rpi_data_path = "/var/tmp/sqm_macleish/"  # where sensor stores its data (NOT in repo)
-rpi_image_path = "/var/tmp/images/"  # where sensor stores its images (NOT in repo)
 
-rpi_is_ethernet = False
-rpi_hostname = "rp3.local"  # only necessary if connecting via Ethernet
-
-rpi_is_wifi = True  # if the RPi uses a wifi connection
 rpi_ip = "10.10.9.11"
 rpi_ddns = "macleishmoths.ddns.net"  # ddns recommended if available
 rpi_addr = rpi_ip  # choose which address to use: ip or ddns
 
-rpi_is_cellular = False  # if the RPi uses a cellular connection
 
-rpi_is_radio = False  # if the RPi uses LoRa to talk to an accessory RPi
+# rpi_is_radio = True  # if the RPi uses LoRa to talk to an accessory RPi
 R_ADDR = "/dev/ttyUSB_LORA"  # main RPi's port to the LoRa device
 R_BAUD = 115200  # baud rate
 
@@ -53,8 +47,6 @@ R_BAUD = 115200  # baud rate
 """Info about accessory RPi, if it exists"""
 acc_repo = "~/MotheterRemote/comms"  # path to this repo directory
 acc_data_path = "/var/tmp/sqm_macleish/"  # where sensor stores its data (NOT in repo)
-# ? is this needed
-acc_image_path = "/var/tmp/images/"  # where sensor stores its images (NOT in repo)
 acc_lora_port = "/dev/ttyUSB_LORA"  # accessory RPI's LoRa port
 
 
