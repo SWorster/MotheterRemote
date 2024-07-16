@@ -155,7 +155,7 @@ def _prettify(s: str) -> None:
     trigger_prompt = True  # allow next user input
 
 
-def _loop():
+def _ui_loop():
     """user input loop"""
     global conn
     while True:
@@ -192,17 +192,18 @@ def _loop():
 
 
 def _rsync() -> None:
+    """runs rsync command. also sends an rsync trigger in case radio is used"""
     s = f"rsync -avz -e ssh {rpi_name}@{rpi_addr}:{rpi_data_path} {host_data_path}"
     os.system(s)
     conn.send_to_rpi("rsync")
 
 
 def main() -> None:
-    """parses arguments"""
+    """starts server and listens for incoming communications"""
     global conn
     conn = Server()  # start TCP server
 
-    l = threading.Thread(target=_loop)
+    l = threading.Thread(target=_ui_loop)
     l.start()
 
 

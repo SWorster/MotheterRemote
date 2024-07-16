@@ -67,6 +67,11 @@ class Radio:
         self.s.write((m + EOF).encode(utf8))
 
     def return_collected(self) -> list[str]:
+        """returns all data gathered since last collection
+
+        Returns:
+            list[str]: messages to send
+        """
         d = self.data[:]  # pass by value, not reference
         self.data.clear()
         return d

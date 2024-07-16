@@ -115,6 +115,7 @@ def _loop() -> None:
 
 
 def _find_device() -> None:
+    """determines whether a radio or sensor is connected by trying to create each device"""
     global output
 
     try:

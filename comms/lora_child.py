@@ -32,6 +32,8 @@ acc_data_path = configs.acc_data_path
 
 
 class Ser:
+    """serial connection for radio"""
+
     def __init__(self):
         """initialize serial connection to device"""
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
