@@ -49,7 +49,7 @@ short_s = configs.short_s
 remote_start = configs.remote_start
 
 # global
-trigger_prompt: bool = False  # whether ready to ask for user input
+allow_ui: bool = False  # whether ready to ask for user input
 output: object
 
 
@@ -152,13 +152,13 @@ def _prettify(s: str) -> None:
     arr = s.split(EOL)
     for m in arr:
         print(parse_response.sort_response(m))
-    global trigger_prompt
-    trigger_prompt = True  # allow next user input
+    global allow_ui
+    allow_ui = True  # allow next user input
 
 
 def _ui_loop():
     """user input loop"""
-    global conn
+    global conn, allow_ui
     while True:
         s = input("Type message to send: ")
         match s:
@@ -176,20 +176,20 @@ def _ui_loop():
             case "help":
                 s = "Commands:\n\
                     ui: user interface to generate commands\n\
-                    rsync|sync: get all recorded data from sensor\n\
+                    rsync | sync: get all recorded data from sensor\n\
                     kill: stop the program running on the RPi\n\
-                    exit|quit|q: stop this program\n\
+                    exit | quit | q: stop this program\n\
                     help: print this help menu"
-                print(s)
+                print(s.replace("    ", " "))
+                continue
             case _:
                 pass
 
         conn.send_to_rpi(s)  # if message exists, send it
-        global trigger_prompt
         start = time.time()
-        while (time.time() - start < 1.5) and trigger_prompt == False:
+        while (time.time() - start < 3) and allow_ui == False:
             pass  # do nothing until current prompt dealt with, or timeout
-        trigger_prompt = False  # disallow user input
+        allow_ui = False  # disallow user input
 
 
 def _rsync() -> None:

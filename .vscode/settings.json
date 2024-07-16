@@ -118,6 +118,8 @@
     "RDWR",
     "replug",
     "REUSEADDR",
+    "runradio",
+    "runrpi",
     "RXREADOUT",
     "scandir",
     "sentfromhost",

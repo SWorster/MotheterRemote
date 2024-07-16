@@ -1,4 +1,4 @@
-# MotheterRemote 
+# MotheterRemote
 
 intro text goes here
 
@@ -64,7 +64,7 @@ In the RPi's start menu, go to Preferences > Raspberry Pi Configuration. In the 
 
 ### Fixed USB port names
 
-We need to make sure we can always connect to the sensor, even if the RPi reboots or it gets plugged into a different USB port. 
+We need to make sure we can always connect to the sensor, even if the RPi reboots or it gets plugged into a different USB port.
 
 #### Simplified version
 
@@ -91,7 +91,7 @@ Repeat this process for all of your USB equipment, including your sensor (but no
 
 Note that plugging things into different USB ports can change the USB number, so don't worry if there's overlap in that column.
 
-The `idVendor` and `idProduct` are coded into each device and can't be changed. If you have two `tty` devices with the same `idVendor` and `idProduct` values (such as two LoRa radios), you'll need to use other attributes to distinguish them. Run the command 
+The `idVendor` and `idProduct` are coded into each device and can't be changed. If you have two `tty` devices with the same `idVendor` and `idProduct` values (such as two LoRa radios), you'll need to use other attributes to distinguish them. Run the command
 `udevadm info --name=/dev/<tty_port> --attribute-walk` for both devices. Write down the `ID_USB_SERIAL_SHORT` value for each and use them as attributes in the next step.
 
 Now we get to actually write our rules for the ports. Run the command:
@@ -172,3 +172,32 @@ Clone this repository onto the RPi:
 ```bash
 git clone https://github.com/SWorster/MotheterRemote
 ```
+
+
+## Set up cronjobs
+
+We'll need to set up new cron jobs for the Raspberry Pi (or both, if using a radio setup).
+
+In a terminal, type `crontab -e` to add a new cron job. At the bottom of the file, insert:
+
+```bash
+* * * * * sudo chmod +x ~/MotheterRemote/scripts/runrpi.sh >> /tmp/file 2>&1
+
+* * * * * /bin/bash ~/MotheterRemote/scripts/runrpi.sh >> /tmp/file 2>&1
+
+0 12 * * 0 rm /tmp/file ; rm /tmp/lora_child.log
+```
+
+For the radio RPi, add the following instead:
+
+```bash
+* * * * * sudo chmod +x ~/MotheterRemote/scripts/runradio.sh >> /tmp/file 2>&1
+
+* * * * * /bin/bash ~/MotheterRemote/scripts/runradio.sh >> /tmp/file 2>&1
+
+0 12 * * 0 rm /tmp/file ; rm /tmp/rpi_wifi.log
+```
+
+The first line will ensure we have the authority to run the shell script, and the second actually runs it. We put the output of all of this into a file in the temporary directory, which we can use to debug in the case that something goes wrong. The third line clears out the output files every Sunday at noon so that they don't hog the memory.
+
+After saving the files, run `sudo service cron reload` to update the changes.
