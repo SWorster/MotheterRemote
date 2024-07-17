@@ -166,6 +166,7 @@ class Ser:
 
         l = _all_file_list(acc_data_path)
         a: list[str] = []
+        a.append("rsync files")  # prepend header for parent processing
         p(str(l))
         for file in l:
             if file.endswith(".dat"):  # filter for dat files
@@ -173,7 +174,6 @@ class Ser:
                 s = f"{file},{ctime}"  # entry with name and time
                 a.append(s)
         p(f"ARRAY {a}")
-        a.insert(0, f"rsync files")  # prepend header for parent processing
         s = EOL.join(a)  # join into a single string
         p(s)
         return s
