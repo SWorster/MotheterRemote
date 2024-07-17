@@ -174,15 +174,25 @@ class Radio:
             Returns:
                 list[str]: all .dat files in current directory
             """
-            file_list = os.listdir(path)
+            to_return: list[str] = []
+            try:
+                file_list = os.listdir(path)
+            except:
+                print(f"cannot find directory {path}, returning")
+                return []
             for entry in file_list:
+                p(f"{path}  /  {entry}")
                 fullPath = os.path.join(path, entry)
                 if os.path.isdir(fullPath):  # recurse on directory
-                    file_list.extend(_all_file_list(fullPath))
-            return file_list
+                    to_return.extend(_all_file_list(fullPath))
+                if fullPath.endswith(".dat"):
+                    to_return.append(fullPath)
+            p(str(to_return))
+            return to_return
 
         l = _all_file_list(rpi_data_path)
         d: dict[str, int] = {}
+        p(str(l))
         for file in l:
             if file.endswith(".dat"):  # filter for dat files
                 ctime = os.path.getctime(file)  # seconds since 1970
