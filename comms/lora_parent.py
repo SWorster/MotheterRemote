@@ -136,6 +136,7 @@ class Radio:
         parent = (
             self._get_file_list()
         )  # dict of all .dat files from this rpi with dates
+        m.replace("[", "").replace("]", "")
         c_list = m.split(",")  # list of all child .dat files with dates
 
         p(f"CLIST: {c_list}")
