@@ -115,6 +115,8 @@ class Radio:
         """called when child rpi returns rsync data"""
         if "rsync files" in m:
             self._compare_files(m)
+        elif m.startswith("[rsync files"):
+            self._compare_files(m)
         else:  # store data
             s = m.replace("rsync", "")
             split = s.index(EOL)
