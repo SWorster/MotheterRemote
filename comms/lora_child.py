@@ -172,6 +172,7 @@ class Ser:
                 ctime = os.path.getmtime(file)  # seconds since 1970
                 s = f"{file},{ctime}"  # entry with name and time
                 a.append(s)
+        p(f"ARRAY {a}")
         a.insert(0, f"rsync files")  # prepend header for parent processing
         s = EOL.join(a)  # join into a single string
         p(s)
