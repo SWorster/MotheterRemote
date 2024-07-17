@@ -130,7 +130,7 @@ class Ser:
             with open(name, "r") as file:
                 text = file.read()
 
-            message = f"rsync {short_name} {text}"
+            message = f"rsync {short_name} {EOL}{text}"
 
             # message = first + middle + last
             p("FILE TO SEND")

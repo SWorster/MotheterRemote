@@ -117,8 +117,7 @@ class Radio:
             self._compare_files(m)
         else:  # store data
             s = m.replace("rsync", "")
-            c = "\n"
-            split = s.index(c)
+            split = s.index(EOL)
             name = s[:split].strip()
             s = s[split + 1 :]
             with open(name, "w+") as file:
