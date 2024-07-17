@@ -124,10 +124,13 @@ class Ser:
                 p(f"path {name} not found")
             p(f"reading file {name}")
 
+            short = name.rfind("/")
+            short_name = name[short + 1 :]
+
             with open(name, "r") as file:
                 text = file.read()
 
-            message = f"rsync {name} {text}"
+            message = f"rsync {short_name} {text}"
 
             # message = first + middle + last
             p("FILE TO SEND")
