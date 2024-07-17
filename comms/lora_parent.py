@@ -137,7 +137,14 @@ class Radio:
             self._get_file_list()
         )  # dict of all .dat files from this rpi with dates
         c_list = m.split(",")  # list of all child .dat files with dates
-        c_list.remove("rsync files")
+
+        p(f"CLIST: {c_list}")
+        try:
+            c_list.remove("rsync files")
+        except Exception as e:
+            p(str(e))
+            p("couldn't remove rsync files header for some reason, cringe")
+
         p(f"CLIST: {c_list}")
         child: dict[str, int] = {}  # format child list as dict
         for i in c_list:
