@@ -114,7 +114,7 @@ class Ser:
         Args:
             s (str): request to handle
         """
-        if s == "rsync getfiles":
+        if s == "rsync list":
             p("Sending file list")
             self._send(self._get_file_list())
         else:  # must be asking for specific file

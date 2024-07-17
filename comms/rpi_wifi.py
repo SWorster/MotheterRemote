@@ -100,8 +100,8 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             output.rpi_to_client(self.data)  # forward message to radio/sensor
         except Exception as e:
             p(str(e))
-            p("Resetting output device")
-            _device_search()
+            p("Resetting output device")  # probably lost connection
+            _device_search()  # reconnect if possible
             time.sleep(long_s)
 
 
