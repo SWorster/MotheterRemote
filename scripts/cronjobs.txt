@@ -1,0 +1,41 @@
+This is a list of cronjobs that you might (should) use, depending on your setup. Explanations are given below each job.
+
+For the RPi that's connected via WiFi, use the following three:
+
+* * * * * sudo chmod +x ~/MotheterRemote/scripts/runrpi.sh >> /tmp/perm 2>&1
+## every minute, give permission to execute runrpi.sh. log output to file
+
+* * * * * cd ~/MotheterRemote/scripts ; ./runrpi.sh >> /tmp/debug 2>&1
+## every minute, execute runrpi.sh. log output to file
+
+0 12 * * 0 rm /tmp/perm ; rm /tmp/debug ; rm /tmp/rpi_wifi
+## every Sunday at noon, clear the output files
+
+
+
+For the RPi that's connected via radio, use the following three:
+
+* * * * * sudo chmod +x ~/MotheterRemote/scripts/runradio.sh >> /tmp/perm 2>&1
+## every minute, give permission to execute runradio.sh. log output to file
+
+* * * * * cd ~/MotheterRemote/scripts ; ./runradio.sh >> /tmp/debug 2>&1
+## every minute, execute runradio.sh. log output to file
+
+0 12 * * 0 rm /tmp/perm ; rm /tmp/debug ; rm /tmp/lora_child
+## every Sunday at noon, clear the output files
+
+
+
+For the RPi that's connected to the sensor, use the following:
+
+* * * * * sudo chmod +x ~/MotheterRemote/scripts/runsensor.sh >> /tmp/permS 2>&1
+## every minute, give permission to execute runsensor.sh. log output to file
+
+* 18-23,0-6 * * * cd ~/MotheterRemote/scripts ; ./runsensor.sh >> /tmp/debugS 2>&1
+## every minute between 6PM and 6AM, execute runsensor.sh. log output to file
+
+* 6-18 * * * pkill -f pysqm >> /tmp/killS 2>&1
+## every minute between 6AM and 6PM, kill pysqm program
+
+0 12 * * 0 rm /tmp/permS ; rm /tmp/debugS ; rm /tmp/killS
+## every Sunday at noon, clear the output files
