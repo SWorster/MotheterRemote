@@ -127,14 +127,18 @@ class Ser:
             short = name.rfind("/")
             short_name = name[short + 1 :]
 
-            with open(name, "r") as file:
-                text = file.read()
-                message = f"rsync {short_name} {EOL}{text}"
+            try:
+                with open(name, "r") as file:
+                    text = file.read()
+                    message = f"rsync {short_name} {EOL}{text}"
 
-                # message = first + middle + last
-                p("FILE TO SEND")
-                p(message)
-                self.s.write(message.encode(utf8))
+                    # message = first + middle + last
+                    p("FILE TO SEND")
+                    p(message)
+                    self.s.write(message.encode(utf8))
+            except Exception as e:
+                p(str(e))
+                p("oops???????")
 
             # b = bytearray(f"rsync {name}{EOL}", utf8)  # prepend file name
             # p(f"b1: {b.decode()}")
