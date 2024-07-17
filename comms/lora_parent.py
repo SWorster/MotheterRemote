@@ -133,11 +133,11 @@ class Radio:
         parent = (
             self._get_file_list()
         )  # dict of all .dat files from this rpi with dates
-        c_list = m.split(";")  # list of all child .dat files with dates
+        c_list = m.split(",")  # list of all child .dat files with dates
         print(f"CLIST: {c_list}")
         child: dict[str, int] = {}  # format child list as dict
         for i in c_list:
-            j = i.split(",")
+            j = i.split(";")
             p(f"j: {j}")
             child.update({j[0]: int(j[1])})
 
