@@ -118,9 +118,11 @@ class Radio:
         elif m.startswith("[rsync files"):
             self._compare_files(m)
         else:  # store data
+            p("store data")
+            p(m)
             s = m.replace("rsync", "")
-            split = s.index(EOL)
-            name = s[:split].strip()
+            split = s.index("\n")
+            name = rpi_data_path + s[:split].strip()
             s = s[split + 1 :]
             p("saving file")
             p(name)

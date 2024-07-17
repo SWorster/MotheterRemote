@@ -124,31 +124,31 @@ class Ser:
                 p(f"path {name} not found")
             p(f"reading file {name}")
 
-            short = name.rfind("/")
-            short_name = name[short + 1 :]
+            # short = name.rfind("/")
+            # short_name = name[short + 1 :]
 
-            try:
-                with open(name, "r") as file:
-                    text = file.read()
-                    message = f"rsync {short_name} {EOL}{text}"
+            # try:
+            #     with open(name, "r") as file:
+            #         text = file.read()
+            #         message = f"rsync {short_name} {EOL}{text}"
 
-                    # message = first + middle + last
-                    p("FILE TO SEND")
-                    p(message)
-                    self.s.write(message.encode(utf8))
-            except Exception as e:
-                p(str(e))
-                p("oops???????")
+            #         # message = first + middle + last
+            #         p("FILE TO SEND")
+            #         p(message)
+            #         self.s.write(message.encode(utf8))
+            # except Exception as e:
+            #     p(str(e))
+            #     p("oops???????")
 
-            # b = bytearray(f"rsync {name}{EOL}", utf8)  # prepend file name
-            # p(f"b1: {b.decode()}")
-            # file = bytearray(open(name, "rb").read())  # bytearray of file
-            # b.extend(file)
-            # p(f"b2: {b.decode()}")
-            # b.extend(EOF.encode(utf8))  # EOF to finish
-            # p(f"b3: {b.decode()}")
+            b = bytearray(f"rsync {name}{EOL}", utf8)  # prepend file name
+            p(f"b1: {b.decode()}")
+            file = bytearray(open(name, "rb").read())  # bytearray of file
+            b.extend(file)
+            p(f"b2: {b.decode()}")
+            b.extend(EOF.encode(utf8))  # EOF to finish
+            p(f"b3: {b.decode()}")
 
-            # self.s.write(b)  # send bytearray
+            self.s.write(b)  # send bytearray
             # self.s.write(open(name, "rb").read())  # send as bytes
 
     def _get_file_list(self) -> str:
