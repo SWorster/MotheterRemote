@@ -124,21 +124,25 @@ class Ser:
                 p(f"path {name} not found")
             p(f"reading file {name}")
 
-            # short = name.rfind("/")
-            # short_name = name[short + 1 :]
+            short = name.rfind("/")
+            short_name = name[short + 1 :]
+            p(f"short name {short_name}")
 
-            # try:
-            #     with open(name, "r") as file:
-            #         text = file.read()
-            #         message = f"rsync {short_name} {EOL}{text}"
+            text = open(name, "r").read()
+            p(text)
 
-            #         # message = first + middle + last
-            #         p("FILE TO SEND")
-            #         p(message)
-            #         self.s.write(message.encode(utf8))
-            # except Exception as e:
-            #     p(str(e))
-            #     p("oops???????")
+            try:
+                with open(name, "r") as file:
+                    text = file.read()
+                    message = f"rsync {short_name} {EOL}{text}"
+
+                    # message = first + middle + last
+                    p("FILE TO SEND")
+                    p(message)
+                    self.s.write(message.encode(utf8))
+            except Exception as e:
+                p(str(e))
+                p("oops???????")
 
             b = bytearray(f"rsync {name}{EOL}", utf8)  # prepend file name
             p(f"b1: {b.decode()}")
