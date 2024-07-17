@@ -129,13 +129,12 @@ class Ser:
 
             with open(name, "r") as file:
                 text = file.read()
+                message = f"rsync {short_name} {EOL}{text}"
 
-            message = f"rsync {short_name} {EOL}{text}"
-
-            # message = first + middle + last
-            p("FILE TO SEND")
-            p(message)
-            self.s.write(message.encode(utf8))
+                # message = first + middle + last
+                p("FILE TO SEND")
+                p(message)
+                self.s.write(message.encode(utf8))
 
             # b = bytearray(f"rsync {name}{EOL}", utf8)  # prepend file name
             # p(f"b1: {b.decode()}")
