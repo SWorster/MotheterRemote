@@ -66,7 +66,7 @@ class Ser:
         while self.live:
             time.sleep(mid_s)
             full_msg = self.s.read_until(EOF.encode(utf8))
-            msg_arr = full_msg.decode(utf8).split(EOL)
+            msg_arr = full_msg.decode().split(EOL)
             for msg in msg_arr:
                 time.sleep(short_s)
                 m = msg.strip()
