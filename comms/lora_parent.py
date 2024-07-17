@@ -138,6 +138,7 @@ class Radio:
         child: dict[str, int] = {}  # format child list as dict
         for i in c_list:
             j = i.split(",")
+            p(str(j))
             child.update({j[0]: int(j[1])})
 
         p(f"CHILD: {child}")
@@ -175,16 +176,16 @@ class Radio:
             try:
                 file_list = os.listdir(path)
             except:
-                print(f"cannot find directory {path}, returning")
+                p(f"cannot find directory {path}, returning")
                 return []
             for entry in file_list:
-                p(f"{path}  /  {entry}")
+                # p(f"{path}  /  {entry}")
                 fullPath = os.path.join(path, entry)
                 if os.path.isdir(fullPath):  # recurse on directory
                     to_return.extend(_all_file_list(fullPath))
                 if fullPath.endswith(".dat"):
                     to_return.append(fullPath)
-            p(str(to_return))
+            # p(str(to_return))
             return to_return
 
         l = _all_file_list(rpi_data_path)
@@ -208,38 +209,3 @@ def p(s: str) -> None:
 if __name__ == "__main__":
     s = Radio()
     s.send_loop()
-
-
-# def getListOfFiles(path: str = "") -> list[str]:
-#     listOfFile = os.listdir(path)
-#     nameList = listOfFile
-#     allFiles: dict[str, tuple[int, int]]
-#     for entry in listOfFile:
-#         fullPath = os.path.join(path, entry)
-#         if os.path.isdir(fullPath):
-#             x = getListOfFiles(fullPath)
-#             nameList.extend(x)
-#         else:
-#             print("getting size of fullPath: " + fullPath)
-#             size = os.path.getsize(fullPath)
-#             ctime = os.path.getctime(fullPath)
-#             item = (fullPath, size, ctime)
-#             allFiles.append(item)
-#     return allFiles
-
-# # set with elements in child that aren't in parent
-# child_unique = set(child)
-# child_unique.difference_update(parent)
-# p_dict: dict[str, int] = {}
-# for i in parent:
-#     j = i.split(",")
-#     p_dict.update({j[0]: int(j[1])})
-
-# for c in child_unique:
-#     t = c.split(",")
-#     p_date = p_dict.get(t[0])
-#     if p_date == None:
-#         continue
-#     if int(t[1]) <= p_date:
-#         continue
-#     ask_child_for_file(t[0])
