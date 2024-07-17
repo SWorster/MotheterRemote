@@ -169,7 +169,7 @@ def p(s: str) -> None:
     if echo:
         os.system(f"echo {s}")
     else:
-        print(s)
+        print(s, flush=True)  # print, even if in thread
 
 
 if __name__ == "__main__":
