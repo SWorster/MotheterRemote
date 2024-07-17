@@ -148,6 +148,7 @@ class Ser:
             Returns:
                 list[str]: all .dat files in current directory
             """
+            to_return: list[str] = []
             try:
                 file_list = os.listdir(path)
             except:
@@ -157,9 +158,11 @@ class Ser:
                 p(f"{path}  /  {entry}")
                 fullPath = os.path.join(path, entry)
                 if os.path.isdir(fullPath):
-                    file_list.extend(_all_file_list(fullPath))
-            p(str(file_list))
-            return file_list
+                    to_return.extend(_all_file_list(fullPath))
+                if fullPath.endswith(".dat"):
+                    to_return.extend(fullPath)
+            p(str(to_return))
+            return to_return
 
         l = _all_file_list(acc_data_path)
         a: list[str] = []
