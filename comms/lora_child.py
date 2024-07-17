@@ -148,8 +148,13 @@ class Ser:
             Returns:
                 list[str]: all .dat files in current directory
             """
-            file_list = os.listdir(path)
+            try:
+                file_list = os.listdir(path)
+            except:
+                print(f"cannot find directory {path}, returning")
+                return []
             for entry in file_list:
+                p(f"{path}  /  {entry}")
                 fullPath = os.path.join(path, entry)
                 if os.path.isdir(fullPath):
                     file_list.extend(_all_file_list(fullPath))
