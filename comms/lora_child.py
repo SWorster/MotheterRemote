@@ -174,7 +174,7 @@ class Ser:
                 s = f"{file},{ctime}"  # entry with name and time
                 a.append(s)
         p(f"ARRAY {a}")
-        s = EOL.join(a)  # join into a single string
+        s = ";".join(a)  # join into a single string
         p(f"STRING {s}")
         return s
 
