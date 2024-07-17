@@ -71,7 +71,8 @@ class Ser:
                 time.sleep(short_s)
                 m = msg.strip()
                 p(f"Received over radio: {m}")
-                if "rsync" in m[0]:
+                if "rsync" in m:
+                    p("rsync found in message")
                     self._rsync(m)
                 else:
                     self.device.rpi_to_client(m)  # send command
