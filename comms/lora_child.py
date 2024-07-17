@@ -160,7 +160,7 @@ class Ser:
                 if os.path.isdir(fullPath):
                     to_return.extend(_all_file_list(fullPath))
                 if fullPath.endswith(".dat"):
-                    to_return.extend(fullPath)
+                    to_return.append(fullPath)
             p(str(to_return))
             return to_return
 

@@ -96,7 +96,6 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         p(f"Received from {self.client_address[0]} in {cur_thread.name}: {self.data}")
         global output
         try:
-            p("sending line 99")
             output.rpi_to_client(self.data)  # forward message to radio/sensor
         except Exception as e:
             p(str(e))
