@@ -158,9 +158,9 @@ Read the README.txt to get a sense of what this all does. Then start following t
     - altitude = 52 (it's in meters)
 - Device
     - type = SQM_LU
-    - location_name = ‘Smith College - MacLeish Field Station’
-    - data_supplier = ‘Mariana Abarca / Smith College Biology Department’
-    - addr =  ‘/dev/ttyUSB_SQMsensor
+    - location_name = "Smith College - MacLeish Field Station"
+    - data_supplier = "Mariana Abarca / Smith College Biology Department"
+    - addr =  "/dev/ttyUSB_SQMsensor"
 - Time
     - local timezone = -4 (the UTC where the sensor is located)
     - computer timezone = -4 (the UTC where the computer running this code is located)

@@ -72,7 +72,6 @@ class Ser:
                 m = msg.strip()
                 p(f"Received over radio: {m}")
                 if "rsync" in m:
-                    p("rsync found in message")
                     self._rsync(m)
                 else:
                     self.device.rpi_to_client(m)  # send command
@@ -114,7 +113,7 @@ class Ser:
         Args:
             s (str): request to handle
         """
-        p("in rsync fn")
+        p("Handling rsync")
         if "list" in s:
             p("Sending file list")
             self._send(self._get_file_list())
