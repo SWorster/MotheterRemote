@@ -138,7 +138,9 @@ class Radio:
         )  # dict of all .dat files from this rpi with dates
         m.replace("[", "").replace("]", "")
         c1 = m.split(",")  # list of all child .dat files with dates
-        c_list = [s.replace("[", "").replace("]", "").strip() for s in c1]
+        c_list = [
+            s.replace("[", "").replace("]", "").replace("'", "").strip() for s in c1
+        ]
         for i in c_list:  # get rid of rsync header
             if "rsync" in i:
                 c_list.remove(i)
