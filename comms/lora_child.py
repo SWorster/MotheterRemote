@@ -166,6 +166,7 @@ class Ser:
 
         l = _all_file_list(acc_data_path)
         a: list[str] = []
+        p(str(l))
         for file in l:
             if file.endswith(".dat"):  # filter for dat files
                 ctime = os.path.getmtime(file)  # seconds since 1970
