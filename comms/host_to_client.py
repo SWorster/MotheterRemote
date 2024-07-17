@@ -38,7 +38,8 @@ long_s = configs.long_s
 mid_s = configs.mid_s
 short_s = configs.short_s
 
-remote_start = configs.remote_start
+# only change this for debugging
+remote_start = configs.remote_start  # force start the RPi's program
 
 # global
 allow_ui: bool = False  # whether ready to ask for user input

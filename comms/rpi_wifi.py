@@ -35,8 +35,10 @@ long_s = configs.long_s
 mid_s = configs.mid_s
 short_s = configs.short_s
 
+echo = False  # output to log file
+
+# global
 output: lora_parent.Radio | sensor.SQMLE | sensor.SQMLU
-echo = False
 
 
 class Server:

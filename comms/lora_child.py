@@ -11,6 +11,8 @@ import os
 import configs
 import sensor
 
+acc_data_path = configs.acc_data_path
+
 # radio connection
 ADDR = configs.R_ADDR
 BAUD = configs.R_BAUD
@@ -28,9 +30,7 @@ long_s = configs.long_s
 mid_s = configs.mid_s
 short_s = configs.short_s
 
-acc_data_path = configs.acc_data_path
-
-echo = True
+echo = True  # print to log file
 
 
 class Ser:
@@ -39,7 +39,6 @@ class Ser:
     def __init__(self):
         """initialize serial connection to device"""
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
-        # self.device = sensor.SQM()  # initialize device
         try:
             if device_type == "SQM-LU":
                 self.device = sensor.SQMLU()
