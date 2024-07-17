@@ -113,7 +113,7 @@ class Radio:
 
     def _rsync_from_radio(self, m: str) -> None:
         """called when child rpi returns rsync data"""
-        if m.startswith("[rsync files"):
+        if "rsync files" in m:
             self._compare_files(m)
 
     def _ask_child_for_file(self, filename: str) -> None:
