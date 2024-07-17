@@ -144,11 +144,11 @@ class Radio:
                 c_list.remove(i)
 
         p(f"CLIST: {c_list}")
-        child: dict[str, int] = {}  # format child list as dict
+        child: dict[str, float] = {}  # format child list as dict
         for i in c_list:
             j = i.split(";")
             p(f"j: {j}")
-            child.update({j[0].strip(): int(j[1].strip())})
+            child.update({j[0].strip(): float(j[1].strip())})
 
         p(f"CHILD: {child}")
 
