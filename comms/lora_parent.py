@@ -53,8 +53,11 @@ class Radio:
             for msg in msg_arr:
                 p(f"Received over radio: {msg}")
                 if "rsync" in msg:
+                    p("got rsync from radio")
                     self._rsync_from_radio(msg)
-                self.data.append(msg)
+                else:
+                    p("regular message")
+                    self.data.append(msg)
 
     def _send(self, msg: str | list[str] = "rx") -> None:
         """sends message to child rpi over radio
@@ -134,12 +137,13 @@ class Radio:
             self._get_file_list()
         )  # dict of all .dat files from this rpi with dates
         c_list = m.split(",")  # list of all child .dat files with dates
-        print(f"CLIST: {c_list}")
+        c_list.remove("rsync files")
+        p(f"CLIST: {c_list}")
         child: dict[str, int] = {}  # format child list as dict
         for i in c_list:
             j = i.split(";")
             p(f"j: {j}")
-            child.update({j[0]: int(j[1])})
+            child.update({j[0].strip(): int(j[1].strip())})
 
         p(f"CHILD: {child}")
 
