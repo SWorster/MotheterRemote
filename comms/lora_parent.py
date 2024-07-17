@@ -129,25 +129,33 @@ class Radio:
         Args:
             m (str): list of all .dat files from child with last modified date
         """
+        p("in compare files")
         parent = (
             self._get_file_list()
         )  # dict of all .dat files from this rpi with dates
         c_list = m.split(EOL)  # list of all child .dat files with dates
+        p(f"{c_list}")
         c_list.remove("rsync files")  # remove header
+        p(f"{c_list}")
 
         child: dict[str, int] = {}  # format child list as dict
         for i in child:
             j = i.split(",")
             child.update({j[0]: int(j[1])})
 
+        p(f"{child}")
+
         for c in child.keys():
             p_date = parent.get(c)
             c_date = child.get(c)
+            print(f"{c_date} v {p_date}")
             if c_date == None:  # something must have broken somewhere
                 continue
             elif p_date == None:  # no match in parent dict
+                p(f"no match, getting {c} from child")
                 self._ask_child_for_file(c)  # send request
             elif p_date <= c_date:  # if child file more recent
+                p(f"more recent version found, getting {c} from child")
                 self._ask_child_for_file(c)  # send request
 
     def _get_file_list(self) -> dict[str, int]:
