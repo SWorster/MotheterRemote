@@ -122,13 +122,14 @@ class Ser:
             name = s.replace("rsync ", "").strip()  # rest of request is path
             if not os.path.isfile(name):  # if wrong, ignore
                 p(f"path {name} not found")
-            p(f"sending file {name}")
+            p(f"reading file {name}")
 
-            first = f"rsync {name}{EOL}"
-            middle = open(name, "r").read()
-            last = EOF
+            with open(name, "r") as file:
+                text = file.read()
 
-            message = first + middle + last
+            message = f"rsync {name} {text}"
+
+            # message = first + middle + last
             p("FILE TO SEND")
             p(message)
             self.s.write(message.encode(utf8))

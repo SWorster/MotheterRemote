@@ -115,6 +115,14 @@ class Radio:
         """called when child rpi returns rsync data"""
         if "rsync files" in m:
             self._compare_files(m)
+        else:  # store data
+            s = m.replace("rsync", "")
+            c = "\n"
+            split = s.index(c)
+            name = s[:split].strip()
+            s = s[split + 1 :]
+            with open(name, "w+") as file:
+                file.write(s)
 
     def _ask_child_for_file(self, filename: str) -> None:
         """get file from child for rsync
