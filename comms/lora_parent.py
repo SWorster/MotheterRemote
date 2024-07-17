@@ -25,6 +25,8 @@ short_s = configs.short_s
 
 rpi_data_path = configs.rpi_data_path
 
+echo = True
+
 
 class Radio:
     def __init__(self):
@@ -39,7 +41,7 @@ class Radio:
         try:
             self.l.start()
         except RuntimeError:
-            print("Listener already running")
+            p("Listener already running")
 
     def _listen(self) -> None:
         """radio listener that runs continuously"""
@@ -49,7 +51,7 @@ class Radio:
             full_msg = self.s.read_until(EOF.encode(utf8))
             msg_arr = full_msg.decode(utf8).split(EOL)
             for msg in msg_arr:
-                print(f"Received over radio: {msg}")
+                p(f"Received over radio: {msg}")
                 if "rsync" in msg:
                     self._rsync_from_radio(msg)
                 self.data.append(msg)
@@ -89,10 +91,10 @@ class Radio:
             m (str): message to send
         """
         if m == "rsync":  # filter out rsync requests
-            print("Got rsync request!")
+            p("Got rsync request!")
             self._send("rsync list")  # ask child for list of dat files
             return
-        print(f"Sending to radio: {m}")
+        p(f"Sending to radio: {m}")
         self._send(m)
 
     def client_to_rpi(self) -> str:
@@ -103,7 +105,7 @@ class Radio:
         """
         msg_arr = self.return_collected()
         if len(msg_arr) != 0:
-            print(f"Received over radio: {msg_arr}")
+            p(f"Received over radio: {msg_arr}")
         return EOL.join(msg_arr)
 
     def _rsync_from_radio(self, m: str) -> None:
@@ -117,7 +119,7 @@ class Radio:
         Args:
             s (str): file name
         """
-        print(f"Rsync: asking for file {filename}")
+        p(f"Rsync: asking for file {filename}")
         s = f"rsync {filename}"
         self._send(s)
 
@@ -178,6 +180,14 @@ class Radio:
                 ctime = os.path.getctime(file)  # seconds since 1970
                 d.update({file: int(ctime)})  # new dict entry for name and date
         return d
+
+
+def p(s: str) -> None:
+    global echo
+    if echo:
+        os.system(f"echo {s}")
+    else:
+        print(s, flush=True)  # print, even if in thread
 
 
 if __name__ == "__main__":
