@@ -175,7 +175,7 @@ class Ser:
                 a.append(s)
         p(f"ARRAY {a}")
         s = EOL.join(a)  # join into a single string
-        p(s)
+        p(f"STRING {s}")
         return s
 
 

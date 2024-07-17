@@ -138,7 +138,7 @@ class Radio:
         child: dict[str, int] = {}  # format child list as dict
         for i in c_list:
             j = i.split(",")
-            p(str(j))
+            p(f"j: {j}")
             child.update({j[0]: int(j[1])})
 
         p(f"CHILD: {child}")
