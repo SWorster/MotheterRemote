@@ -85,7 +85,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
         # ensure request is socket
         if not isinstance(self.request, socket.socket):
-            print("ThreadedTCPRequestHandler: self.request not socket")
+            p("ThreadedTCPRequestHandler: self.request not socket")
             return
 
         # when request comes in, decode and format it

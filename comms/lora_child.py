@@ -166,7 +166,7 @@ class Ser:
                 a.append(s)
         a.insert(0, f"rsync files")  # prepend header for parent processing
         s = EOL.join(a)  # join into a single string
-        print(s)
+        p(s)
         return s
 
 
