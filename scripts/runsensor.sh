@@ -3,7 +3,7 @@
 processes=$(ps -ef | grep [p]ysqm)
 if [[ $? == 1 ]]; then # grep found nothing
     echo "Not running pysqm module! Running..."
-    nohup /usr/bin/python3 -m ~/Desktop/pysqm >> /tmp/sensor 2>&1 &
+    nohup /usr/bin/python3 -m ~/MotheterRemote/Py3SQM/pysqm >> /tmp/sensor 2>&1 &
     echo "Will not output again until pysqm stops or an error occurs."
 elif [[ $processes ]]; then # grep returned something
     : # do nothing

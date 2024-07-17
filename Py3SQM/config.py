@@ -39,14 +39,14 @@ SITE location
 """
 
 _observatory_name = "MacLeish"
-_observatory_latitude = 42.449183
-_observatory_longitude = 72.679909
+_observatory_latitude = 42.449155
+_observatory_longitude = -72.679323
 _observatory_altitude = 52
 _observatory_horizon = 10  # If Sun is below this altitude, the program will take data
 
 _device_shorttype = "SQM"  # Device STR in the file
 _device_type = "SQM_LU"  # Device type in the Header
-_device_id = _device_type + "-" + _observatory_name  # Long Device lame
+_device_id = _device_type + "-" + _observatory_name  # Long Device name
 _device_locationname = (
     "Smith College - MacLeish Field Station"  # Device location in the world
 )

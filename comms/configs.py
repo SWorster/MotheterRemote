@@ -3,7 +3,7 @@ Please update this file with the correct information for your setup before tryin
 """
 
 """Info about the host computer. This should be a computer with a static IP."""
-host_data_path = "data"  # path within repo
+host_data_path = "~/SQMdata"  # where to store collected data (not in repo)
 host_name = "skyeworster"
 host_addr = "10.10.26.80"  # ip or ddns, either should work #TODO should test this
 
