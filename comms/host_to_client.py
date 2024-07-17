@@ -147,7 +147,7 @@ def _ui_loop():
     """user input loop"""
     global conn, allow_ui
     while True:
-        s = input("Type message to send: ")
+        s = input("\nType message to send: ")
         match s:
             case "ui":
                 s = ui_commands.command_menu()

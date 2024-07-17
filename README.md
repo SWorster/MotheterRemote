@@ -183,7 +183,7 @@ In a terminal, type `crontab -e` to add a new cron job. At the bottom of the fil
 ```bash
 * * * * * sudo chmod +x ~/MotheterRemote/scripts/runrpi.sh >> /tmp/perm 2>&1
 
-* * * * * /bin/bash ~/MotheterRemote/scripts/runrpi.sh >> /tmp/debug 2>&1
+* * * * * cd ~/MotheterRemote/scripts ; ./runrpi.sh >> /tmp/debug 2>&1
 
 0 12 * * 0 rm /tmp/perm ; rm /tmp/debug ; rm /tmp/lora_child
 ```
@@ -193,7 +193,7 @@ For the radio RPi, add the following instead:
 ```bash
 * * * * * sudo chmod +x ~/MotheterRemote/scripts/runradio.sh >> /tmp/perm 2>&1
 
-* * * * * /bin/bash ~/MotheterRemote/scripts/runradio.sh >> /tmp/debug 2>&1
+* * * * * cd ~/MotheterRemote/scripts ; ./runradio.sh >> /tmp/debug 2>&1
 
 0 12 * * 0 rm /tmp/perm ; rm /tmp/debug ; rm /tmp/rpi_wifi
 ```
