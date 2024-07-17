@@ -129,6 +129,7 @@ class Ser:
             last = EOF
 
             message = first + middle + last
+            p("FILE TO SEND")
             p(message)
             self.s.write(message.encode(utf8))
 
