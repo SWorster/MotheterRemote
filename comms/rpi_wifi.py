@@ -36,7 +36,7 @@ mid_s = configs.mid_s
 short_s = configs.short_s
 
 output: lora_parent.Radio | sensor.SQMLE | sensor.SQMLU
-echo = True
+echo = False
 
 
 class Server:
