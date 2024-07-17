@@ -174,6 +174,8 @@ class Ser:
                 s = f"{file},{ctime}"  # entry with name and time
                 a.append(s)
         p(f"ARRAY {a}")
+        c = str(a)
+        p(f"BETTER? {c}")
         s = ";".join(a)  # join into a single string
         p(f"STRING {s}")
         return s
