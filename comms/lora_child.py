@@ -123,14 +123,24 @@ class Ser:
             if not os.path.isfile(name):  # if wrong, ignore
                 p(f"path {name} not found")
             p(f"sending file {name}")
-            b = bytearray(f"rsync {name}{EOL}", utf8)  # prepend file name
-            p(f"b2: {b.decode()}")
-            file = bytearray(open(name, "rb").read())  # bytearray of file
-            b.extend(file)
-            p(f"b2: {b.decode()}")
-            b.extend(EOF.encode(utf8))  # EOF to finish
-            p(f"b3: {b.decode()}")
-            self.s.write(b)  # send bytearray
+
+            first = f"rsync {name}{EOL}"
+            middle = open(name, "r").read()
+            last = EOF
+
+            message = first + middle + last
+            p(message)
+            self.s.write(message.encode(utf8))
+
+            # b = bytearray(f"rsync {name}{EOL}", utf8)  # prepend file name
+            # p(f"b1: {b.decode()}")
+            # file = bytearray(open(name, "rb").read())  # bytearray of file
+            # b.extend(file)
+            # p(f"b2: {b.decode()}")
+            # b.extend(EOF.encode(utf8))  # EOF to finish
+            # p(f"b3: {b.decode()}")
+
+            # self.s.write(b)  # send bytearray
             # self.s.write(open(name, "rb").read())  # send as bytes
 
     def _get_file_list(self) -> str:
