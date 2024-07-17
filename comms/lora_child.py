@@ -30,6 +30,8 @@ short_s = configs.short_s
 
 acc_data_path = configs.acc_data_path
 
+echo = True
+
 
 class Ser:
     """serial connection for radio"""
@@ -38,12 +40,16 @@ class Ser:
         """initialize serial connection to device"""
         self.s = serial.Serial(ADDR, BAUD, timeout=None)
         # self.device = sensor.SQM()  # initialize device
-        if device_type == "SQM-LU":
-            self.device = sensor.SQMLU()
-        elif device_type == "SQM-LE":
-            self.device = sensor.SQMLE()
-        else:
-            self.device = sensor.SQMLU()  # default
+        try:
+            if device_type == "SQM-LU":
+                self.device = sensor.SQMLU()
+            elif device_type == "SQM-LE":
+                self.device = sensor.SQMLE()
+            else:
+                self.device = sensor.SQMLU()  # default
+        except Exception as e:
+            p(f"{e}")  # if device not connected, quit
+            exit()
         self.device.start_continuous_read()  # start device listener
         time.sleep(mid_s)
         self.radio = threading.Thread(target=self._listen_radio)  # run radio listener
@@ -56,7 +62,7 @@ class Ser:
     def _listen_radio(self) -> None:
         """get incoming radio messages, send them to device"""
         cur_thread = threading.current_thread()
-        print("Radio listener running in thread:", cur_thread.name)
+        p(f"Radio listener running in {cur_thread.name}")
         self.live = True
         while self.live:
             time.sleep(mid_s)
@@ -65,7 +71,7 @@ class Ser:
             for msg in msg_arr:
                 time.sleep(short_s)
                 m = msg.strip()
-                print(f"Received over radio: {m}")
+                p(f"Received over radio: {m}")
                 if "rsync" in m[0]:
                     self._rsync(m)
                 else:
@@ -74,13 +80,13 @@ class Ser:
     def _listen_sensor(self) -> None:
         """get incoming sensor messages, send them over radio"""
         cur_thread = threading.current_thread()
-        print("Listener loop running in thread:", cur_thread.name)
+        p(f"Listener loop running in {cur_thread.name}")
         self.live = True
         while self.live:
             time.sleep(mid_s)
             resp = self.device.client_to_rpi()  # get response from device
             if len(resp) != 0:
-                print(f"Received from sensor: {resp}")
+                p(f"Received from sensor: {resp}")
                 self._send(resp)
 
     def _send(self, msg: str | list[str] = "test") -> None:
@@ -93,7 +99,7 @@ class Ser:
             m = EOL.join(msg)  # if list, collate into string
         else:
             m = msg
-        print(f"Sending over radio: {m}")
+        p(f"Sending over radio: {m}")
         self.s.write((m + EOF).encode(utf8))
 
     def _send_loop(self) -> None:
@@ -109,18 +115,18 @@ class Ser:
             s (str): request to handle
         """
         if s == "rsync getfiles":
-            print("sending file list")
+            p("Sending file list")
             self._send(self._get_file_list())
         else:  # must be asking for specific file
             name = s.replace("rsync ", "")  # rest of request is path
             if not os.path.isfile(name):  # if wrong, ignore
-                print(f"path {name} not found")
-            print(f"sending file {name}")
-            b = bytearray(f"rsync {name}{EOL}", utf8)
-            file = bytearray(open(name, "rb").read())
+                p(f"path {name} not found")
+            p(f"sending file {name}")
+            b = bytearray(f"rsync {name}{EOL}", utf8)  # prepend file name
+            file = bytearray(open(name, "rb").read())  # bytearray of file
             b.extend(file)
-            b.extend(EOF.encode(utf8))
-            self.s.write(b)
+            b.extend(EOF.encode(utf8))  # EOF to finish
+            self.s.write(b)  # send bytearray
             # self.s.write(open(name, "rb").read())  # send as bytes
 
     def _get_file_list(self) -> str:
@@ -158,7 +164,13 @@ class Ser:
         return s
 
 
+def p(s: str) -> None:
+    global echo
+    if echo:
+        os.system(f"echo {s}")
+    else:
+        print(s)
+
+
 if __name__ == "__main__":
-    print("started lora", end=" ")
     s = Ser()
-    print("made serial", end=" ")
