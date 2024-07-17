@@ -118,6 +118,7 @@ class Ser:
             p("Sending file list")
             self._send(self._get_file_list())
         else:  # must be asking for specific file
+            p("getting file...")
             name = s.replace("rsync ", "").strip()  # rest of request is path
             if not os.path.isfile(name):  # if wrong, ignore
                 p(f"path {name} not found")
