@@ -124,15 +124,12 @@ class Ser:
                 p(f"path {name} not found")
             p(f"sending file {name}")
             b = bytearray(f"rsync {name}{EOL}", utf8)  # prepend file name
-            p("b1:")
-            p(str(b))
+            p(f"b2: {b.decode()}")
             file = bytearray(open(name, "rb").read())  # bytearray of file
             b.extend(file)
-            p(f"b2: {b}")
+            p(f"b2: {b.decode()}")
             b.extend(EOF.encode(utf8))  # EOF to finish
-            p(f"b3: {b}")
-            st = b.decode()
-            p(f"st {st}")
+            p(f"b3: {b.decode()}")
             self.s.write(b)  # send bytearray
             # self.s.write(open(name, "rb").read())  # send as bytes
 
