@@ -120,6 +120,9 @@ class Radio:
             split = s.index(EOL)
             name = s[:split].strip()
             s = s[split + 1 :]
+            p("saving file")
+            p(name)
+            p(s)
             with open(name, "w+") as file:
                 file.write(s)
 
