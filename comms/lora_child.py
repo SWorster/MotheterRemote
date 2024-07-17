@@ -124,7 +124,8 @@ class Ser:
                 p(f"path {name} not found")
             p(f"sending file {name}")
             b = bytearray(f"rsync {name}{EOL}", utf8)  # prepend file name
-            p(f"b1: {b}")
+            p("b1:")
+            p(str(b))
             file = bytearray(open(name, "rb").read())  # bytearray of file
             b.extend(file)
             p(f"b2: {b}")
