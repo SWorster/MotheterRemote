@@ -114,18 +114,22 @@ class Ser:
         Args:
             s (str): request to handle
         """
-        if s == "rsync list":
+        p("in rsync fn")
+        if "list" in s:
             p("Sending file list")
             self._send(self._get_file_list())
         else:  # must be asking for specific file
-            name = s.replace("rsync ", "")  # rest of request is path
+            name = s.replace("rsync ", "").strip()  # rest of request is path
             if not os.path.isfile(name):  # if wrong, ignore
                 p(f"path {name} not found")
             p(f"sending file {name}")
             b = bytearray(f"rsync {name}{EOL}", utf8)  # prepend file name
+            p(f"b1: {b}")
             file = bytearray(open(name, "rb").read())  # bytearray of file
             b.extend(file)
+            p(f"b2: {b}")
             b.extend(EOF.encode(utf8))  # EOF to finish
+            p(f"b3: {b}")
             self.s.write(b)  # send bytearray
             # self.s.write(open(name, "rb").read())  # send as bytes
 
@@ -150,6 +154,7 @@ class Ser:
                 fullPath = os.path.join(path, entry)
                 if os.path.isdir(fullPath):
                     file_list.extend(_all_file_list(fullPath))
+            p(str(file_list))
             return file_list
 
         l = _all_file_list(acc_data_path)
@@ -161,6 +166,7 @@ class Ser:
                 a.append(s)
         a.insert(0, f"rsync files")  # prepend header for parent processing
         s = EOL.join(a)  # join into a single string
+        print(s)
         return s
 
 
