@@ -96,7 +96,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         p(f"Received from {self.client_address[0]} in {cur_thread.name}: {self.data}")
         global output
         if "rsync" in self.data:
-            if not isinstance(output, lora_parent.Radio):
+            if isinstance(output, sensor.SQMLU or sensor.SQMLE):
                 return  # don't send rsync message to sensor
         try:
             output.rpi_to_client(self.data)  # forward message to radio/sensor

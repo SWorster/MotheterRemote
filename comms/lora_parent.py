@@ -1,5 +1,5 @@
 """
-Handles LoRa communications from main RPi.
+Handles LoRa communications for the main RPi.
 """
 
 import time
