@@ -131,6 +131,8 @@ class Ser:
             p(f"b2: {b}")
             b.extend(EOF.encode(utf8))  # EOF to finish
             p(f"b3: {b}")
+            st = b.decode()
+            p(f"st {st}")
             self.s.write(b)  # send bytearray
             # self.s.write(open(name, "rb").read())  # send as bytes
 
