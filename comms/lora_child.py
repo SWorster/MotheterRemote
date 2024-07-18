@@ -147,7 +147,7 @@ class Ser:
             #     p(str(e))
             #     p("oops???????")
 
-            b = bytearray(f"rsync {name} {EOL}", utf8)  # prepend file name
+            b = bytearray(f"rsync {short_name} {EOL}", utf8)  # prepend file name
             p(f"b1: {b.decode()}")
             # file = bytearray(open(name, "rb").read())  # bytearray of file
             # p(f"{file}")
