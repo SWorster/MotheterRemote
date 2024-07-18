@@ -5,7 +5,7 @@ Please update this file with the correct information for your setup before tryin
 """Info about the host computer. This should be a computer with a static IP."""
 host_data_path = "~/SQMdata"  # where to store collected data (not in repo)
 host_name = "skyeworster"
-host_addr = "10.10.26.80"  # ip or ddns, either should work #TODO should test this
+host_addr = "10.10.24.243"  # ip or ddns, either should work #TODO should test this
 
 
 """Info about RPi. Careful: this is the RPi that the server will talk to, which may or may not be the one attached to the sensor device."""
