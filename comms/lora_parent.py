@@ -25,7 +25,7 @@ short_s = configs.short_s
 
 rpi_data_path = configs.rpi_data_path
 
-echo = True
+echo = False
 
 
 class Radio:
