@@ -205,7 +205,7 @@ class Ser:
 def p(s: str) -> None:
     global echo
     if echo:
-        os.system(f"echo {s}")
+        os.system(f"echo '{s}'")
     else:
         print(s, flush=True)  # print, even if in thread
 
