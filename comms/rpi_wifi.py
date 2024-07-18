@@ -2,7 +2,6 @@
 Handles WiFi communication for the RPi. Forwards messages from host to radio/sensor, and from radio/sensor back to host.
 """
 
-import os
 import socket
 import time
 import threading
@@ -34,8 +33,6 @@ msg_len = configs.msg_len
 long_s = configs.long_s
 mid_s = configs.mid_s
 short_s = configs.short_s
-
-echo = False  # output to log file
 
 # global
 output: lora_parent.Radio | sensor.SQMLE | sensor.SQMLU
@@ -151,15 +148,12 @@ def _device_search() -> None:
 
 
 def p(s: str) -> None:
-    global echo
-    if echo:
-        os.system(f"echo {s}")
-    else:
-        print(s, flush=True)  # print, even if in thread
+    print(s, flush=True)  # print, even if in thread
 
 
 def main():
     """when program is run, creates server for Wifi connection from host, creates socket to send to host, sets up connection to lora radio or sensor."""
+    p("\n\n")
 
     global output, conn
 

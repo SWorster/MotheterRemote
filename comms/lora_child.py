@@ -30,8 +30,6 @@ long_s = configs.long_s
 mid_s = configs.mid_s
 short_s = configs.short_s
 
-echo = False  # print to log file
-
 
 class Ser:
     """serial connection for radio"""
@@ -52,9 +50,8 @@ class Ser:
         self.device.start_continuous_read()  # start device listener
         time.sleep(mid_s)
         self.radio = threading.Thread(target=self._listen_radio)  # run radio listener
-        self.sensor = threading.Thread(
-            target=self._listen_sensor
-        )  # run sensor listener
+        # run sensor listener
+        self.sensor = threading.Thread(target=self._listen_sensor)
         self.radio.start()
         self.sensor.start()
 
@@ -121,45 +118,21 @@ class Ser:
             p("Sending file list")
             self._send(self._get_file_list())
         else:  # must be asking for specific file
-            p("getting file...")
             name = s.replace("rsync ", "").strip()  # rest of request is path
             if not os.path.isfile(name):  # if wrong, ignore
-                p(f"path {name} not found")
-            p(f"reading file {name}")
+                p(f"Path {name} not found")
+            p(f"Reading file {name}")
 
             short = name.rfind("/")
             short_name = name[short + 1 :]
-            p(f"short name {short_name}")
-
-            # text = open(name, "r").read()
-            # p(text)
-
-            # try:
-            #     with open(name, "r") as file:
-            #         text = file.read()
-            #         message = f"rsync {short_name} {EOL}{text}"
-
-            #         # message = first + middle + last
-            #         p("FILE TO SEND")
-            #         p(message)
-            #         self.s.write(message.encode(utf8))
-            # except Exception as e:
-            #     p(str(e))
-            #     p("oops???????")
-
             b = bytearray(f"rsync {short_name} {EOL}", utf8)  # prepend file name
-            p(f"b1: {b.decode()}")
-            # file = bytearray(open(name, "rb").read())  # bytearray of file
-            # p(f"{file}")
             with open(name, "rb") as file:
                 text = file.read()
                 b.extend(text)
-                p(f"b2: {b.decode()}")
                 b.extend(EOF.encode(utf8))  # EOF to finish
-                p(f"b3: {b.decode()}")
+                p(f"File to send: {b.decode()}")
 
             self.s.write(b)  # send bytearray
-            # self.s.write(open(name, "rb").read())  # send as bytes
 
     def _get_file_list(self) -> str:
         """gets string list of all .dat files in the data directory on this rpi, with the corresponding date of modification
@@ -181,22 +154,19 @@ class Ser:
             try:
                 file_list = os.listdir(path)
             except:
-                print(f"cannot find directory {path}, returning")
+                print(f"Cannot find directory {path}, returning")
                 return []
             for entry in file_list:
-                p(f"{path}  /  {entry}")
                 fullPath = os.path.join(path, entry)
                 if os.path.isdir(fullPath):
                     to_return.extend(_all_file_list(fullPath))
                 if fullPath.endswith(".dat"):
                     to_return.append(fullPath)
-            p(str(to_return))
             return to_return
 
         l = _all_file_list(acc_data_path)
         a: list[str] = []
         a.append("rsync files")  # prepend header for parent processing
-        p(str(l))
         for file in l:
             if file.endswith(".dat"):  # filter for dat files
                 ctime = os.path.getmtime(file)  # seconds since 1970
@@ -208,12 +178,7 @@ class Ser:
 
 
 def p(s: str) -> None:
-    global echo
-
-    if echo:
-        os.system(f"echo '{s}'")
-    else:
-        print(s, flush=True)  # print, even if in thread
+    print(s, flush=True)  # print, even if in thread
 
 
 if __name__ == "__main__":
