@@ -1,0 +1,5 @@
+.venv/
+.vscode/
+.pycache/
+__pycache__/
+package-lock.json

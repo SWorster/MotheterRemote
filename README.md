@@ -25,6 +25,7 @@ To prevent your host/RPi IP address from changing, you can either request a stat
 - `sensor`: runs on main RPI, or accessory RPi if using a LoRa setup. Uses serial to communicate with the SQM sensor.
 - `/scripts/runradio.sh`: bash script to automatically run the radio program (lora_child)
 - `/scripts/runrpi.sh`: bash script to automatically run the RPi program (rpi_wifi)
+- - `/scripts/runsensor.sh`: bash script to automatically run the sensor module (Py3SQM)
 
 
 # Setup
@@ -45,11 +46,11 @@ Connect your RPi to power using the provided power cable. Connect a mouse and ke
 
 ## Connection Options
 
-Your host computer needs a reliable connection to the RPi. The two options to achieve this are Ethernet and WiFi. Ethernet hasn't been thoroughly tested for this project, so WiFi is recommended. For either connection option, setting up [SSH Key Sharing](#sshkey) is strongly recommended.
+Your host computer needs a reliable connection to the RPi. The two options to achieve this are Ethernet and WiFi. Ethernet hasn't been thoroughly tested for this project, so WiFi is recommended. For either connection option, setting up SSH key sharing is strongly recommended.
 
-### Ethernet {#ethernet}
+### Ethernet
 
-If your device will be connected to the host computer via Ethernet, follow the instructions in this section. Otherwise, continue to the [WiFi](#wifi) section below.
+If your device will be connected to the host computer via Ethernet, follow the instructions in this section. Otherwise, continue to the WiFi section below.
 
 Plug an Ethernet cable into your device, then find the network connection icon on the taskbar (when connected to WiFi, this looks like a fan. When connected to Ethernet, it looks like two arrows). Mousing over this icon will show your IP address(es), and clicking on it will show you the available LAN networks. Select **Advanced Options > Connection Information** to view more information about all active connections.
 
@@ -57,11 +58,11 @@ Connect your computer to Ethernet. It's important to note that your computer wil
 
 In a terminal, run the command `ssh rp1@rp1.local` and provide RPi's password to log in. You can now run commands on the RPi. Use Ctrl-D to exit the RPi.
 
-### WiFi {#wifi}
+### WiFi
 
 Mouse over the WiFi symbol on the RPi to view its IP. On your computer, run the command `ssh rp1@<IP>` and provide RPi's password to log in. You can now run commands on the RPi. Use Ctrl-D to exit the RPi.
 
-### SSH Key Sharing {#sshkey}
+### SSH Key Sharing
 
 If we want to use SSH for automated communication, we don't want our programs to sit around and wait for us to put the password in. We can make this automatic by creating and sharing an SSH key pair.
 
@@ -211,31 +212,7 @@ You'll need to edit the configs file with TBD
 
 ## Set up cronjobs
 
-We'll need to set up new cron jobs for the Raspberry Pi (or both, if using a radio setup).
-
-In a terminal, type `crontab -e` to add a new cron job. At the bottom of the file, insert:
-
-```bash
-* * * * * sudo chmod +x ~/MotheterRemote/scripts/runrpi.sh >> /tmp/perm 2>&1
-
-* * * * * cd ~/MotheterRemote/scripts ; ./runrpi.sh >> /tmp/debug 2>&1
-
-0 12 * * 0 rm /tmp/perm ; rm /tmp/debug ; rm /tmp/lora_child
-```
-
-For the radio RPi, add the following instead:
-
-```bash
-* * * * * sudo chmod +x ~/MotheterRemote/scripts/runradio.sh >> /tmp/perm 2>&1
-
-* * * * * cd ~/MotheterRemote/scripts ; ./runradio.sh >> /tmp/debug 2>&1
-
-0 12 * * 0 rm /tmp/perm ; rm /tmp/debug ; rm /tmp/rpi_wifi
-```
-
-The first line will ensure we have the authority to run the shell script, and the second actually runs it. We put the output of all of this into a file in the temporary directory, which we can use to debug in the case that something goes wrong. The third line clears the output files every Sunday at noon so that they don't hog the memory (this includes the output file for the shell script).
-
-After saving the files, run `sudo service cron reload` to update the changes. Wait a minute, then type `cat /tmp/filename` to view the logged output. `perm` will have output from the `chmod` command, which should be nothing if it works; `debug` will have info about whether the python file is running; the `rpi_wifi` or `lora_child` file will have the output of the corresponding program (the stuff that would normally print to the console).
+We'll need to set up new cron jobs for the Raspberry Pi (or both, if using a radio setup). Read the `scripts/cronjobs.txt` file to see which jobs to add where. In a terminal, type `crontab -e` to add a new cron job.
 
 #### Troubleshooting cron jobs
 
