@@ -147,6 +147,7 @@ class Ser:
             b = bytearray(f"rsync {name} ", utf8)  # prepend file name
             p(f"b1: {b.decode()}")
             file = bytearray(open(name, "rb").read())  # bytearray of file
+            p(str(file))
             b.extend(file)
             p(f"b2: {b.decode()}")
             b.extend(EOF.encode(utf8))  # EOF to finish
