@@ -3,8 +3,10 @@
 The Motheter project records images and SQM light sensor readings at field stations to track moth populations. This repository aims to simplify the data collection process by allowing remote access to the light sensor data. This version does not include the ability to transfer image data.
 
 There are two options for the sensor setup:
-1 - a host computer connects to an RPi over WiFi, which is directly connected to the SQM sensor.
-2 - a host computer connects to an RPi over WiFi, which uses a radio module to communicate with the RPi that's connected to the SQM sensor.
+
+- A host computer connects to an RPi over WiFi, which is directly connected to the SQM sensor.
+
+- A host computer connects to an RPi over WiFi, which uses a radio module to communicate with the RPi that's connected to the SQM sensor.
 
 Cellular compatibility has not yet been implemented. Existing code could be adapted for Ethernet, but this has not been tested.
 
