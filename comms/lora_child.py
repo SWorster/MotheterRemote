@@ -182,4 +182,5 @@ def p(s: str) -> None:
 
 
 if __name__ == "__main__":
+    p("\n\n")
     s = Ser()
