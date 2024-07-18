@@ -128,30 +128,32 @@ class Ser:
             short_name = name[short + 1 :]
             p(f"short name {short_name}")
 
-            text = open(name, "r").read()
-            p(text)
+            # text = open(name, "r").read()
+            # p(text)
 
-            try:
-                with open(name, "r") as file:
-                    text = file.read()
-                    message = f"rsync {short_name} {EOL}{text}"
+            # try:
+            #     with open(name, "r") as file:
+            #         text = file.read()
+            #         message = f"rsync {short_name} {EOL}{text}"
 
-                    # message = first + middle + last
-                    p("FILE TO SEND")
-                    p(message)
-                    self.s.write(message.encode(utf8))
-            except Exception as e:
-                p(str(e))
-                p("oops???????")
+            #         # message = first + middle + last
+            #         p("FILE TO SEND")
+            #         p(message)
+            #         self.s.write(message.encode(utf8))
+            # except Exception as e:
+            #     p(str(e))
+            #     p("oops???????")
 
             b = bytearray(f"rsync {name} ", utf8)  # prepend file name
             p(f"b1: {b.decode()}")
-            file = bytearray(open(name, "rb").read())  # bytearray of file
-            p(str(file))
-            b.extend(file)
-            p(f"b2: {b.decode()}")
-            b.extend(EOF.encode(utf8))  # EOF to finish
-            p(f"b3: {b.decode()}")
+            # file = bytearray(open(name, "rb").read())  # bytearray of file
+            # p(f"{file}")
+            with open(name, "rb") as file:
+                text = file.read()
+                b.extend(text)
+                p(f"b2: {b.decode()}")
+                b.extend(EOF.encode(utf8))  # EOF to finish
+                p(f"b3: {b.decode()}")
 
             self.s.write(b)  # send bytearray
             # self.s.write(open(name, "rb").read())  # send as bytes
