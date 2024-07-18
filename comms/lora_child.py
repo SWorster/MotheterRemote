@@ -64,17 +64,20 @@ class Ser:
         p(f"Radio listener running in {cur_thread.name}")
         self.live = True
         while self.live:
-            time.sleep(mid_s)
-            full_msg = self.s.read_until(EOF.encode(utf8))
-            msg_arr = full_msg.decode(utf8).split(EOL)
-            for msg in msg_arr:
-                time.sleep(short_s)
-                m = msg.strip()
-                p(f"Received over radio: {m}")
-                if "rsync" in m:
-                    self._rsync(m)
-                else:
-                    self.device.rpi_to_client(m)  # send command
+            try:
+                time.sleep(mid_s)
+                full_msg = self.s.read_until(EOF.encode(utf8))
+                msg_arr = full_msg.decode(utf8).split(EOL)
+                for msg in msg_arr:
+                    time.sleep(short_s)
+                    m = msg.strip()
+                    p(f"Received over radio: {m}")
+                    if "rsync" in m:
+                        self._rsync(m)
+                    else:
+                        self.device.rpi_to_client(m)  # send command
+            except Exception as e:
+                print(e)
 
     def _listen_sensor(self) -> None:
         """get incoming sensor messages, send them over radio"""
