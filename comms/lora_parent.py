@@ -49,14 +49,13 @@ class Radio:
         while self.live:
             time.sleep(short_s)
             full_msg = self.s.read_until(EOF.encode(utf8))
-            msg_arr = full_msg.decode(utf8).split(EOL)
-            for msg in msg_arr:
-                p(f"Received over radio: {msg}")
-                if "rsync" in msg:
-                    p("got rsync from radio")
-                    self._rsync_from_radio(msg)
-                else:
-                    p("regular message")
+            if "rsync".encode(utf8) in full_msg:
+                p("got rsync from radio")
+                self._rsync_from_radio(full_msg.decode(utf8))
+            else:
+                p("regular message")
+                msg_arr = full_msg.decode(utf8).split(EOL)
+                for msg in msg_arr:
                     self.data.append(msg)
 
     def _send(self, msg: str | list[str] = "rx") -> None:
