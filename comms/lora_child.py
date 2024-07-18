@@ -30,7 +30,7 @@ long_s = configs.long_s
 mid_s = configs.mid_s
 short_s = configs.short_s
 
-echo = True  # print to log file
+echo = False  # print to log file
 
 
 class Ser:
@@ -206,6 +206,7 @@ class Ser:
 
 def p(s: str) -> None:
     global echo
+
     if echo:
         os.system(f"echo '{s}'")
     else:
