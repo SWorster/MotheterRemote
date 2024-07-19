@@ -10,7 +10,7 @@ There are two options for the sensor setup:
 
 Cellular compatibility has not yet been implemented. Existing code could be adapted for Ethernet, but this has not been tested.
 
-All code relating to SQM sensor communication was unceremoniously copied from the Py3SQM project and has been extensively modified (bastardized). If you find yourself needing to debug or rework anything in that area, I recommend checking that project for assistance.
+All code relating to SQM sensor communication was copied from the Py3SQM project and has been extensively modified (bastardized). If you find yourself needing to debug or rework anything in that area, I recommend checking that project for assistance.
 
 This code suite was only tested on an SQM-LU device. The framework for an SQM-LE exists, but you will have to debug it yourself (sorry, not much I could do on that front without the actual device). I recommend looking at the original PY3SQM project to see how their version works.
 
