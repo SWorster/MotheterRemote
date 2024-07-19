@@ -39,6 +39,8 @@ output: lora_parent.Radio | sensor.SQMLE | sensor.SQMLU
 
 
 class Server:
+    """Socket server for incoming communications from host"""
+
     def __init__(self):
         p(f"Creating RPi server {rpi_addr}:{rpi_server}")
         socketserver.TCPServer.allow_reuse_address = True  # allows reconnecting
@@ -55,7 +57,7 @@ class Server:
         p(f"Server loop running in {server_thread.name}")
 
     def send_to_host(self, s: str) -> None:
-        """simple socket connection that forwards a single message to the host, then dies
+        """Simple socket connection that forwards a single message to the host, then dies
 
         Args:
             s (str): message to send
@@ -89,8 +91,9 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
         # when request comes in, decode and format it
         self.data = self.request.recv(msg_len).decode(utf8).strip()
-        cur_thread = threading.current_thread()
-        p(f"Received from {self.client_address[0]} in {cur_thread.name}: {self.data}")
+        p(
+            f"Received from {self.client_address[0]} in {threading.current_thread().name}: {self.data}"
+        )
         global output
         try:
             output.rpi_to_client(self.data)  # forward message to radio/sensor
@@ -102,10 +105,9 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
 
 def _loop() -> None:
-    """loops in a dedicated thread. pulls messages from the child connection's buffer and sends them."""
+    """Loops in a dedicated thread. Pulls messages from the child connection's buffer and sends them."""
     global output, conn
-    cur_thread = threading.current_thread()
-    p(f"Listener loop running in {cur_thread.name}")
+    p(f"Listener loop running in {threading.current_thread().name}")
     while True:
         time.sleep(mid_s)
         s = output.client_to_rpi()  # get messages from child
@@ -120,7 +122,7 @@ def _loop() -> None:
 
 
 def _device_search() -> None:
-    """determines whether a radio or sensor is connected by trying to create each device"""
+    """Determines whether a radio or sensor is connected by trying to create each device"""
     global output
 
     try:
@@ -148,11 +150,16 @@ def _device_search() -> None:
 
 
 def p(s: str) -> None:
-    print(s, flush=True)  # print, even if in thread
+    """Flushes buffer and prints. Enables print in threads
+
+    Args:
+        s (str): string to print
+    """
+    print(s, flush=True)
 
 
 def main():
-    """when program is run, creates server for Wifi connection from host, creates socket to send to host, sets up connection to lora radio or sensor."""
+    """When program is run, creates server for Wifi connection from host, creates socket to send to host, sets up connection to lora radio or sensor."""
     p("\n\n")
 
     global output, conn

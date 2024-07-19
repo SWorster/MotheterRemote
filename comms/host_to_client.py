@@ -29,9 +29,9 @@ rpi_repo = configs.rpi_repo
 
 # text encoding
 utf8 = configs.utf8
-EOF = configs.EOF  # end of file character
-EOL = configs.EOL  # end of line character
-msg_len = configs.msg_len  # length of message to send/receive
+EOF = configs.EOF
+EOL = configs.EOL
+msg_len = configs.msg_len
 
 # timing
 long_s = configs.long_s
@@ -39,7 +39,7 @@ mid_s = configs.mid_s
 short_s = configs.short_s
 
 # only change this for debugging
-remote_start = configs.remote_start  # force start the RPi's program
+remote_start = configs.remote_start
 
 # global
 allow_ui: bool = False  # whether ready to ask for user input
@@ -47,9 +47,12 @@ output: object
 
 
 class Server:
+    """Socket server to listen for incoming communications"""
+
     def __init__(self):
         print(f"Creating host server {host_addr}:{host_server}")
         socketserver.TCPServer.allow_reuse_address = True  # allows reconnecting
+
         # start TCP server
         try:
             self.server = socketserver.TCPServer(
@@ -111,11 +114,11 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         print(
             f"Received from {self.client_address[0]} in {cur_thread.name}: {self.data}"
         )
-        _prettify(self.data)  # print formatted data to terminal
+        _print_formatted(self.data)  # print formatted data to terminal
 
 
-def _start_listener():
-    """sends command to prompt RPi to start listening"""
+def _start_listener() -> None:
+    """Sends command to prompt RPi to start listening"""
     # nohup allows rpi_wifi.py to run even after terminal ends
     # & lets process run the the background
     s = [f"ssh {rpi_name}@{rpi_addr} 'cd {rpi_repo}; nohup python3 rpi_wifi.py' &"]
@@ -124,15 +127,15 @@ def _start_listener():
     to_kill.start()
 
 
-def _kill_listener():
-    """kills RPi program"""
+def _kill_listener() -> None:
+    """Kills RPi program via an SSH command"""
     s = f"ssh {rpi_name}@{rpi_addr} 'pkill -f rpi_wifi.py'"
     print("Sending command to RPi:", s)
     os.system(s)
 
 
-def _prettify(s: str) -> None:
-    """prints formatted response from RPi
+def _print_formatted(s: str) -> None:
+    """Prints formatted response from RPi
 
     Args:
         s (str): message to format
@@ -144,8 +147,8 @@ def _prettify(s: str) -> None:
     allow_ui = True  # allow next user input
 
 
-def _ui_loop():
-    """user input loop"""
+def _ui_loop() -> None:
+    """User input loop"""
     global conn, allow_ui
     while True:
         s = input("\nType message to send: ")
@@ -174,25 +177,25 @@ def _ui_loop():
                 pass
 
         conn.send_to_rpi(s)  # if message exists, send it
-        start = time.time()
+        start = time.time()  # set up timer to wait for response
         while (time.time() - start < 3) and allow_ui == False:
             pass  # do nothing until current prompt dealt with, or timeout
         allow_ui = False  # disallow user input
 
 
 def _rsync() -> None:
-    """runs rsync command. also sends an rsync trigger in case radio is used"""
+    """Runs rsync command. Sends an rsync trigger in case radio is used"""
     s = f"rsync -avz -e ssh {rpi_name}@{rpi_addr}:{rpi_data_path} {host_data_path}"
     os.system(s)
     conn.send_to_rpi("rsync")
 
 
 def main() -> None:
-    """starts server and listens for incoming communications"""
+    """Starts server and listens for incoming communications"""
     global conn, output
     conn = Server()  # start TCP server
 
-    l = threading.Thread(target=_ui_loop)
+    l = threading.Thread(target=_ui_loop)  # user input loop
     l.start()
 
 

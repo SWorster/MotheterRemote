@@ -1,5 +1,6 @@
 """
 Runs on the RPi that is directly connected to the sensor.
+This file is designed to run only on the RPi that is directly hooked up to the sensor. If it is run as main, it will just parse your arguments and print the sensor response. To get multiple sensor responses, create an SQM() instance from another program.
 """
 
 import sys
@@ -56,13 +57,13 @@ class SQM:
         time.sleep(short_s)
         self.start_connection()
 
-    def _clear_buffer(self):
-        """clears buffer and prints to console"""
+    def _clear_buffer(self) -> None:
+        """Clears buffer and prints to console"""
         print("Clearing buffer ... | ", end="")
         print(self._read_buffer(), "| ... DONE")
 
     def send_and_receive(self, s: str, tries: int = tries) -> str:
-        """sends and receives a single command. called from main
+        """Sends and receives a single command. called from main
 
         Args:
             command (str): command to send
@@ -92,36 +93,36 @@ class SQM:
         return m
 
     def start_continuous_read(self) -> None:
-        """starts listener"""
+        """Starts listener"""
         self.data: list[str] = []
         self.live = True
         self.t1 = threading.Thread(target=self._listen)  # listener in background
         self.t1.start()
 
     def stop_continuous_read(self) -> None:
-        """stops listener"""
+        """Stops listener"""
         self.live = False
         self.t1.join()
 
     def _listen(self):
-        """listener. runs in dedicated thread"""
+        """Listener. Runs in dedicated thread"""
         self.live
         while self.live:
             time.sleep(short_s)
             self._read_buffer()  # this stores the data
 
     def _return_collected(self) -> list[str]:
-        """clears data array, returns contents
+        """Clears data array, returns contents
 
         Returns:
             list[str]: data to return
         """
         d = self.data[:]  # pass by value, not reference
-        self.data.clear()
+        self.data.clear()  # clear buffer
         return d
 
     def rpi_to_client(self, s: str) -> None:
-        """sends a command to the sensor
+        """Sends a command to the sensor
 
         Args:
             s (str): command to send
@@ -130,7 +131,7 @@ class SQM:
         self._send_command(s)
 
     def client_to_rpi(self) -> list[str]:
-        """returns responses from sensor
+        """Returns responses from sensor
 
         Returns:
             list[str]: responses
@@ -233,7 +234,7 @@ class SQMLE(SQM):
         return m
 
     def _send_command(self, s: str) -> None:
-        """how the SQM_LE sends a command to the sensor
+        """SQM_LE sends a command to the sensor
 
         Args:
             s (str): the command to send
@@ -262,10 +263,7 @@ class SQMLU(SQM):
         self._clear_buffer()
 
     def _search(self) -> str:
-        """
-        Photometer search.
-        Name of the port depends on the platform.
-        """
+        """Photometer search. Name of the port depends on the platform."""
         ports_unix = ["/dev/ttyUSB" + str(num) for num in range(100)]
         ports_win = ["COM" + str(num) for num in range(100)]
 
@@ -320,7 +318,7 @@ class SQMLU(SQM):
         return m
 
     def _send_command(self, s: str) -> None:
-        """how the SQM_LU sends a command to the sensor
+        """SQM_LU sends a command to the sensor
 
         Args:
             s (str): the command to send
@@ -328,6 +326,15 @@ class SQMLU(SQM):
         self.s.write(s.encode(utf8))
 
     def send_and_receive(self, s: str, tries: int = tries) -> str:
+        """Deprecated way of sending a command and waiting for a response. However, there's no way to guarantee that the given response originated from the command that was sent.
+
+        Args:
+            s (str): command to send
+            tries (int, optional): number of attempts to make. Defaults to tries.
+
+        Returns:
+            str: _description_
+        """
         m: str = ""
         self._send_command(s)
         time.sleep(long_s)
@@ -350,7 +357,7 @@ class SQMLU(SQM):
 
 
 if __name__ == "__main__":
-    """This file is designed to run only on the RPi that is directly hooked up to the sensor. If it is run as main, it will just parse your arguments and print the sensor response. To get multiple sensor responses, create an SQM() instance from another program."""
+    """For debugging purposes. Parses command line arguments."""
     parser = argparse.ArgumentParser(
         prog="rpi_to_sensor.py",
         description="Sends a command to the sensor. If run as main, prints result.",
@@ -375,7 +382,7 @@ if __name__ == "__main__":
         d = SQMLE()
     else:
         d = SQMLU()  # default
-    # d = SQM()  # create device
+
     time.sleep(long_s)
     resp = d.send_and_receive(command)
     print(f"Sensor response: {resp}")
