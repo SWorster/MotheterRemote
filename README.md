@@ -148,11 +148,14 @@ If it worked, `/dev/ttyUSB_SQMsensor` will show up in light blue. If it didn’t
 
 ## Py3SQM
 
-The Py3SQM module is what we'll use to actually collect data.
+The Py3SQM module is what we'll use to actually collect data. It's included in the MotheterRemote repo, so you don't need to install it separately. Run the following commands to install a few dependencies:
 
-The USB stick that came with the SQM sensor has a few files you'll need. You can also access them through [this webpage](http://unihedron.com/projects/darksky/cd/index.html). Select **RPi**, then download `Py3SQM.zip`. Extract it by right-clicking and select **Extract Here**. You’ll get a bunch of files in a folder called Py3SQM; keep this on the desktop for easy access. It should contain a folder called `pysqm` containing the following: `common.py`, `__init__.py`, `__main__.py`, `main.py`, `plot.py`, `read.py`, `settings.py`. They may have been moved outside the pysqm folder when you extracted them; just remake the folder and put them back in.
+```bash
+sudo apt install python3-ephem
+sudo apt install python3-matplotlib
+```
 
-Read the README.txt to get a sense of what this all does. Then start following their instructions to modify `config.py`, elaborated here:
+Read the `README.txt` to get a sense of what this all does. Then start following their instructions to modify `config.py`, elaborated here:
 
 - Observatory
     - name = MacLeish
@@ -172,21 +175,19 @@ Read the README.txt to get a sense of what this all does. Then start following t
     - daily_data_directory = monthly_data_directory_+“/daily_data/”
     - daily_graph_directory = monthly_data_directory_+“/daily_graphs/”
 
+To run the module, navigate to the Py3SQM directory and run ```python -m pysqm```.
+
+### Fresh install
+
+You can also work from a separate installation of Py3SQM.
+
+The USB stick that came with the SQM sensor has Py3SQM on it, but you can also access it through [this webpage](http://unihedron.com/projects/darksky/cd/index.html). Select **RPi**, then download `Py3SQM.zip`. Extract it by right-clicking and select **Extract Here**. You’ll get a bunch of files in a folder called Py3SQM; keep this on the desktop for easy access. It should contain a folder called `pysqm` containing the following: `common.py`, `__init__.py`, `__main__.py`, `main.py`, `plot.py`, `read.py`, `settings.py`. They may have been moved outside the `pysqm` folder when you extracted them; just remake the folder and put them back in.
+
 You’ll also need to manually fix a bug. In the pysqm folder, open `plot.py`. At the top of the method `window_smooth`, write the following (be sure to only use spaces, NOT tabs):
 
 ```python
 if isinstance(x,list):
     x = np.array(x)
-```
-
-Finally, run the following commands:
-
-```bash
-sudo apt install python3-ephem
-sudo apt install python3-matplotlib
-cd Desktop
-cd Py3SQM
-python -m pysqm
 ```
 
 ### Troubleshooting
@@ -209,10 +210,9 @@ git clone https://github.com/SWorster/MotheterRemote
 
 ### Change the configs file
 
-You'll need to edit the configs file with TBD
+You'll need to edit the `configs` file with the appropriate data for your setup. Change the info for the host computer, main RPi, radio RPi (if applicable), sensor, and socket connection. It's not recommended to change values in the text formatting, timing, and miscellaneous sections.
 
-
-## Set up cronjobs
+### Set up cronjobs
 
 We'll need to set up new cron jobs for the Raspberry Pi (or both, if using a radio setup). Read the `scripts/cronjobs.txt` file to see which jobs to add where. In a terminal, type `crontab -e` to add a new cron job.
 
@@ -220,3 +220,6 @@ We'll need to set up new cron jobs for the Raspberry Pi (or both, if using a rad
 
 If you try to perform a git merge (like `git pull`) and your edits include changes to the shell scripts, git may require you to commit or stash your changes before merging. The simplest way to resolve this is `git reset --hard`. **Warning: this will discard any uncommited changes on the RPi.** I recommend making all code changes on a non-RPi computer for this reason, as you'll never need to keep track of what to save.
 
+## Running the repository
+
+There's no need to run anything on the RPis directly, as those programs will run automatically. Simply run `host_to_client.py` on the host computer.
