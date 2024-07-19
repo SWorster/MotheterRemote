@@ -12,7 +12,7 @@ host_addr = "10.10.41.171"  # ip or ddns for host computer
 rpi_name = "rp3"  # the username, not the hostname
 rpi_repo = "~/MotheterRemote/comms"  # path to this repo directory
 rpi_data_path = "/var/tmp/sqm_macleish/"  # where sensor stores its data (NOT in repo)
-rpi_addr = "10.10.9.11"  # ip or ddns address
+rpi_addr = "10.10.1.11"  # ip or ddns address
 
 
 """main RPi's radio connection, if applicable"""
