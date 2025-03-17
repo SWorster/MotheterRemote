@@ -126,14 +126,6 @@ def _device_search() -> None:
     global output
 
     try:
-        output = lora_parent.Radio()
-        return
-    except Exception as e:
-        p(str(e))
-        p(f"No radio found at port {configs.R_ADDR}")
-        p("Trying sensor connection...")
-
-    try:
         if device_type == "SQM-LU":
             output = sensor.SQMLU()
         elif device_type == "SQM-LE":
@@ -145,6 +137,14 @@ def _device_search() -> None:
     except Exception as e:
         p(str(e))
         p(f"SQM-LU or SQM-LE sensor not found.")
+        p("Trying radio connection...")
+
+    try:
+        output = lora_parent.Radio()
+        return
+    except Exception as e:
+        p(str(e))
+        p(f"No radio found at port {configs.R_ADDR}")
 
     p("No radio or sensor found. Please check connection!")
 
