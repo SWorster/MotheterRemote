@@ -69,6 +69,7 @@ class Server:
             sock.sendall(f"{s}".encode(utf8))  # send everything
             p(f"Sent: {s}")  # for debugging
         finally:
+            print(f"host_addr: {host_addr}, host_server: {host_server}")
             sock.close()  # die
 
 
