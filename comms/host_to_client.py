@@ -83,6 +83,7 @@ class Server:
         except Exception as e:
             print(e)  # print error without halting
             print("Client RPi might not be running rpi_wifi.py")
+            print(f"rpi_addr: {rpi_addr}, rpi_server: {rpi_server}")
             if remote_start:
                 _start_listener()  # force RPi to run rpi_wifi.py
                 time.sleep(long_s)  # give time for program to start before continuing
